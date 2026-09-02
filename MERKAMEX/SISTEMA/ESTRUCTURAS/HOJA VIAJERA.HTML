@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Hoja Viajera | MERKAMEX</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* ========================================================
+           1. VARIABLES DE TEMA (ESTILO MERKAMEX)
+           ======================================================== */
+        :root {
+            --bg-black: #050505;
+            --bg-card: rgba(15, 15, 18, 0.7);
+            --bg-glass: rgba(10, 10, 12, 0.85);
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #997A00;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --neon-blue: #00f3ff;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --border-glass: rgba(212, 175, 55, 0.2);
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --menu-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: var(--bg-black); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1;}
+
+        /* CANVAS FONDO ANIMADO */
+        #gold-network { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.4; }
+
+        /* ========================================================
+           2. UI DEL SISTEMA (MODO OSCURO Y MENÚ)
+           ======================================================== */
+        
+        /* MENÚ VERTICAL LATERAL (OCULTO) */
+        .side-nav { position: fixed; top: 0; left: calc(-1 * var(--menu-width)); width: var(--menu-width); height: 100%; background: var(--bg-glass); border-right: 1px solid var(--gold-primary); backdrop-filter: blur(15px); z-index: 1000; transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
+        .side-nav.open { left: 0; }
+        .side-nav-header { padding: 25px 20px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
+        .side-nav-title { font-weight: 800; color: var(--gold-primary); letter-spacing: 2px; font-size: 1.1rem; }
+        .btn-close-nav { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.3s; padding: 5px; }
+        .btn-close-nav:hover { color: var(--danger-color); }
+        .nav-menu { display: flex; flex-direction: column; list-style: none; padding: 15px 0; overflow-y: auto; flex: 1; }
+        .nav-item { padding: 15px 25px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; border-left: 3px solid transparent; display: flex; align-items: center; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
+        .nav-item.active { color: var(--gold-primary); border-left-color: var(--gold-primary); background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); text-shadow: 0 0 10px var(--gold-glow); }
+
+        /* PESTAÑA PARA ABRIR MENÚ */
+        .nav-toggle-tab { position: fixed; top: 50%; left: 0; transform: translateY(-50%); background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary)); width: 35px; height: 90px; display: flex; justify-content: center; align-items: center; border-radius: 0 8px 8px 0; cursor: pointer; z-index: 900; box-shadow: 2px 0 15px var(--gold-glow); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.8; }
+        .nav-toggle-tab:hover { opacity: 1; width: 45px; }
+        .nav-toggle-tab.open { left: var(--menu-width); border-radius: 0 8px 8px 0; background: var(--bg-card); border: 1px solid var(--gold-primary); border-left: none; width: 40px; }
+        .nav-toggle-tab svg { width: 20px; height: 20px; stroke: #000; transition: transform 0.4s; }
+        .nav-toggle-tab.open svg { stroke: var(--gold-primary); transform: rotate(180deg); }
+
+        /* OVERLAY PARA CERRAR MENÚ */
+        .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 990; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .nav-overlay.open { opacity: 1; visibility: visible; }
+
+        .app-header {
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px 40px; border-bottom: 1px solid var(--border-glass); 
+            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%); 
+            backdrop-filter: blur(10px); padding-left: 70px;
+        }
+        .header-title h1 { font-size: 1.4rem; font-weight: 800; color: var(--gold-primary); letter-spacing: 2px; }
+        .header-title p { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 3px; font-weight: 600; }
+        
+        .btn-volver { 
+            background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); 
+            padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; 
+            cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-volver:hover { background: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); color: #fff; }
+
+        .controls-bar {
+            margin: 20px 40px 20px 70px; padding: 20px; background: rgba(10,10,12,0.6); 
+            border: 1px solid var(--border-glass); border-radius: 8px;
+            display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-label { font-size: 0.75rem; font-weight: 700; color: var(--gold-light); text-transform: uppercase; }
+        .form-control {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); 
+            color: var(--text-main); padding: 10px 15px; border-radius: 4px; outline: none;
+            font-size: 0.85rem; min-width: 250px;
+        }
+        .form-control:focus { border-color: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); }
+
+        .btn-group { display: flex; gap: 10px; }
+        .btn {
+            padding: 10px 20px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; 
+            text-transform: uppercase; cursor: pointer; transition: all 0.3s; border: none; letter-spacing: 1px;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: var(--bg-black); }
+        .btn-primary:hover { box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
+        .btn-secondary { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); }
+        .btn-secondary:hover { border-color: var(--gold-primary); color: var(--gold-primary); }
+
+        /* ========================================================
+           3. DOCUMENTO HOJA VIAJERA (MODO BLANCO / IMPRESIÓN)
+           ======================================================== */
+        .document-wrapper { flex: 1; padding: 0 40px 40px 70px; overflow-x: auto; }
+        
+        .paper {
+            background-color: #ffffff; color: #000000;
+            width: 100%; min-width: 1000px; max-width: 1400px; margin: 0 auto;
+            padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 4px;
+            font-family: Arial, sans-serif; /* Fuente estándar para documentos impresos */
+        }
+
+        .paper-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            margin-bottom: 20px; font-size: 14px; font-weight: bold;
+        }
+        
+        .data-grid {
+            width: 100%; border-collapse: collapse; border: 1px solid #000;
+            margin-bottom: 15px; font-size: 12px; font-weight: bold;
+        }
+        .data-grid td { border: 1px solid #000; padding: 4px 8px; }
+        .bg-beige { background-color: #f5eedc; } /* Color crema del encabezado */
+
+        .route-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        .route-table th { 
+            border: 1px solid #000; padding: 6px; text-align: center;
+            background-color: #f5eedc; font-weight: bold;
+        }
+        .route-table td { border: 1px solid #000; padding: 2px; text-align: center; height: 28px; }
+        
+        /* Inputs dentro del papel transparente para que parezcan texto */
+        .paper input, .paper select {
+            width: 100%; border: none; background: transparent; padding: 6px;
+            font-size: 11px; outline: none; font-family: Arial, sans-serif;
+            text-align: center; color: #000;
+        }
+        .paper input[type="text"].text-left { text-align: left; }
+        .paper input:focus, .paper select:focus { background-color: rgba(212, 175, 55, 0.1); }
+        
+        .btn-delete-row { 
+            background: var(--danger-color); color: white; border: none; 
+            padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 10px;
+        }
+
+        /* ========================================================
+           4. CONFIGURACIÓN ESTRICTA DE IMPRESIÓN (CARTA HORIZONTAL)
+           ======================================================== */
+        @media print {
+            @page { size: letter landscape; margin: 5mm; }
+            body { background: white; -webkit-print-color-adjust: exact; padding: 0; margin: 0; width: 100%; }
+            #gold-network { display: none !important; }
+            .app-header, .controls-bar, .no-print, .btn-delete-row, .side-nav, .nav-toggle-tab, .nav-overlay { display: none !important; }
+            
+            .document-wrapper { padding: 0; overflow: visible; width: 100%; }
+            
+            /* Se agrega MARCO INTERNO DE 5MM y box-sizing para evitar recortes */
+            .paper { 
+                box-shadow: none; 
+                border-radius: 0; 
+                padding: 5mm !important; 
+                width: 100%; 
+                max-width: 100%; 
+                min-width: auto !important; 
+                box-sizing: border-box !important; 
+            }
+            
+            table { width: 100%; max-width: 100%; }
+            
+            .paper select { appearance: none; -webkit-appearance: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- FONDO ANIMADO CANVAS -->
+    <canvas id="gold-network"></canvas>
+
+    <!-- PESTAÑA LATERAL PARA ABRIR MENÚ -->
+    <div class="nav-toggle-tab no-print" id="nav-toggle" onclick="toggleNav()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </div>
+
+    <!-- OVERLAY PARA CERRAR MENÚ AL HACER CLIC FUERA -->
+    <div class="nav-overlay no-print" id="nav-overlay" onclick="toggleNav()"></div>
+
+    <!-- MENÚ LATERAL DESPLEGABLE -->
+    <nav class="side-nav no-print" id="side-nav">
+        <div class="side-nav-header">
+            <span class="side-nav-title">MENÚ MÓDULO</span>
+            <button class="btn-close-nav" onclick="toggleNav()">✕</button>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Piso / Avance</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nueva OT</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nuevo Proyecto</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Centros Trabajo</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Recursos</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Historial</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Códigos Artículo</li>
+            <li class="nav-item" onclick="window.location.href='CONTROL DE RUTAS DE PRODUCCION.HTML'">Rutas Operación</li>
+            <li class="nav-item active" onclick="toggleNav()">Hoja Viajera</li>
+        </ul>
+    </nav>
+
+    <header class="app-header no-print">
+        <div class="header-title">
+            <h1>MERKAMEX / HOJA VIAJERA</h1>
+            <p>MÓDULO DE CONTROL DE PRODUCCIÓN</p>
+        </div>
+        <div>
+            <a href="ESTRUCTURAS.HTML" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> VOLVER AL SISTEMA</a>
+        </div>
+    </header>
+
+    <div class="controls-bar no-print">
+        <div class="form-group">
+            <label class="form-label">SELECCIONAR ORDEN DE TRABAJO (OT)</label>
+            <select class="form-control" id="select-ot" onchange="cargarOT()">
+                <option value="">-- SELECCIONE UNA OT PARA GENERAR --</option>
+            </select>
+        </div>
+        
+        <div class="btn-group">
+            <button class="btn btn-secondary" onclick="agregarFilaVacia()"><i class="fa-solid fa-plus"></i> Fila Vacía</button>
+            <button class="btn btn-secondary" onclick="limpiarPantalla()"><i class="fa-solid fa-eraser"></i> Limpiar</button>
+            <button class="btn btn-primary" onclick="window.print()" style="background: var(--neon-blue); color: #000;"><i class="fa-solid fa-print"></i> Imprimir</button>
+        </div>
+    </div>
+
+    <div class="document-wrapper">
+        <div class="paper" id="documento-imprimir">
+            
+            <div class="paper-header">
+                <div>HOJA VIAJERA</div>
+                <div>MERKAMEX</div>
+                <div id="doc-fecha">DD/MM/AA</div>
+            </div>
+
+            <table class="data-grid">
+                <tr>
+                    <td style="width: 10%;">CODIGO</td>
+                    <td colspan="2" style="text-align: center;" class="bg-beige" id="doc-proy">PROYECTO DESCRIPCIÓN</td>
+                    <td style="width: 15%; text-align: center;">CANTIDAD</td>
+                    <td style="width: 15%; text-align: center;">OT</td>
+                </tr>
+                <tr>
+                    <td id="doc-cod">---</td>
+                    <td colspan="2" id="doc-desc">---</td>
+                    <td style="text-align: center;" id="doc-cant">0</td>
+                    <td style="text-align: center;" id="doc-ot">---</td>
+                </tr>
+            </table>
+
+            <table class="route-table">
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">CT</th>
+                        <th style="width: 8%;">CR</th>
+                        <th style="width: 25%;">DESCRIPCION</th>
+                        <th style="width: 10%;">FECHA</th>
+                        <th style="width: 12%;">OPERADOR</th>
+                        <th style="width: 7%;">INICIO</th>
+                        <th style="width: 7%;">FINAL</th>
+                        <th style="width: 5%;">PZ</th>
+                        <th style="width: 5%;">MERMA</th>
+                        <th style="width: 10%;">TIEMPO/PREPARACION</th>
+                        <th style="width: 3%;" class="no-print"></th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-procesos">
+                    </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <script>
+        /* ========================================================
+           Lógica del Menú
+           ======================================================== */
+        function toggleNav() {
+            const sideNav = document.getElementById('side-nav');
+            const toggleTab = document.getElementById('nav-toggle');
+            const overlay = document.getElementById('nav-overlay');
+            
+            sideNav.classList.toggle('open');
+            
+            if (sideNav.classList.contains('open')) {
+                toggleTab.classList.add('open');
+                overlay.classList.add('open');
+                toggleTab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>';
+            } else {
+                toggleTab.classList.remove('open');
+                overlay.classList.remove('open');
+                toggleTab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+            }
+        }
+
+        /* ========================================================
+           BASE DE DATOS SIMULADA (Extracción de tu sistema)
+           ======================================================== */
+        const DB = {
+            proyectos: [
+                { id: "PRO1995", cliente: "LUIS RODRIGO CRUZ GONZALES", nombre: "PRO1995 LUIS RODRIGO CRUZ" },
+                { id: "PRO2000", cliente: "BACHOCO", nombre: "PRO2000 BACHOCO HERMOSILLO" }
+            ],
+            ots: [
+                {
+                    ot: "OT61943", proyectoId: "PRO2000", articulo: "E2401094", descArticulo: "Trabe de Solera 3/16\" x 3/4\" y Angulo 1/8\" x 1 1/4\" P/Caseta de 11.00Mts.", pzTotales: 132,
+                    ruta: [
+                        { ct: "CT0101", cr: "CR0102", desc: "Centro de Corte EST" },
+                        { ct: "CT0107", cr: "CR0117", desc: "Centro de Soldadura EST" },
+                        { ct: "CT0902", cr: "CR0902", desc: "Centro Pintura Aspersion PNT" }
+                    ]
+                },
+                {
+                    ot: "OT61911", proyectoId: "PRO1995", articulo: "E2501020", descArticulo: "ARMADURA DE VIGA IPR 12\"", pzTotales: 4,
+                    ruta: [
+                        { ct: "CT0100", cr: "CR0100", desc: "CENTRO DE CORTE - SIERRA CINTA" },
+                        { ct: "CT0119", cr: "CR0119", desc: "CENTRO DE ARMADO EST" }
+                    ]
+                }
+            ]
+        };
+
+        // Al cargar la página
+        window.onload = () => {
+            const hoy = new Date();
+            const dia = String(hoy.getDate()).padStart(2, '0');
+            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            const anio = String(hoy.getFullYear()).slice(-2); 
+            document.getElementById('doc-fecha').textContent = `${dia}/${mes}/${anio}`;
+
+            cargarSelectores();
+            limpiarTabla(true); 
+
+            // Iniciar partículas
+            initCanvas(); 
+            drawCanvas();
+        };
+
+        function cargarSelectores() {
+            const select = document.getElementById('select-ot');
+            DB.ots.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.ot;
+                opt.textContent = `${o.ot} - ${o.articulo}`;
+                select.appendChild(opt);
+            });
+        }
+
+        /* ========================================================
+           LÓGICA DE TABLA Y ESTRUCTURA DE FILAS
+           ======================================================== */
+        function cargarOT() {
+            const otId = document.getElementById('select-ot').value;
+            if(!otId) return limpiarTabla(true);
+
+            const dataOT = DB.ots.find(o => o.ot === otId);
+            const proy = DB.proyectos.find(p => p.id === dataOT.proyectoId);
+
+            document.getElementById('doc-proy').textContent = proy.nombre.toUpperCase();
+            document.getElementById('doc-cod').textContent = dataOT.articulo;
+            document.getElementById('doc-desc').textContent = dataOT.descArticulo;
+            document.getElementById('doc-cant').textContent = dataOT.pzTotales;
+            document.getElementById('doc-ot').textContent = dataOT.ot;
+
+            const tbody = document.getElementById('tabla-procesos');
+            tbody.innerHTML = '';
+            
+            dataOT.ruta.forEach(paso => {
+                agregarFilaData({ ct: paso.ct || '', cr: paso.cr || '', desc: paso.desc || '' });
+                for(let i = 0; i < 4; i++) {
+                    agregarFilaVacia();
+                }
+            });
+        }
+
+        function agregarFilaData(datos) {
+            const tbody = document.getElementById('tabla-procesos');
+            const tr = document.createElement('tr');
+            
+            tr.innerHTML = `
+                <td><input type="text" value="${datos.ct || ''}" placeholder=""></td>
+                <td><input type="text" value="${datos.cr || ''}" placeholder=""></td>
+                <td><input type="text" value="${datos.desc || ''}" class="text-left" placeholder=""></td>
+                <td><input type="text" value=""></td>
+                <td><input type="text" value=""></td>
+                <td><input type="text" value=""></td>
+                <td><input type="text" value=""></td>
+                <td><input type="text" value=""></td>
+                <td><input type="text" value=""></td>
+                <td><input type="text" value=""></td>
+                <td class="no-print"><button class="btn-delete-row" onclick="this.closest('tr').remove();"><i class="fa-solid fa-trash"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function agregarFilaVacia() {
+            agregarFilaData({ ct: '', cr: '', desc: '' });
+        }
+
+        function limpiarTabla(incluirEncabezado = false) {
+            document.getElementById('tabla-procesos').innerHTML = '';
+            
+            for(let i=0; i<5; i++) agregarFilaVacia(); 
+
+            if(incluirEncabezado) {
+                document.getElementById('doc-proy').textContent = 'PROYECTO DESCRIPCIÓN';
+                document.getElementById('doc-cod').textContent = '---';
+                document.getElementById('doc-desc').textContent = '---';
+                document.getElementById('doc-cant').textContent = '0';
+                document.getElementById('doc-ot').textContent = '---';
+            }
+        }
+        
+        function limpiarPantalla() {
+            document.getElementById('select-ot').value = '';
+            cargarOT(); 
+        }
+
+        /* ========================================================
+           CANVAS BACKGROUND ANIMATION (RED DORADA)
+           ======================================================== */
+        const canvas = document.getElementById('gold-network');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            const pc = width < 768 ? 30 : 60;
+            for(let i=0; i<pc; i++) particles.push({ x: Math.random()*width, y: Math.random()*height, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4, r: Math.random()*1.5+0.5 });
+        }
+        function drawCanvas() {
+            requestAnimationFrame(drawCanvas);
+            ctx.clearRect(0,0,width,height);
+            ctx.fillStyle = 'rgba(212, 175, 55, 0.5)';
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x<0 || p.x>width) p.vx*=-1; if(p.y<0 || p.y>height) p.vy*=-1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
+            });
+            for(let i=0; i<particles.length; i++){
+                for(let j=i+1; j<particles.length; j++){
+                    let dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
+                    if(dist<140){
+                        ctx.beginPath(); ctx.strokeStyle=`rgba(212, 175, 55, ${(1-(dist/140))*0.15})`; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        window.addEventListener('resize', initCanvas);
+
+    </script>
+</body>
+</html>
