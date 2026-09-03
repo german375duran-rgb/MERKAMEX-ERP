@@ -245,7 +245,7 @@
                 </div>
             </section>
 
-            <section class="card" id="seccion-info-artículo" style="display: none;">
+            <section class="card" id="seccion-info-articulo" style="display: none;">
                 <div class="card-header">
                     DATOS DEL artículo
                     <span id="badge-estado-ruta" class="badge"></span>
@@ -487,8 +487,10 @@
         /* --------------------------------------------------------
            3. BUSCADOR DE articulos
            -------------------------------------------------------- */
-        function buscarArticulo() {
-            const query = document.getElementById('input-busqueda').value.toLowerCase().trim();
+                function buscarArticulo() {
+            const inputVal = document.getElementById('input-busqueda').value;
+            if(!inputVal) return;
+            const query = inputVal.toLowerCase().trim();
             const tbody = document.getElementById('tbody-resultados');
             const tableDiv = document.getElementById('resultados-busqueda');
             
@@ -497,40 +499,50 @@
                 return;
             }
 
-            document.getElementById('seccion-info-artículo').style.display = 'none';
+            document.getElementById('seccion-info-articulo').style.display = 'none';
             document.getElementById('seccion-ruta').style.display = 'none';
 
-            tbody.innerHTML = '';
+            let resultadosHtml = '';
             
-            const resultados = appDb.articulos.filter(a => 
-                a.id.toLowerCase().includes(query) || 
-                a.nombre.toLowerCase().includes(query) || 
-                a.desc.toLowerCase().includes(query)
-            );
+            // Limit to max 100 results for massive performance boost
+            let matches = 0;
+            const maxResults = 100;
 
-            if (resultados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger-color);">âœ• EL artículo NO EXISTE EN EL CATÁLOGO.</td></tr>`;
-            } else {
-                resultados.forEach(art => {
-                    const rutaInfo = appDb.rutas.find(r => r.id_articulo === art.id);
+            for (let i = 0; i < appDb.articulos.length; i++) {
+                const a = appDb.articulos[i];
+                const safeId = a.id ? a.id.toLowerCase() : '';
+                const safeNombre = a.nombre ? a.nombre.toLowerCase() : '';
+                const safeDesc = a.desc ? a.desc.toLowerCase() : '';
+
+                if (safeId.includes(query) || safeNombre.includes(query) || safeDesc.includes(query)) {
+                    const rutaInfo = appDb.rutas.find(r => r.id_articulo === a.id);
                     const tieneRuta = !!rutaInfo;
                     
                     const badgeStr = tieneRuta ? `<span class="badge bg-success">ACTIVA</span>` : `<span class="badge bg-warning">SIN RUTA</span>`;
                     const btnAccion = tieneRuta 
-                        ? `<button class="btn btn-secondary" onclick="seleccionarArticulo('${art.id}')"><i class="fa-solid fa-eye"></i> VER RUTA</button>`
-                        : `<button class="btn btn-primary" onclick="seleccionarArticulo('${art.id}')"><i class="fa-solid fa-plus"></i> CREAR RUTA</button>`;
+                        ? `<button class="btn btn-secondary" onclick="seleccionarArticulo('${a.id}')"><i class="fa-solid fa-eye"></i> VER RUTA</button>`
+                        : `<button class="btn btn-primary" onclick="seleccionarArticulo('${a.id}')"><i class="fa-solid fa-plus"></i> CREAR RUTA</button>`;
 
-                    tbody.innerHTML += `
+                    resultadosHtml += `
                         <tr>
-                            <td><strong style="color:var(--gold-light)">${art.id}</strong></td>
-                            <td><strong>${art.nombre}</strong><br><span style="font-size:0.7rem; color:var(--text-muted)">${art.desc}</span></td>
-                            <td>${tieneRuta ? rutaInfo.id_ruta : 'â€”'}</td>
+                            <td><strong style="color:var(--gold-light)">${a.id}</strong></td>
+                            <td><strong>${a.nombre}</strong><br><span style="font-size:0.7rem; color:var(--text-muted)">${a.desc}</span></td>
+                            <td>${tieneRuta ? rutaInfo.id_ruta : '--'}</td>
                             <td>${badgeStr}</td>
                             <td>${btnAccion}</td>
                         </tr>
                     `;
-                });
+                    matches++;
+                    if(matches >= maxResults) break;
+                }
             }
+
+            if (matches === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger-color);">⚠️ EL ARTÍCULO NO EXISTE EN EL CATÁLOGO.</td></tr>`;
+            } else {
+                tbody.innerHTML = resultadosHtml;
+            }
+            
             tableDiv.style.display = 'block';
         }
 
@@ -1045,6 +1057,7 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
 
 
 
