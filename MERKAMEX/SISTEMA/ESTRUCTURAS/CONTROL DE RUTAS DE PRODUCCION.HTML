@@ -948,6 +948,7 @@ async function procesarExcelGrid() {
         const trs = tbody.querySelectorAll('tr');
         let procesadas = 0;
         let currentArticulo = "";
+        let currentNombre = "";
         
         let nuevasRutas = {}; 
         
@@ -958,7 +959,10 @@ async function procesarExcelGrid() {
             const art = tds[0].innerText.trim();
             const artNombre = tds[1].innerText.trim();
             
-            if(art) currentArticulo = art; 
+            if(art) {
+                currentArticulo = art;
+                currentNombre = artNombre || "Art. " + art;
+            }
             if(!currentArticulo) return;
             
             const seq = parseInt(tds[2].innerText.trim());
@@ -972,16 +976,12 @@ async function procesarExcelGrid() {
                 nuevasRutas[currentArticulo] = {
                     id_ruta: "RT-" + currentArticulo + "-" + Math.floor(Math.random()*1000), 
                     id_articulo: currentArticulo,
-                    nombre_articulo: artNombre || "Art. " + currentArticulo,
+                    nombre_articulo: currentNombre,
                     estado: "ACTIVA",
                     operaciones: []
                 };
             }
             
-            if (artNombre && nuevasRutas[currentArticulo].nombre_articulo.startsWith("Art. ")) {
-                nuevasRutas[currentArticulo].nombre_articulo = artNombre;
-            }
-
             nuevasRutas[currentArticulo].operaciones.push({
                 seq: seq,
                 ct: ct,
@@ -1020,9 +1020,15 @@ async function procesarExcelGrid() {
         }
         
         await guardarDB();
-        renderRutas();
         cerrarModal('modal-importacion');
-        showToast("Se cargaron " + Object.keys(nuevasRutas).length + " rutas con éxito.");
+        
+        // Refrescar búsqueda si hay algo escrito
+        const searchInput = document.getElementById('search-input');
+        if (searchInput && searchInput.value) {
+            buscarArticulo();
+        }
+        
+        showToast("Se guardaron " + Object.keys(nuevasRutas).length + " rutas con éxito en Firebase.");
     } catch (error) {
         alert("ERROR INTERNO: " + error.message);
         console.error(error);
@@ -1031,6 +1037,7 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
 
 
 
