@@ -225,8 +225,8 @@
             <section class="card search-section no-print">
                 <div class="card-header">BUSCAR artículo</div>
                 <div style="display: flex; gap: 15px;">
-                    <input type="text" id="input-busqueda" class="form-control" placeholder="Ingrese código o descripción del artículo (Ej. ART-001 o Panel)..." onkeyup="buscarartículo()">
-                    <button class="btn btn-primary" onclick="buscarartículo()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                    <input type="text" id="input-busqueda" class="form-control" placeholder="Ingrese código o descripción del artículo (Ej. ART-001 o Panel)..." onkeyup="buscarArticulo()">
+                    <button class="btn btn-primary" onclick="buscarArticulo()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                 </div>
                 
                 <div id="resultados-busqueda" class="table-responsive" style="display: none; margin-top: 20px;">
@@ -264,7 +264,7 @@
                     <span><i class="fa-solid fa-route"></i> DETALLE DE RUTA: <span id="lbl-ruta-id" style="color:var(--text-main)"></span></span>
                     <div class="no-print" style="display: flex; gap: 10px;">
                         <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
-                        <button class="btn btn-success" id="btn-add-op" onclick="agregarFilaOperación()"><i class="fa-solid fa-plus"></i> Agregar Operación</button>
+                        <button class="btn btn-success" id="btn-add-op" onclick="agregarFilaOperacion()"><i class="fa-solid fa-plus"></i> Agregar Operación</button>
                     </div>
                 </div>
 
@@ -287,7 +287,7 @@
                 </div>
 
                 <div class="summary-grid">
-                    <div class="summary-item"><span>TOTAL OperaciónES</span><strong id="res-ops">0</strong></div>
+                    <div class="summary-item"><span>TOTAL operaciones</span><strong id="res-ops">0</strong></div>
                     <div class="summary-item"><span>TIEMPO TOTAL (MIN/PZ)</span><strong id="res-tiempo" style="color: var(--neon-blue);">0.00</strong></div>
                     <div class="summary-item"><span>CT DISTINTOS</span><strong id="res-ct">0</strong></div>
                     <div class="summary-item"><span>CR DISTINTOS</span><strong id="res-cr">0</strong></div>
@@ -409,7 +409,7 @@
            1. MOCK DATA (Datos Iniciales si localStorage estÃ¡ vacÃ­o)
            -------------------------------------------------------- */
         const defaultData = {
-            artículos: [
+            articulos: [
                 { id: "ART-001", nombre: "Panel Lateral", desc: "Panel lateral metÃ¡lico 2mm", unidad: "PZA", familia: "LÃ¡mina" },
                 { id: "ART-002", nombre: "Base Estructural", desc: "Base H-Beam principal", unidad: "PZA", familia: "Estructuras" },
                 { id: "ART-003", nombre: "Soporte Frontal", desc: "Soporte tipo L", unidad: "PZA", familia: "Placas" },
@@ -431,8 +431,8 @@
             ],
             rutas: [
                 {
-                    id_ruta: "RT-0001", id_artículo: "ART-001", estado: "ACTIVA",
-                    Operaciónes: [
+                    id_ruta: "RT-0001", id_articulo: "ART-001", estado: "ACTIVA",
+                    operaciones: [
                         { seq: 10, ct: "CT-001", cr: "CR-001", tiempo: 2.5 },
                         { seq: 20, ct: "CT-002", cr: "CR-003", tiempo: 1.2 }
                     ]
@@ -442,7 +442,7 @@
 
         // Estado de la aplicaciÃ³n
         let appDb = {};
-        let currentartículo = null;
+        let currentArticulo = null;
         let currentRutaOps = []; 
         let lastGeneredRouteId = null;
         let datosAImportar = null;
@@ -485,9 +485,9 @@
         }
 
         /* --------------------------------------------------------
-           3. BUSCADOR DE artículoS
+           3. BUSCADOR DE articulos
            -------------------------------------------------------- */
-        function buscarartículo() {
+        function buscarArticulo() {
             const query = document.getElementById('input-busqueda').value.toLowerCase().trim();
             const tbody = document.getElementById('tbody-resultados');
             const tableDiv = document.getElementById('resultados-busqueda');
@@ -502,7 +502,7 @@
 
             tbody.innerHTML = '';
             
-            const resultados = appDb.artículos.filter(a => 
+            const resultados = appDb.articulos.filter(a => 
                 a.id.toLowerCase().includes(query) || 
                 a.nombre.toLowerCase().includes(query) || 
                 a.desc.toLowerCase().includes(query)
@@ -512,13 +512,13 @@
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger-color);">âœ• EL artículo NO EXISTE EN EL CATÁLOGO.</td></tr>`;
             } else {
                 resultados.forEach(art => {
-                    const rutaInfo = appDb.rutas.find(r => r.id_artículo === art.id);
+                    const rutaInfo = appDb.rutas.find(r => r.id_articulo === art.id);
                     const tieneRuta = !!rutaInfo;
                     
                     const badgeStr = tieneRuta ? `<span class="badge bg-success">ACTIVA</span>` : `<span class="badge bg-warning">SIN RUTA</span>`;
                     const btnAccion = tieneRuta 
-                        ? `<button class="btn btn-secondary" onclick="seleccionarartículo('${art.id}')"><i class="fa-solid fa-eye"></i> VER RUTA</button>`
-                        : `<button class="btn btn-primary" onclick="seleccionarartículo('${art.id}')"><i class="fa-solid fa-plus"></i> CREAR RUTA</button>`;
+                        ? `<button class="btn btn-secondary" onclick="seleccionarArticulo('${art.id}')"><i class="fa-solid fa-eye"></i> VER RUTA</button>`
+                        : `<button class="btn btn-primary" onclick="seleccionarArticulo('${art.id}')"><i class="fa-solid fa-plus"></i> CREAR RUTA</button>`;
 
                     tbody.innerHTML += `
                         <tr>
@@ -537,16 +537,16 @@
         /* --------------------------------------------------------
            4. SELECCIÃ“N Y CARGA DE RUTA
            -------------------------------------------------------- */
-        function seleccionarartículo(idartículo) {
-            currentartículo = appDb.artículos.find(a => a.id === idartículo);
-            const rutaExistente = appDb.rutas.find(r => r.id_artículo === idartículo);
+        function seleccionarArticulo(idArticulo) {
+            currentArticulo = appDb.articulos.find(a => a.id === idArticulo);
+            const rutaExistente = appDb.rutas.find(r => r.id_articulo === idArticulo);
 
             document.getElementById('resultados-busqueda').style.display = 'none';
 
-            document.getElementById('lbl-art-cod').textContent = currentartículo.id;
-            document.getElementById('lbl-art-desc').textContent = currentartículo.nombre + " - " + currentartículo.desc;
-            document.getElementById('lbl-art-uni').textContent = currentartículo.unidad;
-            document.getElementById('lbl-art-fam').textContent = currentartículo.familia;
+            document.getElementById('lbl-art-cod').textContent = currentArticulo.id;
+            document.getElementById('lbl-art-desc').textContent = currentArticulo.nombre + " - " + currentArticulo.desc;
+            document.getElementById('lbl-art-uni').textContent = currentArticulo.unidad;
+            document.getElementById('lbl-art-fam').textContent = currentArticulo.familia;
             
             const badge = document.getElementById('badge-estado-ruta');
             
@@ -556,7 +556,7 @@
                 badge.textContent = 'âœ“ RUTA ENCONTRADA';
                 
                 lastGeneredRouteId = rutaExistente.id_ruta;
-                currentRutaOps = JSON.parse(JSON.stringify(rutaExistente.Operaciónes)); 
+                currentRutaOps = JSON.parse(JSON.stringify(rutaExistente.operaciones)); 
             } else {
                 document.getElementById('lbl-art-ruta').textContent = "POR ASIGNAR";
                 badge.className = 'badge bg-warning';
@@ -574,7 +574,7 @@
         }
 
         /* --------------------------------------------------------
-           5. RENDERIZADO Y EDICIÃ“N DE TABLA DE OperaciónES
+           5. RENDERIZADO Y EDICIÃ“N DE TABLA DE operaciones
            -------------------------------------------------------- */
                 function renderTablaRuta() {
             const tbody = document.getElementById('tbody-ruta');
@@ -585,8 +585,8 @@
                 let ctEncontrado = appDb.centrosTrabajo.find(c => c.id === op.ct);
                 let crEncontrado = appDb.recursos.find(c => c.id === op.cr);
                 
-                const ctDesc = ctEncontrado?.desc || op.desc_Operación || '';
-                const crDesc = crEncontrado?.desc || op.desc_Operación || '';
+                const ctDesc = ctEncontrado?.desc || op.desc_operacion || '';
+                const crDesc = crEncontrado?.desc || op.desc_operacion || '';
 
                 let ctSelectHtml = <select class="table-select" onchange="actualizarCT(${index}, this.value)">;
                 ctSelectHtml += <option value="">-- SELECCIONE CT --</option>;
@@ -621,20 +621,20 @@
                         <td style="color:var(--text-muted); font-size:0.75rem; font-weight:bold; color:var(--gold-light);"></td>
                         <td><input type="number" step="0.01" min="0" class="table-input" value="${op.tiempo}" onchange="actualizarDatoFila(${index}, 'tiempo', this.value)" style="text-align:right;"></td>
                         <td class="no-print" style="text-align:center;">
-                            <button class="btn-danger" onclick="eliminarOperación(${index})" title="Eliminar Operación"><i class="fa-solid fa-trash"></i></button>
+                            <button class="btn-danger" onclick="eliminarOperacion(${index})" title="Eliminar Operación"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 ;
             });
 
             if(currentRutaOps.length === 0) {
-                tbody.innerHTML = <tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin Operaciónes asignadas. Presione "+ Agregar Operación".</td></tr>;
+                tbody.innerHTML = <tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar Operación".</td></tr>;
             }
 
             calcularTotalesResumen();
         }
 
-        function agregarFilaOperación() {
+        function agregarFilaOperacion() {
             let nextSeq = 10;
             if (currentRutaOps.length > 0) {
                 const maxSeq = Math.max(...currentRutaOps.map(o => parseInt(o.seq) || 0));
@@ -645,7 +645,7 @@
             renderTablaRuta();
         }
 
-        function eliminarOperación(index) {
+        function eliminarOperacion(index) {
             currentRutaOps.splice(index, 1);
             renderTablaRuta();
         }
@@ -687,7 +687,7 @@
            6. GUARDAR Y CANCELAR (VALIDACIONES)
            -------------------------------------------------------- */
         function guardarRuta() {
-            if(!currentartículo) return;
+            if(!currentArticulo) return;
 
             if (currentRutaOps.length === 0) {
                 alert("âš  ValidaciÃ³n: Debe existir al menos una Operación en la ruta.");
@@ -707,17 +707,17 @@
 
             currentRutaOps.sort((a,b) => a.seq - b.seq);
 
-            const indexRuta = appDb.rutas.findIndex(r => r.id_artículo === currentartículo.id);
+            const indexRuta = appDb.rutas.findIndex(r => r.id_articulo === currentArticulo.id);
             
             if (indexRuta >= 0) {
-                appDb.rutas[indexRuta].Operaciónes = JSON.parse(JSON.stringify(currentRutaOps));
+                appDb.rutas[indexRuta].operaciones = JSON.parse(JSON.stringify(currentRutaOps));
             } else {
                 appDb.rutas.push({
                     id_ruta: lastGeneredRouteId,
-                    id_artículo: currentartículo.id,
+                    id_articulo: currentArticulo.id,
                     estado: "ACTIVA",
                     fecha_creacion: new Date().toISOString().split('T')[0],
-                    Operaciónes: JSON.parse(JSON.stringify(currentRutaOps))
+                    operaciones: JSON.parse(JSON.stringify(currentRutaOps))
                 });
             }
 
@@ -731,7 +731,7 @@
 
         function cancelarCambios() {
             if(confirm("Â¿EstÃ¡s seguro de cancelar? Se perderÃ¡n las modificaciones no guardadas.")) {
-                seleccionarartículo(currentartículo.id); 
+                seleccionarArticulo(currentArticulo.id); 
             }
         }
 
@@ -795,7 +795,7 @@
                 let errorFila = false;
 
                 if(!codArt) { errores.push({ f: numFila, a: 'N/A', err: 'Falta código de artículo.'}); errorFila = true; }
-                else if (!appDb.artículos.some(a => a.id === codArt)) { errores.push({ f: numFila, a: codArt, err: 'artículo no existe en CATÁLOGO.'}); errorFila = true; }
+                else if (!appDb.articulos.some(a => a.id === codArt)) { errores.push({ f: numFila, a: codArt, err: 'artículo no existe en CATÁLOGO.'}); errorFila = true; }
                 
                 if(!codRuta) { errores.push({ f: numFila, a: codArt, err: 'Falta código de ruta.'}); errorFila = true; }
                 if(isNaN(seq) || seq <= 0) { errores.push({ f: numFila, a: codArt, err: 'Secuencia invÃ¡lida.'}); errorFila = true; }
@@ -808,9 +808,9 @@
 
                 if(!errorFila) {
                     validos++;
-                    if(!rutasMap[codArt]) rutasMap[codArt] = { id_ruta: codRuta, Operaciónes: [] };
-                    rutasMap[codArt].Operaciónes.push({ seq: seq, ct: ct, cr: cr,
-            desc_Operación: (tds[8] ? tds[8].innerText.trim() : ''), tiempo: tiempo });
+                    if(!rutasMap[codArt]) rutasMap[codArt] = { id_ruta: codRuta, operaciones: [] };
+                    rutasMap[codArt].operaciones.push({ seq: seq, ct: ct, cr: cr,
+            desc_operacion: (tds[8] ? tds[8].innerText.trim() : ''), tiempo: tiempo });
                 }
             });
 
@@ -846,20 +846,20 @@
             let creadas = 0;
             let actualizadas = 0;
 
-            for(const [idartículo, data] of Object.entries(datosAImportar)) {
-                data.Operaciónes.sort((a,b) => a.seq - b.seq);
+            for(const [idArticulo, data] of Object.entries(datosAImportar)) {
+                data.operaciones.sort((a,b) => a.seq - b.seq);
                 
-                const idx = appDb.rutas.findIndex(r => r.id_artículo === idartículo);
+                const idx = appDb.rutas.findIndex(r => r.id_articulo === idArticulo);
                 if(idx >= 0) {
-                    appDb.rutas[idx].Operaciónes = data.Operaciónes;
+                    appDb.rutas[idx].operaciones = data.operaciones;
                     appDb.rutas[idx].id_ruta = data.id_ruta;
                     actualizadas++;
                 } else {
                     appDb.rutas.push({
                         id_ruta: data.id_ruta,
-                        id_artículo: idartículo,
+                        id_articulo: idArticulo,
                         estado: "ACTIVA",
-                        Operaciónes: data.Operaciónes
+                        operaciones: data.operaciones
                     });
                     creadas++;
                 }
@@ -869,8 +869,8 @@
             cerrarModal('modal-importacion');
             showToast(`IMPORTACIÃ“N COMPLETADA: ${creadas} nuevas, ${actualizadas} actualizadas.`);
             
-            if(currentartículo && datosAImportar[currentartículo.id]) {
-                seleccionarartículo(currentartículo.id);
+            if(currentArticulo && datosAImportar[currentArticulo.id]) {
+                seleccionarArticulo(currentArticulo.id);
             }
         }
 
@@ -955,7 +955,7 @@ async function procesarExcelGrid() {
         const tbody = document.getElementById('excel-grid-body');
         const trs = tbody.querySelectorAll('tr');
         let procesadas = 0;
-        let currentartículo = "";
+        let currentArticulo = "";
         let currentNombre = "";
         
         let nuevasRutas = {}; 
@@ -968,10 +968,10 @@ async function procesarExcelGrid() {
             const artNombre = tds[1].innerText.trim();
             
             if(art) {
-                currentartículo = art;
+                currentArticulo = art;
                 currentNombre = artNombre || "Art. " + art;
             }
-            if(!currentartículo) return;
+            if(!currentArticulo) return;
             
             const seq = parseInt(tds[2].innerText.trim());
             const ct = tds[3].innerText.trim();
@@ -980,21 +980,21 @@ async function procesarExcelGrid() {
             
             if(isNaN(seq) || !ct || !cr) return; 
             
-            if(!nuevasRutas[currentartículo]) {
-                nuevasRutas[currentartículo] = {
-                    id_ruta: "RT-" + currentartículo + "-" + Math.floor(Math.random()*1000), 
-                    id_artículo: currentartículo,
-                    nombre_artículo: currentNombre,
+            if(!nuevasRutas[currentArticulo]) {
+                nuevasRutas[currentArticulo] = {
+                    id_ruta: "RT-" + currentArticulo + "-" + Math.floor(Math.random()*1000), 
+                    id_articulo: currentArticulo,
+                    nombre_articulo: currentNombre,
                     estado: "ACTIVA",
-                    Operaciónes: []
+                    operaciones: []
                 };
             }
             
-            nuevasRutas[currentartículo].Operaciónes.push({
+            nuevasRutas[currentArticulo].operaciones.push({
                 seq: seq,
                 ct: ct,
                 cr: cr,
-                desc_Operación: (tds[9] ? tds[9].innerText.trim() : ''),
+                desc_operacion: (tds[9] ? tds[9].innerText.trim() : ''),
                 tiempo: tiempo
             });
             procesadas++;
@@ -1007,23 +1007,23 @@ async function procesarExcelGrid() {
         
         if(!appDb) appDb = {};
         if(!appDb.rutas) appDb.rutas = [];
-        if(!appDb.artículos) appDb.artículos = [];
+        if(!appDb.articulos) appDb.articulos = [];
         
         for(let art in nuevasRutas) {
-            appDb.rutas = appDb.rutas.filter(r => r.id_artículo !== art);
+            appDb.rutas = appDb.rutas.filter(r => r.id_articulo !== art);
             appDb.rutas.push(nuevasRutas[art]);
             
-            let existingArt = appDb.artículos.find(a => a.id === art);
+            let existingArt = appDb.articulos.find(a => a.id === art);
             if(!existingArt) {
-                appDb.artículos.push({ 
+                appDb.articulos.push({ 
                     id: art, 
-                    nombre: nuevasRutas[art].nombre_artículo, 
+                    nombre: nuevasRutas[art].nombre_articulo, 
                     desc: "Importado masivamente", 
                     unidad: "PZA", 
                     familia: "General" 
                 });
             } else {
-                existingArt.nombre = nuevasRutas[art].nombre_artículo;
+                existingArt.nombre = nuevasRutas[art].nombre_articulo;
             }
         }
         
@@ -1033,7 +1033,7 @@ async function procesarExcelGrid() {
         // Refrescar búsqueda si hay algo escrito
         const searchInput = document.getElementById('search-input');
         if (searchInput && searchInput.value) {
-            buscarartículo();
+            buscarArticulo();
         }
         
         showToast("Se guardaron " + Object.keys(nuevasRutas).length + " rutas con éxito en Firebase.");
@@ -1045,6 +1045,9 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
+
+
 
 
 
