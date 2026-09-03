@@ -832,13 +832,6 @@
             guardarPiso();
             renderCatalogos();
         }
-            } else {
-                appDb.catalogos.ct_cr[ctCode] = appDb.catalogos.ct_cr[ctCode].filter(c => c !== crCode);
-            }
-            
-            guardarPiso();
-            renderCatalogos();
-        }
         /* ========================================================
            CONTROL DEL PANEL LATERAL Y VISTAS
            ======================================================== */
@@ -1544,6 +1537,7 @@
     </div>
 </body>
 </html>
+
 
 
 
