@@ -734,14 +734,9 @@
         /* --------------------------------------------------------
            7. CARGA MASIVA DE RUTAS (EXCEL)
            -------------------------------------------------------- */
-        function abrirModalImportacion() {
-            document.getElementById('file-excel').value = "";
-            document.getElementById('preview-importacion').style.display = 'none';
-            document.getElementById('tabla-errores-container').style.display = 'none';
-            document.getElementById('btn-confirmar-import').style.display = 'none';
-            datosAImportar = null;
-            
-            document.getElementById('modal-importacion').classList.add('active'); iniciarGrid();
+                function abrirModalImportacion() {
+            document.getElementById('modal-importacion').classList.add('active');
+            iniciarGrid();
         }
 
         function cerrarModal(id) {
@@ -1011,4 +1006,5 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
 
