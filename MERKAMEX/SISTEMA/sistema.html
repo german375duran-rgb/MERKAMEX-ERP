@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -141,6 +141,13 @@
 
     <div class="dashboard-wrapper">
         
+                <!-- BOTÓN CERRAR SESIÓN -->
+        <div style="position: fixed; top: 25px; left: 25px; z-index: 90;">
+            <button onclick="cerrarSesion()" style="background: rgba(231,76,60,0.1); border: 1px solid #e74c3c; color: #e74c3c; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s;" onmouseover="this.style.background='#e74c3c'; this.style.color='#fff';" onmouseout="this.style.background='rgba(231,76,60,0.1)'; this.style.color='#e74c3c';">
+                <i class="fa-solid fa-power-off"></i> CERRAR SESIÓN
+            </button>
+        </div>
+
         <!-- PANEL DE USUARIO -->
         <div class="user-panel" id="btn-open-profile" onclick="abrirModal()">
             <img src="" alt="Avatar" class="user-panel-avatar" id="panel-avatar">
@@ -400,6 +407,14 @@
         }
 
         const modal = document.getElementById('profile-modal');
+                function cerrarSesion() {
+            if(confirm("¿Estás seguro de que deseas cerrar sesión?")) {
+                localStorage.removeItem("operadorActivo");
+                localStorage.removeItem("codigoActivo");
+                window.location.href = "../index.html";
+            }
+        }
+
         function abrirModal() { modal.classList.add('active'); cancelarEdicion(); }
         function cerrarModal() { modal.classList.remove('active'); }
         modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); });
@@ -558,3 +573,4 @@
     </script>
 </body>
 </html>
+
