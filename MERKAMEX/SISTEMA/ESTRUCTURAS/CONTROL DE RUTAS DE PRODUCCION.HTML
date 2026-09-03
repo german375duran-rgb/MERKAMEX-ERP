@@ -550,199 +550,210 @@
         /* --------------------------------------------------------
            4. SELECCIÃ“N Y CARGA DE RUTA
            -------------------------------------------------------- */
-        function seleccionarArticulo(idArticulo) {
-            currentArticulo = appDb.articulos.find(a => a.id === idArticulo);
-            const rutaExistente = appDb.rutas.find(r => r.id_articulo === idArticulo);
+            var diccCT = {
+      "CT0101": "Centro de Corte EST", "CT0102": "Centro de Rolado EST", "CT0103": "Centro de Barrenado EST", "CT0104": "Centro de Troquelado EST", "CT0105": "Centro de Roscado EST", "CT0106": "Centro de Doblado EST", "CT0107": "Centro de Soldadura EST", "CT0108": "Centro Montacargas EST", "CT0109": "Centro de Armado EST",
+      "CT0201": "Centro de Estirado Automatico ALB", "CT0202": "Centro de Estirado Manual ALB", "CT0203": "Centro de Roscado ALB", "CT0204": "Centro de Formado ALB", "CT0205": "Centro de Punteado Automatico ALB", "CT0206": "Centro de Punteado Manual ALB", "CT0207": "Centro de Recorte ALB", "CT0208": "Centro de Doblado ALB", "CT0209": "Centro de Troquelado ALB", "CT0210": "Centro de Empaque ALB", "CT0211": "Centro de Galvanizado ALB", 
+      "CT0301": "Centro de Inyección PLC", "CT0302": "Centro de Extrusión PLC", "CT0303": "Centro de Acondicionado PLC", "CT0304": "Centro Mezclado de Material PLC", "CT0305": "Centro de Empaque PLC", "CT0306": "Centro de Mano de obra Maestro PLC", 
+      "CT0401": "Centro de Torneado TRN", "CT0402": "Centro de Fresado TRN", "CT0403": "Centro de Cepillado TRN", "CT0404": "Centro de Barrenado TRN", "CT0405": "Centro de Machueleado TRN", "CT0406": "Centro de Prensado TRN", "CT0407": "Centro de Perfilado TRN", "CT0408": "Centro de Rectificado TRN", "CT0409": "Centro de Erosionado TRN", "CT0410": "Centro de Corte TRN", "CT0411": "Centro de Torno CNC TRN", "CT0412": "Centro Revolver TRN", "CT0413": "Centro de Ensamblado TRN", "CT0414": "Centro de Avellanado TRN", "CT0415": "Centro de Empaque TRN", 
+      "CT0501": "Centro de Corte MCN", "CT0502": "Centro de Rolado MCN", "CT0503": "Centro de Terminaciones MCN", "CT0504": "Centro de Doblado MCN", "CT0505": "Centro de Soldadura MCN", "CT0506": "Centro de Ensamblaje MCN", "CT0507": "Centro de Barrenado MCN", "CT0508": "Centro de Empaque MCN", "CT0509": "Centro de Acabados MCN", 
+      "CT0601": "Empaque Paileria PAI", "CT0602": "Centro Instalaciones PAI", "CT0603": "Centro Corte PAI", "CT0604": "Centro de Rolado PAI", "CT0605": "Centro de Doblado PAI", "CT0606": "Centro de Armado PAI", "CT0607": "Centro de Soldadura PAI", "CT0608": "Centro de Transporte PAI", "CT0609": "Centro de Barrenado PAI", "CT0610": "Centro de Servicios PAI", 
+      "CT0701": "Centro de Corte EXH", "CT0702": "Centro de Rolado EXH", "CT0703": "Centro de Doblado EXH", "CT0704": "Centro de Armado EXH", "CT0705": "Centro de Punteado EXH", "CT0706": "Centro de Barrenado EXH", "CT0707": "Centro Pintura Electrostatica EXH", "CT0708": "Centro de Ensamblado EXH", "CT0709": "Centro de Pegado de Artes EXH", "CT0710": "Centro de Empaque EXH", 
+      "CT0801": "Centro de Mano de Obra Maestro ELE", "CT0802": "Centro de Mano de Obra Ayudante ELE", "CT0803": "Centro de Servicios ELE", 
+      "CT0901": "Centro Pintura Estopa PNT", "CT0902": "Centro Pintura Aspersion PNT", "CT0903": "Centro Pintura Manual PNT", 
+      "CT1001": "Centro de Nivelado-Corte Lamina CRT", "CT1002": "Centro de Punzonado Corte CRT", "CT1003": "Centro de Corte Laser CRT", "CT1004": "Centro de Corte Plasma CRT", "CT1005": "Centro de Programacion CRT", 
+      "CT1101": "Centro de Instalaciones INS"
+    };
 
-            document.getElementById('resultados-busqueda').style.display = 'none';
+    var diccCT_CR = {
+      "CT0101": ["CR0101", "CR0102", "CR0103", "CR0104", "CR0105"], "CT0102": ["CR0106"], "CT0103": ["CR0107"], "CT0104": ["CR0108", "CR0109", "CR0110", "CR0111", "CR0112"], "CT0105": ["CR0113"], "CT0106": ["CR0114"], "CT0107": ["CR0115", "CR0116", "CR0117"], "CT0108": ["CR0118"], "CT0109": ["CR0119"],
+      "CT0201": ["CR0201", "CR0202"], "CT0202": ["CR0203"], "CT0203": ["CR0204"], "CT0204": ["CR0205", "CR0206"], "CT0205": ["CR0207", "CR0208", "CR0209", "CR0210", "CR0211", "CR0212"], "CT0206": ["CR0213", "CR0214", "CR0215", "CR0216", "CR0217", "CR0218", "CR0219", "CR0220"], "CT0207": ["CR0221", "CR0222", "CR0223", "CR0224", "CR0225", "CR0226", "CR0227", "CR0228", "CR0229", "CR0230"], "CT0208": ["CR0231"], "CT0209": ["CR0232"], "CT0210": ["CR0233"], "CT0211": ["CR0236"],
+      "CT0301": ["CR0301", "CR0302", "CR0303"], "CT0302": ["CR0304", "CR0305", "CR0306"], "CT0303": ["CR0307", "CR0308"], "CT0304": ["CR0309"], "CT0305": ["CR0310"], "CT0306": ["CR0311"],
+      "CT0401": ["CR0401", "CR0402", "CR0403", "CR0404"], "CT0402": ["CR0405"], "CT0403": ["CR0406"], "CT0404": ["CR0407"], "CT0405": ["CR0408"], "CT0406": ["CR0409"], "CT0407": ["CR0410"], "CT0408": ["CR0411"], "CT0409": ["CR0412"], "CT0410": ["CR0413", "CR0414"], "CT0411": ["CR0415", "CR0416"], "CT0412": ["CR0417"], "CT0413": ["CR0418"], "CT0414": ["CR0419"], "CT0415": ["CR0420"],
+      "CT0501": ["CR0501", "CR0502"], "CT0502": ["CR0503", "CR0504", "CR0505"], "CT0503": ["CR0506", "CR0507"], "CT0504": ["CR0508", "CR0509", "CR0510", "CR0511", "CR0512"], "CT0505": ["CR0513", "CR0514", "CR0515"], "CT0506": ["CR0516", "CR0517"], "CT0507": ["CR0518"], "CT0508": ["CR0519"], "CT0509": ["CR0520"],
+      "CT0601": ["CR0601"], "CT0602": ["CR0602", "CR0603"], "CT0603": ["CR0604", "CR0605"], "CT0604": ["CR0606"], "CT0605": ["CR0607"], "CT0606": ["CR0608"], "CT0607": ["CR0609"], "CT0608": ["CR0610"], "CT0609": ["CR0611"], "CT0610": ["CR0612"],
+      "CT0701": ["CR0701"], "CT0702": ["CR0702"], "CT0703": ["CR0703"], "CT0704": ["CR0704", "CR0705"], "CT0705": ["CR0706"], "CT0706": ["CR0707"], "CT0707": ["CR0708"], "CT0708": ["CR0709"], "CT0709": ["CR0710"], "CT0710": ["CR0711"],
+      "CT0801": ["CR0801"], "CT0802": ["CR0802"], "CT0803": ["CR0803"],
+      "CT0901": ["CR0901"], "CT0902": ["CR0902"], "CT0903": ["CR0903"],
+      "CT1001": ["CR1001"], "CT1002": ["CR1002"], "CT1003": ["CR1003", "CR1004"], "CT1004": ["CR1005"], "CT1005": ["CR1006"],
+      "CT1101": ["CR1101", "CR1102", "CR1103", "CR1104", "CR1105"]
+    };
 
-            document.getElementById('lbl-art-cod').textContent = currentArticulo.id;
-            document.getElementById('lbl-art-desc').textContent = currentArticulo.nombre + " - " + currentArticulo.desc;
-            document.getElementById('lbl-art-uni').textContent = currentArticulo.unidad;
-            document.getElementById('lbl-art-fam').textContent = currentArticulo.familia;
+    var diccCR = {
+      "CR0101": "Centro Corte Sierra Cinta", "CR0102": "Centro Corte Metalera Bufalo", "CR0103": "Centro Corte Plasma Est.", "CR0104": "Centro Cortadora de Disco Est.", "CR0105": "Centro Corte Soplete Est.", "CR0106": "Centro Rolado RN100", "CR0107": "Centro Taladro Fundoya-Barrenado", "CR0108": "Centro Troqueladora Comamet", "CR0109": "Centro Troqueladora Bufalo", "CR0110": "Centro Troqueladora de Monten", "CR0111": "Centro Troqueladora MEISTER 90", "CR0112": "Centro Troqueladora MEISTER 120", "CR0113": "Centro Roscado", "CR0114": "Centro Doblez Icaro", "CR0115": "Centro Soldadura Polin", "CR0116": "Centro Soldadura 1Per", "CR0117": "Centro Soldadura (2 Personas)", "CR0118": "Centro de Montacargas", "CR0119": "Centro Armado (2 Personas)",
+      "CR0201": "Centro Estirado Automático", "CR0202": "Corte de Alambre", "CR0203": "Centro Estirado Manual", "CR0204": "Centro Birlo", "CR0205": "Centro Wafios 1", "CR0206": "Centro Wafios 2", "CR0207": "Centro Schlatter 1", "CR0208": "Centro Schlatter 2", "CR0209": "Centro Schlatter 3", "CR0210": "Centro Schlatter 4", "CR0211": "Centro Posiweld 1", "CR0212": "Centro Posiweld 2", "CR0213": "Centro Punteado 1", "CR0214": "Centro Punteado 2", "CR0215": "Centro Punteado 3", "CR0216": "Centro Punteado 4", "CR0217": "Centro Punteado 5", "CR0218": "Centro Punteado 6", "CR0219": "Centro Punteado 7", "CR0220": "Centro Punteado 8", "CR0221": "Centro Terminación Recorte 1", "CR0222": "Centro Terminación Recorte 2", "CR0223": "Centro Terminación Recorte 3", "CR0224": "Centro Terminación Recorte 4", "CR0225": "Centro Terminación Recorte 5", "CR0226": "Centro Terminación Recorte 6", "CR0227": "Centro Terminación Recorte 7", "CR0228": "Centro Terminación Recorte 8", "CR0229": "Centro Terminación Recorte 9", "CR0230": "Centro Terminación Recorte 10", "CR0231": "Centro Terminación Doblez 1", "CR0232": "Centro Terminación Ventana", "CR0233": "Centro Empaque Alambre", "CR0236": "Centro Galvanizado",
+      "CR0301": "Centro Inyección Engel", "CR0302": "Centro Inyección Haitian", "CR0303": "Centro Inyección Negri Bossi", "CR0304": "Centro Extrusión SJSZ 1", "CR0305": "Centro Extrusión SJSZ 2", "CR0306": "Centro Extrusión Baussano", "CR0307": "Centro Curvado y Acampanado", "CR0308": "Centro Pegado Silleta", "CR0309": "Centro Mezclado", "CR0310": "Centro de Empaque Plásticos", "CR0311": "vacio",
+      "CR0401": "Centro Torneado", "CR0402": "Maquinado externo", "CR0403": "Centro Ajuste Tornos", "CR0404": "Centro de Trabajo Desbaste Tornos", "CR0405": "Centro Fresado", "CR0406": "Centro Cepillado", "CR0407": "Centro Barrenado Tornos", "CR0408": "Centro Machueleado", "CR0409": "Centro Prensado Tornos", "CR0410": "Centro Perfilado", "CR0411": "Centro Rectificado", "CR0412": "Centro Erosionado", "CR0413": "Centro Corte Sierra Cinta #1", "CR0414": "Centro Corte Sierra Cinta #2", "CR0415": "Centro Torno CNC", "CR0416": "Centro CNC Vertical", "CR0417": "Centro Revolver", "CR0418": "Centro Ensamblado Tornos", "CR0419": "Avellanado Tornos", "CR0420": "Empaque Tornos",
+      "CR0501": "Centro Cortado Mec.", "CR0502": "Centro Corte Disco Mec.", "CR0503": "Centro Rolado Comedero (4Per)", "CR0504": "Centro Rolado Bipie-Riel", "CR0505": "Centro Rolado Columna", "CR0506": "Centro Punzonado Unipunch", "CR0507": "Centro Troquelado Mec.", "CR0508": "Centro Doblado Mec.", "CR0509": "Centro Prensa Mec.", "CR0510": "Centro Machucado Mec.", "CR0511": "Centro de Engargolado", "CR0512": "Centro Prensado Accurpress", "CR0513": "Centro de Klinchado", "CR0514": "Centro Soldado Mec.", "CR0515": "Punteado Mec.", "CR0516": "Centro Armado Mec.", "CR0517": "Centro Ensamblado Mec.", "CR0518": "Centro Barrenado Mec.", "CR0519": "Empaque y Emplayado", "CR0520": "Centro Pulido Mec.",
+      "CR0601": "Empaque Paileria", "CR0602": "Paileria-Inst. Foranea", "CR0603": "Paileria-Inst. Torres y Tambos", "CR0604": "Centro Corte Disco Paileria", "CR0605": "Centro Corte Cizalla Paileria", "CR0606": "Centro de Rolado Paileria", "CR0607": "Centro de Doblado Paileria", "CR0608": "Centro de Armado Paileria", "CR0609": "Centro de Soldado Paileria", "CR0610": "Vuelta de Camioneta", "CR0611": "Centro de Barrenado Paileria", "CR0612": "vacio",
+      "CR0701": "Centro de Corte Exhibidores", "CR0702": "Centro de Rolado Exhibidores", "CR0703": "Centro de Doblez Exhibidores", "CR0704": "Centro de Punteado Soldadura Exhibidores", "CR0705": "Centro de Armado y Soldadura Exhibidores", "CR0706": "Centro de Punteado de Cenefas Exhibidores", "CR0707": "Centro de Barrenado Exhibidores", "CR0708": "Centro Pintura Electrostatica", "CR0709": "Centro de Ensamblado Exhibidores", "CR0710": "Centro de Pegado de Artes Exhibidores", "CR0711": "Centro de Empaque Exhibidores",
+      "CR0801": "Centro Electrificacion (Miguel)", "CR0802": "Centro Electrificacion (Ayudante)", "CR0803": "vacio",
+      "CR0901": "Centro Pintura Estopa", "CR0902": "Centro Pintura Aspersion", "CR0903": "Centro Pintura Manual",
+      "CR1001": "Centro Nivelado-Corte Lamina", "CR1002": "Centro Amada", "CR1003": "Centro Bystronic Nitrogeno 1", "CR1004": "Centro Bystronic Nitrogeno 2", "CR1005": "Centro Corte Plasma", "CR1006": "vacio",
+      "CR1101": "Centro Instalaciones", "CR1102": "Instalacion Electrica", "CR1103": "Instalacion de Sist. de Llenado", "CR1104": "Inst. de Bases", "CR1105": "Inst. Armar y Tapar"
+    };
+
+    function abrirPantallaCompletaRuta() {
+        let modal = document.getElementById('modal-editor-ruta');
+        if(!modal) {
+            modal = document.createElement('div');
+            modal.id = 'modal-editor-ruta';
+            modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-black); z-index:9999; overflow-y:auto; padding:40px;';
+            document.body.appendChild(modal);
+
+            const header = document.createElement('div');
+            header.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;';
             
-            const badge = document.getElementById('badge-estado-ruta');
+            const title = document.createElement('h2');
+            title.innerHTML = '<i class="fa-solid fa-route"></i> VISOR Y EDITOR DE RUTAS (PANTALLA COMPLETA)';
+            title.style.color = 'var(--gold-primary)';
             
-            if (rutaExistente) {
-                document.getElementById('lbl-art-ruta').textContent = rutaExistente.id_ruta;
-                badge.className = 'badge bg-success';
-                badge.textContent = 'âœ“ RUTA ENCONTRADA';
-                
-                lastGeneredRouteId = rutaExistente.id_ruta;
-                currentRutaOps = JSON.parse(JSON.stringify(rutaExistente.operaciones)); 
-            } else {
-                document.getElementById('lbl-art-ruta').textContent = "POR ASIGNAR";
-                badge.className = 'badge bg-warning';
-                badge.textContent = 'âš  SIN RUTA ASIGNADA';
-                
-                lastGeneredRouteId = "RT-" + Math.floor(Math.random() * 9000 + 1000);
-                currentRutaOps = [];
-            }
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '<i class="fa-solid fa-times"></i> CERRAR Y VOLVER A BÚSQUEDA';
+            closeBtn.className = 'btn btn-danger';
+            closeBtn.onclick = () => { 
+                modal.style.display = 'none'; 
+                document.getElementById('resultados-busqueda').style.display = 'block'; 
+            };
+            
+            header.appendChild(title);
+            header.appendChild(closeBtn);
+            modal.appendChild(header);
 
-            document.getElementById('lbl-ruta-id').textContent = lastGeneredRouteId;
-            document.getElementById('seccion-info-artículo').style.display = 'block';
-            document.getElementById('seccion-ruta').style.display = 'block';
+            // Mover secciones al modal
+            modal.appendChild(document.getElementById('seccion-info-articulo'));
+            modal.appendChild(document.getElementById('seccion-ruta'));
+        }
+        
+        document.getElementById('seccion-info-articulo').style.display = 'block';
+        document.getElementById('seccion-ruta').style.display = 'block';
+        modal.style.display = 'block';
+    }
 
-            renderTablaRuta();
+    function seleccionarArticulo(idArticulo) {
+        currentArticulo = appDb.articulos.find(a => a.id === idArticulo);
+        const rutaExistente = appDb.rutas.find(r => r.id_articulo === idArticulo);
+
+        document.getElementById('resultados-busqueda').style.display = 'none';
+
+        document.getElementById('lbl-art-cod').textContent = currentArticulo.id;
+        document.getElementById('lbl-art-desc').textContent = currentArticulo.nombre + " - " + currentArticulo.desc;
+        document.getElementById('lbl-art-uni').textContent = currentArticulo.unidad;
+        document.getElementById('lbl-art-fam').textContent = currentArticulo.familia;
+        
+        const badge = document.getElementById('badge-estado-ruta');
+        
+        if (rutaExistente) {
+            document.getElementById('lbl-art-ruta').textContent = rutaExistente.id_ruta;
+            badge.className = 'badge bg-success';
+            badge.textContent = '✔️ RUTA ENCONTRADA';
+            lastGeneredRouteId = rutaExistente.id_ruta;
+            currentRutaOps = JSON.parse(JSON.stringify(rutaExistente.operaciones)); 
+        } else {
+            document.getElementById('lbl-art-ruta').textContent = "POR ASIGNAR";
+            badge.className = 'badge bg-warning';
+            badge.textContent = '⚠️ SIN RUTA ASIGNADA';
+            lastGeneredRouteId = "RT-" + Math.floor(Math.random() * 9000 + 1000);
+            currentRutaOps = [];
         }
 
-        /* --------------------------------------------------------
-           5. RENDERIZADO Y EDICIÃ“N DE TABLA DE operaciones
-           -------------------------------------------------------- */
-                        function renderTablaRuta() {
-            const tbody = document.getElementById('tbody-ruta');
-            tbody.innerHTML = '';
+        document.getElementById('lbl-ruta-id').textContent = lastGeneredRouteId;
+        
+        // Open modal
+        abrirPantallaCompletaRuta();
+        renderTablaRuta();
+    }
 
-            currentRutaOps.sort((a,b) => a.seq - b.seq).forEach((op, index) => {
-                
-                let ctEncontrado = appDb.centrosTrabajo.find(c => c.id === op.ct);
-                let crEncontrado = appDb.recursos.find(c => c.id === op.cr);
-                
-                const ctDesc = ctEncontrado?.desc || op.desc_operacion || '';
-                const crDesc = crEncontrado?.desc || op.desc_operacion || '';
+    function actualizarCT(index, value) {
+        currentRutaOps[index].ct = value;
+        currentRutaOps[index].cr = ''; // Reset CR
+        renderTablaRuta();
+    }
 
-                let ctSelectHtml = `<select class="table-select" onchange="actualizarCT(${index}, this.value)">`;
-                ctSelectHtml += `<option value="">-- SELECCIONE CT --</option>`;
-                let foundCt = false;
-                appDb.centrosTrabajo.forEach(ct => {
-                    if (ct.id === op.ct) foundCt = true;
-                    ctSelectHtml += `<option value="${ct.id}" ${ct.id === op.ct ? 'selected' : ''}>${ct.id} - ${ct.desc}</option>`;
-                });
-                if(!foundCt && op.ct) {
-                    ctSelectHtml += `<option value="${op.ct}" selected>${op.ct} (De Excel)</option>`;
-                }
-                ctSelectHtml += `</select>`;
-
-                let crOptions = '<option value="">-- SELECCIONE CR --</option>';
-                let foundCr = false;
-                if(op.ct) {
-                    appDb.recursos.filter(r => r.id_ct === op.ct).forEach(cr => {
-                        if (cr.id === op.cr) foundCr = true;
-                        crOptions += `<option value="${cr.id}" ${cr.id === op.cr ? 'selected' : ''}>${cr.id} - ${cr.desc}</option>`;
-                    });
-                }
-                if(!foundCr && op.cr) {
-                    crOptions += `<option value="${op.cr}" selected>${op.cr} (De Excel)</option>`;
-                }
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td><input type="number" class="table-input" value="${op.seq}" onchange="actualizarDatoFila(${index}, 'seq', this.value)" style="text-align:center; font-weight:bold;"></td>
-                        <td>${ctSelectHtml}</td>
-                        <td style="color:var(--text-muted); font-size:0.75rem;">${ctDesc}</td>
-                        <td><select class="table-select" onchange="actualizarCR(${index}, this.value)">${crOptions}</select></td>
-                        <td style="color:var(--text-muted); font-size:0.75rem; font-weight:bold; color:var(--gold-light);">${op.desc_operacion || crDesc}</td>
-                        <td><input type="number" step="0.01" min="0" class="table-input" value="${op.tiempo}" onchange="actualizarDatoFila(${index}, 'tiempo', this.value)" style="text-align:right;"></td>
-                        <td class="no-print" style="text-align:center;">
-                            <button class="btn-danger" onclick="eliminarOperacion(${index})" title="Eliminar Operación"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-
-            if(currentRutaOps.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar Operación".</td></tr>`;
-            }
-
+    function actualizarCR(index, value) {
+        currentRutaOps[index].cr = value;
+        renderTablaRuta();
+    }
+    
+    function actualizarDatoFila(index, campo, value) {
+        if(campo === 'tiempo') {
+            currentRutaOps[index][campo] = parseFloat(value) || 0;
             calcularTotalesResumen();
+        } else if (campo === 'seq') {
+            currentRutaOps[index][campo] = parseInt(value) || 0;
         }
+    }
 
-        function agregarFilaOperacion() {
-            let nextSeq = 10;
-            if (currentRutaOps.length > 0) {
-                const maxSeq = Math.max(...currentRutaOps.map(o => parseInt(o.seq) || 0));
-                nextSeq = maxSeq + 10;
-            }
+    function renderTablaRuta() {
+        const tbody = document.getElementById('tbody-ruta');
+        tbody.innerHTML = '';
+
+        currentRutaOps.sort((a,b) => a.seq - b.seq).forEach((op, index) => {
             
-            currentRutaOps.push({ seq: nextSeq, ct: "", cr: "", tiempo: 0 });
-            renderTablaRuta();
-        }
-
-        function eliminarOperacion(index) {
-            currentRutaOps.splice(index, 1);
-            renderTablaRuta();
-        }
-
-        function actualizarDatoFila(index, campo, valor) {
-            currentRutaOps[index][campo] = campo === 'tiempo' || campo === 'seq' ? Number(valor) : valor;
-            calcularTotalesResumen();
-        }
-
-        function actualizarCT(index, nuevoCT) {
-            currentRutaOps[index].ct = nuevoCT;
-            currentRutaOps[index].cr = ""; 
-            renderTablaRuta();
-        }
-
-        function actualizarCR(index, nuevoCR) {
-            currentRutaOps[index].cr = nuevoCR;
-            renderTablaRuta();
-        }
-
-        function calcularTotalesResumen() {
-            let totalTiempo = 0;
-            let setCT = new Set();
-            let setCR = new Set();
-
-            currentRutaOps.forEach(op => {
-                totalTiempo += Number(op.tiempo) || 0;
-                if(op.ct) setCT.add(op.ct);
-                if(op.cr) setCR.add(op.cr);
+            // Selector CT (Descripciones, pero value es el CT Code)
+            let ctSelectHtml = `<select class="table-select" onchange="actualizarCT(${index}, this.value)">`;
+            ctSelectHtml += `<option value="">-- SELECCIONE C.T. --</option>`;
+            Object.keys(diccCT).forEach(ctCode => {
+                ctSelectHtml += `<option value="${ctCode}" ${ctCode === op.ct ? 'selected' : ''}>${diccCT[ctCode]}</option>`;
             });
-
-            document.getElementById('res-ops').textContent = currentRutaOps.length;
-            document.getElementById('res-tiempo').textContent = totalTiempo.toFixed(2);
-            document.getElementById('res-ct').textContent = setCT.size;
-            document.getElementById('res-cr').textContent = setCR.size;
-        }
-
-        /* --------------------------------------------------------
-           6. GUARDAR Y CANCELAR (VALIDACIONES)
-           -------------------------------------------------------- */
-        function guardarRuta() {
-            if(!currentArticulo) return;
-
-            if (currentRutaOps.length === 0) {
-                alert("âš  ValidaciÃ³n: Debe existir al menos una Operación en la ruta.");
-                return;
+            // Fallback si no está en dicc
+            if (op.ct && !diccCT[op.ct]) {
+                ctSelectHtml += `<option value="${op.ct}" selected>${op.ct} (Importado)</option>`;
             }
+            ctSelectHtml += `</select>`;
 
-            let seqSet = new Set();
-            for(let i=0; i<currentRutaOps.length; i++) {
-                const op = currentRutaOps[i];
-                if (!op.seq || op.seq <= 0) { alert(`âš  Fila ${i+1}: La secuencia no es vÃ¡lida.`); return; }
-                if (seqSet.has(op.seq)) { alert(`âš  Existe una secuencia duplicada (${op.seq}).`); return; }
-                seqSet.add(op.seq);
-                if (!op.ct) { alert(`âš  Fila ${i+1}: Falta seleccionar Centro de Trabajo (CT).`); return; }
-                if (!op.cr) { alert(`âš  Fila ${i+1}: Falta seleccionar Recurso (CR).`); return; }
-                if (!op.tiempo || op.tiempo <= 0) { alert(`âš  Fila ${i+1}: El tiempo debe ser mayor a cero.`); return; }
-            }
-
-            currentRutaOps.sort((a,b) => a.seq - b.seq);
-
-            const indexRuta = appDb.rutas.findIndex(r => r.id_articulo === currentArticulo.id);
-            
-            if (indexRuta >= 0) {
-                appDb.rutas[indexRuta].operaciones = JSON.parse(JSON.stringify(currentRutaOps));
-            } else {
-                appDb.rutas.push({
-                    id_ruta: lastGeneredRouteId,
-                    id_articulo: currentArticulo.id,
-                    estado: "ACTIVA",
-                    fecha_creacion: new Date().toISOString().split('T')[0],
-                    operaciones: JSON.parse(JSON.stringify(currentRutaOps))
+            // Selector CR (Descripciones, pero value es el CR Code)
+            let crOptions = '<option value="">-- SELECCIONE C.R. --</option>';
+            if(op.ct && diccCT_CR[op.ct]) {
+                diccCT_CR[op.ct].forEach(crCode => {
+                    crOptions += `<option value="${crCode}" ${crCode === op.cr ? 'selected' : ''}>${diccCR[crCode]}</option>`;
                 });
+            } else if (op.cr && !diccCR[op.cr]) {
+                // Fallback para Excel
+                crOptions += `<option value="${op.cr}" selected>${op.cr} (Importado)</option>`;
+            } else if (op.cr && diccCR[op.cr]) {
+                // Si el CT no está en el diccionario pero el CR sí
+                crOptions += `<option value="${op.cr}" selected>${diccCR[op.cr]}</option>`;
             }
 
-            guardarDB();
-            
-            document.getElementById('badge-estado-ruta').className = 'badge bg-success';
-            document.getElementById('badge-estado-ruta').textContent = 'âœ“ RUTA GUARDADA';
-            document.getElementById('lbl-art-ruta').textContent = lastGeneredRouteId;
-            showToast("âœ“ RUTA GUARDADA CORRECTAMENTE");
+            // Nombre op
+            let descFinal = diccCR[op.cr] || op.desc_operacion || '';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td><input type="number" class="table-input" value="${op.seq}" onchange="actualizarDatoFila(${index}, 'seq', this.value)" style="text-align:center; font-weight:bold; width: 60px;"></td>
+                    <td style="color:var(--text-muted); font-size:0.8rem; font-weight:bold;">${op.ct || '--'}</td>
+                    <td>${ctSelectHtml}</td>
+                    <td style="color:var(--text-muted); font-size:0.8rem; font-weight:bold;">${op.cr || '--'}</td>
+                    <td><select class="table-select" onchange="actualizarCR(${index}, this.value)">${crOptions}</select></td>
+                    <td><input type="number" step="0.01" min="0" class="table-input" value="${op.tiempo}" onchange="actualizarDatoFila(${index}, 'tiempo', this.value)" style="text-align:right; width: 80px;"></td>
+                    <td class="no-print" style="text-align:center;">
+                        <button class="btn-danger" onclick="eliminarOperacion(${index})" title="Eliminar Operación"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        if(currentRutaOps.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar Operación".</td></tr>`;
         }
 
-        function cancelarCambios() {
+        calcularTotalesResumen();
+    }
+
+    function agregarFilaOperacion() {
+        let maxSeq = 0;
+        currentRutaOps.forEach(op => { if(op.seq > maxSeq) maxSeq = op.seq; });
+        currentRutaOps.push({
+            seq: maxSeq + 10,
+            ct: "",
+            cr: "",
+            desc_operacion: "",
+            tiempo: 0
+        });
+        renderTablaRuta();
+    } 
+
+        function cancelarCambios()  {
             if(confirm("Â¿EstÃ¡s seguro de cancelar? Se perderÃ¡n las modificaciones no guardadas.")) {
                 seleccionarArticulo(currentArticulo.id); 
             }
@@ -1058,6 +1069,7 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
 
 
 
