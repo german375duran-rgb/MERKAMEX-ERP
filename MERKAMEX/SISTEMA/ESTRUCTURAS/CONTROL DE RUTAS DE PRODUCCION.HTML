@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutas de ProducciÃ³n | MERKAMEX</title>
+    <title>Rutas de Producción | MERKAMEX</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,12 +38,12 @@
         body { background-color: var(--bg-black); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
 
         /* ========================================================
-           Fondo Animado (PartÃ­culas)
+           Fondo Animado (Partículas)
            ======================================================== */
         #gold-network { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.4; }
 
         /* ========================================================
-           2. LAYOUT PRINCIPAL Y MENÃš LATERAL
+           2. LAYOUT PRINCIPAL Y MENÚ LATERAL
            ======================================================== */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; width: 100%; }
         
@@ -53,11 +53,11 @@
         
         .content { padding: 30px 40px; flex: 1; display: flex; flex-direction: column; gap: 30px; padding-left: 70px;}
 
-        /* BotÃ³n Volver */
+        /* Botón Volver */
         .btn-volver { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: flex; align-items: center; gap: 8px; }
         .btn-volver:hover { background: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); color: #fff; }
 
-        /* MENÃš VERTICAL LATERAL (OCULTO) */
+        /* MENÚ VERTICAL LATERAL (OCULTO) */
         .side-nav { position: fixed; top: 0; left: calc(-1 * var(--menu-width)); width: var(--menu-width); height: 100%; background: var(--bg-glass); border-right: 1px solid var(--gold-primary); backdrop-filter: blur(15px); z-index: 1000; transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
         .side-nav.open { left: 0; }
         .side-nav-header { padding: 25px 20px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
@@ -69,14 +69,14 @@
         .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
         .nav-item.active { color: var(--gold-primary); border-left-color: var(--gold-primary); background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); text-shadow: 0 0 10px var(--gold-glow); }
 
-        /* PESTAÃ‘A PARA ABRIR MENÃš */
+        /* PESTAÑA PARA ABRIR MENÚ */
         .nav-toggle-tab { position: fixed; top: 50%; left: 0; transform: translateY(-50%); background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary)); width: 35px; height: 90px; display: flex; justify-content: center; align-items: center; border-radius: 0 8px 8px 0; cursor: pointer; z-index: 900; box-shadow: 2px 0 15px var(--gold-glow); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.8; }
         .nav-toggle-tab:hover { opacity: 1; width: 45px; }
         .nav-toggle-tab.open { left: var(--menu-width); border-radius: 0 8px 8px 0; background: var(--bg-card); border: 1px solid var(--gold-primary); border-left: none; width: 40px; }
         .nav-toggle-tab svg { width: 20px; height: 20px; stroke: #000; transition: transform 0.4s; }
         .nav-toggle-tab.open svg { stroke: var(--gold-primary); transform: rotate(180deg); }
 
-        /* OVERLAY PARA CERRAR MENÃš */
+        /* OVERLAY PARA CERRAR MENÚ */
         .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 990; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .nav-overlay.open { opacity: 1; visibility: visible; }
 
@@ -112,7 +112,7 @@
         td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
         tr:hover td { background: rgba(255,255,255,0.02); }
         
-        /* Inputs dentro de la tabla de ediciÃ³n */
+        /* Inputs dentro de la tabla de edición */
         .table-input { background: transparent; border: none; border-bottom: 1px solid var(--text-muted); color: var(--text-main); padding: 5px; width: 100%; font-size: 0.8rem; outline: none; }
         .table-input:focus { border-color: var(--neon-blue); }
         .table-select { background: var(--bg-black); border: 1px solid var(--text-muted); color: var(--text-main); padding: 5px; width: 100%; font-size: 0.8rem; outline: none; }
@@ -134,13 +134,13 @@
         .toast.show { bottom: 40px; }
 
         /* ========================================================
-           6. IMPRESIÃ“N (A4 LANDSCAPE)
+           6. IMPRESIÓN (A4 LANDSCAPE)
            ======================================================== */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: #fff !important; color: #000 !important; display: block; }
             .header, .search-section, .no-print, .side-nav, .nav-toggle-tab, .nav-overlay { display: none !important; }
-            #gold-network { display: none !important; } /* Ocultar partÃ­culas al imprimir */
+            #gold-network { display: none !important; } /* Ocultar partículas al imprimir */
             .main-wrapper { margin: 0; }
             .content { padding: 0; gap: 15px; }
             
@@ -171,7 +171,7 @@
 
     <canvas id="gold-network"></canvas>
 
-    <!-- PESTAÃ‘A LATERAL PARA ABRIR MENÃš -->
+    <!-- PESTAÑA LATERAL PARA ABRIR MENÚ -->
     <div class="nav-toggle-tab no-print" id="nav-toggle" onclick="toggleNav()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -180,14 +180,14 @@
         </svg>
     </div>
 
-    <!-- OVERLAY PARA CERRAR MENÃš AL HACER CLIC FUERA -->
+    <!-- OVERLAY PARA CERRAR MENÚ AL HACER CLIC FUERA -->
     <div class="nav-overlay no-print" id="nav-overlay" onclick="toggleNav()"></div>
 
-    <!-- MENÃš LATERAL DESPLEGABLE -->
+    <!-- MENÚ LATERAL DESPLEGABLE -->
     <nav class="side-nav no-print" id="side-nav">
         <div class="side-nav-header">
-            <span class="side-nav-title">MENÃš MÃ“DULO</span>
-            <button class="btn-close-nav" onclick="toggleNav()">âœ•</button>
+            <span class="side-nav-title">MENÚ MÓDULO</span>
+            <button class="btn-close-nav" onclick="toggleNav()">✕</button>
         </div>
         <ul class="nav-menu">
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Piso / Avance</li>
@@ -196,8 +196,8 @@
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Centros Trabajo</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Recursos</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Historial</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">CÃ³digos ArtÃ­culo</li>
-            <li class="nav-item active" onclick="toggleNav()">Rutas OperaciÃ³n</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Códigos Artículo</li>
+            <li class="nav-item active" onclick="toggleNav()">Rutas Operación</li>
             <li class="nav-item" onclick="window.location.href='HOJA VIAJERA.HTML'">Hoja Viajera</li>
         </ul>
     </nav>
@@ -207,7 +207,7 @@
         <header class="header no-print">
             <div style="display: flex; align-items: center; gap: 20px;">
                 <a href="ESTRUCTURAS.HTML" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> VOLVER</a>
-                <h1>CONTROL DE RUTAS DE PRODUCCIÃ“N</h1>
+                <h1>CONTROL DE RUTAS DE PRODUCCIÓN</h1>
             </div>
             <div style="display: flex; gap: 15px;">
                 <button class="btn btn-secondary" onclick="abrirModalImportacion()"><i class="fa-solid fa-upload"></i> Carga Masiva</button>
@@ -219,13 +219,13 @@
             
             <div id="print-header">
                 <h1>MERKAMEX GRUPO INDUSTRIAL</h1>
-                <p>REPORTE DE RUTA DE PRODUCCIÃ“N</p>
+                <p>REPORTE DE RUTA DE PRODUCCIÓN</p>
             </div>
 
             <section class="card search-section no-print">
-                <div class="card-header">BUSCAR ARTÃCULO</div>
+                <div class="card-header">BUSCAR ARTÍCULO</div>
                 <div style="display: flex; gap: 15px;">
-                    <input type="text" id="input-busqueda" class="form-control" placeholder="Ingrese cÃ³digo o descripciÃ³n del artÃ­culo (Ej. ART-001 o Panel)..." onkeypress="if(event.key === 'Enter') buscarArticulo()">
+                    <input type="text" id="input-busqueda" class="form-control" placeholder="Ingrese código o descripción del artículo (Ej. ART-001 o Panel)..." onkeypress="if(event.key === 'Enter') buscarArticulo()">
                     <button class="btn btn-primary" onclick="buscarArticulo()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                 </div>
                 
@@ -233,11 +233,11 @@
                     <table id="tabla-resultados">
                         <thead>
                             <tr>
-                                <th>CÃ“DIGO</th>
-                                <th>ARTÃCULO / DESCRIPCIÃ“N</th>
+                                <th>CÓDIGO</th>
+                                <th>ARTÍCULO / DESCRIPCIÓN</th>
                                 <th>RUTA ASIGNADA</th>
                                 <th>ESTADO</th>
-                                <th>ACCIÃ“N</th>
+                                <th>ACCIÓN</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-resultados"></tbody>
@@ -247,12 +247,12 @@
 
             <section class="card" id="seccion-info-articulo" style="display: none;">
                 <div class="card-header">
-                    DATOS DEL ARTÃCULO
+                    DATOS DEL ARTÍCULO
                     <span id="badge-estado-ruta" class="badge"></span>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
-                    <div><span style="font-size: 0.7rem; color: var(--text-muted);">CÃ“DIGO</span><div id="lbl-art-cod" style="font-weight: 700; color: var(--gold-light);"></div></div>
-                    <div style="grid-column: span 2;"><span style="font-size: 0.7rem; color: var(--text-muted);">DESCRIPCIÃ“N</span><div id="lbl-art-desc" style="font-weight: 600;"></div></div>
+                    <div><span style="font-size: 0.7rem; color: var(--text-muted);">CÓDIGO</span><div id="lbl-art-cod" style="font-weight: 700; color: var(--gold-light);"></div></div>
+                    <div style="grid-column: span 2;"><span style="font-size: 0.7rem; color: var(--text-muted);">DESCRIPCIÓN</span><div id="lbl-art-desc" style="font-weight: 600;"></div></div>
                     <div><span style="font-size: 0.7rem; color: var(--text-muted);">UNIDAD</span><div id="lbl-art-uni"></div></div>
                     <div><span style="font-size: 0.7rem; color: var(--text-muted);">FAMILIA</span><div id="lbl-art-fam"></div></div>
                     <div><span style="font-size: 0.7rem; color: var(--text-muted);">RUTAS ASIGNADAS</span><div id="lbl-art-ruta" style="color: var(--neon-blue); font-weight: 700;"></div></div>
@@ -264,7 +264,7 @@
                     <span><i class="fa-solid fa-route"></i> DETALLE DE RUTA: <span id="lbl-ruta-id" style="color:var(--text-main)"></span></span>
                     <div class="no-print" style="display: flex; gap: 10px;">
                         <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
-                        <button class="btn btn-success" id="btn-add-op" onclick="agregarFilaOperacion()"><i class="fa-solid fa-plus"></i> Agregar OperaciÃ³n</button>
+                        <button class="btn btn-success" id="btn-add-op" onclick="agregarFilaOperacion()"><i class="fa-solid fa-plus"></i> Agregar Operación</button>
                     </div>
                 </div>
 
@@ -274,11 +274,11 @@
                             <tr>
                                 <th style="width: 8%;">SEC.</th>
                                 <th style="width: 15%;">CENTRO (CT)</th>
-                                <th style="width: 20%;">DESCRIPCIÃ“N CT</th>
+                                <th style="width: 20%;">DESCRIPCIÓN CT</th>
                                 <th style="width: 15%;">RECURSO (CR)</th>
-                                <th style="width: 20%;">DESCRIPCIÃ“N CR</th>
+                                <th style="width: 20%;">DESCRIPCIÓN CR</th>
                                 <th style="width: 12%;">MIN / PZ</th>
-                                <th style="width: 10%; text-align: center;" class="no-print">ACCIÃ“N</th>
+                                <th style="width: 10%; text-align: center;" class="no-print">ACCIÓN</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-ruta">
@@ -345,7 +345,7 @@
         <div class="modal-content" style="max-width: 95vw; width: 1200px;">
             <div class="card-header">
                 HOJA DE EXCEL - CARGA MASIVA DE RUTAS
-                <button style="background:none; border:none; color:var(--text-main); font-size:1.2rem; cursor:pointer;" onclick="cerrarModal('modal-importacion')">Ã—</button>
+                <button style="background:none; border:none; color:var(--text-main); font-size:1.2rem; cursor:pointer;" onclick="cerrarModal('modal-importacion')">×</button>
             </div>
             
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
@@ -361,8 +361,8 @@
                 <table class="excel-grid" id="excel-grid-table">
                     <thead>
                                                 <tr>
-                            <th>ARTÍCULO</th>
-                            <th>NOMBRE ARTÍCULO</th>
+                            <th>ART�CULO</th>
+                            <th>NOMBRE ART�CULO</th>
                             <th>SECUENCIA</th>
                             <th>CT</th>
                             <th>CR</th>
@@ -370,7 +370,7 @@
                             <th>SETUP</th>
                             <th>TIEMPO</th>
                             <th>UM</th>
-                            <th>OPERACIÓN</th>
+                            <th>OPERACI�N</th>
                         </tr>
                     </thead>
                     <tbody id="excel-grid-body">
@@ -381,11 +381,11 @@
         </div>
     </div>
 
-    <div class="toast" id="sys-toast">AcciÃ³n completada</div>
+    <div class="toast" id="sys-toast">Acción completada</div>
 
     <script>
         /* --------------------------------------------------------
-           Funciones para MenÃº Lateral
+           Funciones para Menú Lateral
            -------------------------------------------------------- */
         function toggleNav() {
             const sideNav = document.getElementById('side-nav');
@@ -406,23 +406,23 @@
         }
 
         /* --------------------------------------------------------
-           1. MOCK DATA (Datos Iniciales si localStorage estÃ¡ vacÃ­o)
+           1. MOCK DATA (Datos Iniciales si localStorage está vacío)
            -------------------------------------------------------- */
         const defaultData = {
             articulos: [
-                { id: "ART-001", nombre: "Panel Lateral", desc: "Panel lateral metÃ¡lico 2mm", unidad: "PZA", familia: "LÃ¡mina" },
+                { id: "ART-001", nombre: "Panel Lateral", desc: "Panel lateral metálico 2mm", unidad: "PZA", familia: "Lámina" },
                 { id: "ART-002", nombre: "Base Estructural", desc: "Base H-Beam principal", unidad: "PZA", familia: "Estructuras" },
                 { id: "ART-003", nombre: "Soporte Frontal", desc: "Soporte tipo L", unidad: "PZA", familia: "Placas" },
-                { id: "ART-004", nombre: "Tubo Pasamanos", desc: "Tubo cÃ©dula 30 2mts", unidad: "PZA", familia: "TuberÃ­a" }
+                { id: "ART-004", nombre: "Tubo Pasamanos", desc: "Tubo cédula 30 2mts", unidad: "PZA", familia: "Tubería" }
             ],
             centrosTrabajo: [
-                { id: "CT-001", desc: "Corte LÃ¡ser CNC" },
+                { id: "CT-001", desc: "Corte Láser CNC" },
                 { id: "CT-002", desc: "Doblez CNC" },
                 { id: "CT-003", desc: "Soldadura" },
                 { id: "CT-004", desc: "Pintura y Acabados" }
             ],
             recursos: [
-                { id: "CR-001", id_ct: "CT-001", desc: "LÃ¡ser Trumpf 3030" },
+                { id: "CR-001", id_ct: "CT-001", desc: "Láser Trumpf 3030" },
                 { id: "CR-002", id_ct: "CT-001", desc: "Plasma CNC" },
                 { id: "CR-003", id_ct: "CT-002", desc: "Prensa Amada 100T" },
                 { id: "CR-004", id_ct: "CT-003", desc: "Soldadora MIG 250" },
@@ -440,7 +440,7 @@
             ]
         };
 
-        // Estado de la aplicaciÃ³n
+        // Estado de la aplicación
         let appDb = {};
         let currentArticulo = null;
         let currentRutaOps = []; 
@@ -448,29 +448,30 @@
         let datosAImportar = null;
 
         /* --------------------------------------------------------
-           2. INICIALIZACIÃ“N
+           2. INICIALIZACIÓN
            -------------------------------------------------------- */
-        window.onload = async () => {
+                window.onload = async () => {
             initCanvas(); 
             drawCanvas();
             
             try {
-                const doc = await appDb.collection("sistema").doc("erp_rutas").get();
+                const doc = await db.collection("sistema").doc("erp_rutas").get();
                 if (doc.exists) {
                     appDb = doc.data();
                 } else {
-                    window.appappDb = JSON.parse(JSON.stringify(defaultData));
+                    appDb = JSON.parse(JSON.stringify(defaultData));
                     await guardarDB();
                 }
             } catch(e) {
                 console.error("Error cargando db de Firebase", e);
-                window.appappDb = JSON.parse(JSON.stringify(defaultData));
+                appDb = JSON.parse(JSON.stringify(defaultData));
             }
+            renderRutas();
         };
 
-        async function guardarDB() {
+                async function guardarDB() {
             try {
-                await appDb.collection("sistema").doc("erp_rutas").set(appDb);
+                await db.collection("sistema").doc("erp_rutas").set(appDb);
             } catch(e) {
                 console.error("Error guardando db en Firebase", e);
             }
@@ -484,7 +485,7 @@
         }
 
         /* --------------------------------------------------------
-           3. BUSCADOR DE ARTÃCULOS
+           3. BUSCADOR DE ARTÍCULOS
            -------------------------------------------------------- */
         function buscarArticulo() {
             const query = document.getElementById('input-busqueda').value.toLowerCase().trim();
@@ -508,7 +509,7 @@
             );
 
             if (resultados.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger-color);">âœ• EL ARTÃCULO NO EXISTE EN EL CATÃLOGO.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger-color);">✕ EL ARTÍCULO NO EXISTE EN EL CATÁLOGO.</td></tr>`;
             } else {
                 resultados.forEach(art => {
                     const rutaInfo = appDb.rutas.find(r => r.id_articulo === art.id);
@@ -523,7 +524,7 @@
                         <tr>
                             <td><strong style="color:var(--gold-light)">${art.id}</strong></td>
                             <td><strong>${art.nombre}</strong><br><span style="font-size:0.7rem; color:var(--text-muted)">${art.desc}</span></td>
-                            <td>${tieneRuta ? rutaInfo.id_ruta : 'â€”'}</td>
+                            <td>${tieneRuta ? rutaInfo.id_ruta : '—'}</td>
                             <td>${badgeStr}</td>
                             <td>${btnAccion}</td>
                         </tr>
@@ -534,7 +535,7 @@
         }
 
         /* --------------------------------------------------------
-           4. SELECCIÃ“N Y CARGA DE RUTA
+           4. SELECCIÓN Y CARGA DE RUTA
            -------------------------------------------------------- */
         function seleccionarArticulo(idArticulo) {
             currentArticulo = appDb.articulos.find(a => a.id === idArticulo);
@@ -552,14 +553,14 @@
             if (rutaExistente) {
                 document.getElementById('lbl-art-ruta').textContent = rutaExistente.id_ruta;
                 badge.className = 'badge bg-success';
-                badge.textContent = 'âœ“ RUTA ENCONTRADA';
+                badge.textContent = '✓ RUTA ENCONTRADA';
                 
                 lastGeneredRouteId = rutaExistente.id_ruta;
                 currentRutaOps = JSON.parse(JSON.stringify(rutaExistente.operaciones)); 
             } else {
                 document.getElementById('lbl-art-ruta').textContent = "POR ASIGNAR";
                 badge.className = 'badge bg-warning';
-                badge.textContent = 'âš  SIN RUTA ASIGNADA';
+                badge.textContent = '⚠ SIN RUTA ASIGNADA';
                 
                 lastGeneredRouteId = "RT-" + Math.floor(Math.random() * 9000 + 1000);
                 currentRutaOps = [];
@@ -573,7 +574,7 @@
         }
 
         /* --------------------------------------------------------
-           5. RENDERIZADO Y EDICIÃ“N DE TABLA DE OPERACIONES
+           5. RENDERIZADO Y EDICIÓN DE TABLA DE OPERACIONES
            -------------------------------------------------------- */
         function renderTablaRuta() {
             const tbody = document.getElementById('tbody-ruta');
@@ -612,14 +613,14 @@
                         <td style="color:var(--text-muted); font-size:0.75rem;">${crDesc}</td>
                         <td><input type="number" step="0.01" min="0" class="table-input" value="${op.tiempo}" onchange="actualizarDatoFila(${index}, 'tiempo', this.value)" style="text-align:right;"></td>
                         <td class="no-print" style="text-align:center;">
-                            <button class="btn-danger" onclick="eliminarOperacion(${index})" title="Eliminar OperaciÃ³n"><i class="fa-solid fa-trash"></i></button>
+                            <button class="btn-danger" onclick="eliminarOperacion(${index})" title="Eliminar Operación"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             });
 
             if(currentRutaOps.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar OperaciÃ³n".</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar Operación".</td></tr>`;
             }
 
             calcularTotalesResumen();
@@ -681,19 +682,19 @@
             if(!currentArticulo) return;
 
             if (currentRutaOps.length === 0) {
-                alert("âš  ValidaciÃ³n: Debe existir al menos una operaciÃ³n en la ruta.");
+                alert("⚠ Validación: Debe existir al menos una operación en la ruta.");
                 return;
             }
 
             let seqSet = new Set();
             for(let i=0; i<currentRutaOps.length; i++) {
                 const op = currentRutaOps[i];
-                if (!op.seq || op.seq <= 0) { alert(`âš  Fila ${i+1}: La secuencia no es vÃ¡lida.`); return; }
-                if (seqSet.has(op.seq)) { alert(`âš  Existe una secuencia duplicada (${op.seq}).`); return; }
+                if (!op.seq || op.seq <= 0) { alert(`⚠ Fila ${i+1}: La secuencia no es válida.`); return; }
+                if (seqSet.has(op.seq)) { alert(`⚠ Existe una secuencia duplicada (${op.seq}).`); return; }
                 seqSet.add(op.seq);
-                if (!op.ct) { alert(`âš  Fila ${i+1}: Falta seleccionar Centro de Trabajo (CT).`); return; }
-                if (!op.cr) { alert(`âš  Fila ${i+1}: Falta seleccionar Recurso (CR).`); return; }
-                if (!op.tiempo || op.tiempo <= 0) { alert(`âš  Fila ${i+1}: El tiempo debe ser mayor a cero.`); return; }
+                if (!op.ct) { alert(`⚠ Fila ${i+1}: Falta seleccionar Centro de Trabajo (CT).`); return; }
+                if (!op.cr) { alert(`⚠ Fila ${i+1}: Falta seleccionar Recurso (CR).`); return; }
+                if (!op.tiempo || op.tiempo <= 0) { alert(`⚠ Fila ${i+1}: El tiempo debe ser mayor a cero.`); return; }
             }
 
             currentRutaOps.sort((a,b) => a.seq - b.seq);
@@ -715,13 +716,13 @@
             guardarDB();
             
             document.getElementById('badge-estado-ruta').className = 'badge bg-success';
-            document.getElementById('badge-estado-ruta').textContent = 'âœ“ RUTA GUARDADA';
+            document.getElementById('badge-estado-ruta').textContent = '✓ RUTA GUARDADA';
             document.getElementById('lbl-art-ruta').textContent = lastGeneredRouteId;
-            showToast("âœ“ RUTA GUARDADA CORRECTAMENTE");
+            showToast("✓ RUTA GUARDADA CORRECTAMENTE");
         }
 
         function cancelarCambios() {
-            if(confirm("Â¿EstÃ¡s seguro de cancelar? Se perderÃ¡n las modificaciones no guardadas.")) {
+            if(confirm("¿Estás seguro de cancelar? Se perderán las modificaciones no guardadas.")) {
                 seleccionarArticulo(currentArticulo.id); 
             }
         }
@@ -729,7 +730,7 @@
         function iniciarNuevaRuta() {
             document.getElementById('input-busqueda').value = '';
             document.getElementById('input-busqueda').focus();
-            showToast("Busque un artÃ­culo sin ruta para crear una nueva.");
+            showToast("Busque un artículo sin ruta para crear una nueva.");
         }
 
         /* --------------------------------------------------------
@@ -785,17 +786,17 @@
 
                 let errorFila = false;
 
-                if(!codArt) { errores.push({ f: numFila, a: 'N/A', err: 'Falta cÃ³digo de artÃ­culo.'}); errorFila = true; }
-                else if (!appDb.articulos.some(a => a.id === codArt)) { errores.push({ f: numFila, a: codArt, err: 'ArtÃ­culo no existe en catÃ¡logo.'}); errorFila = true; }
+                if(!codArt) { errores.push({ f: numFila, a: 'N/A', err: 'Falta código de artículo.'}); errorFila = true; }
+                else if (!appDb.articulos.some(a => a.id === codArt)) { errores.push({ f: numFila, a: codArt, err: 'Artículo no existe en catálogo.'}); errorFila = true; }
                 
-                if(!codRuta) { errores.push({ f: numFila, a: codArt, err: 'Falta cÃ³digo de ruta.'}); errorFila = true; }
-                if(isNaN(seq) || seq <= 0) { errores.push({ f: numFila, a: codArt, err: 'Secuencia invÃ¡lida.'}); errorFila = true; }
+                if(!codRuta) { errores.push({ f: numFila, a: codArt, err: 'Falta código de ruta.'}); errorFila = true; }
+                if(isNaN(seq) || seq <= 0) { errores.push({ f: numFila, a: codArt, err: 'Secuencia inválida.'}); errorFila = true; }
                 
                 if(!appDb.centrosTrabajo.some(c => c.id === ct)) { errores.push({ f: numFila, a: codArt, err: `CT '${ct}' no existe.`}); errorFila = true; }
                 if(!appDb.recursos.some(r => r.id === cr)) { errores.push({ f: numFila, a: codArt, err: `CR '${cr}' no existe.`}); errorFila = true; }
                 else if (!appDb.recursos.some(r => r.id === cr && r.id_ct === ct)) { errores.push({ f: numFila, a: codArt, err: `CR '${cr}' no pertenece al CT '${ct}'.`}); errorFila = true; }
                 
-                if(isNaN(tiempo) || tiempo <= 0) { errores.push({ f: numFila, a: codArt, err: 'Tiempo invÃ¡lido.'}); errorFila = true; }
+                if(isNaN(tiempo) || tiempo <= 0) { errores.push({ f: numFila, a: codArt, err: 'Tiempo inválido.'}); errorFila = true; }
 
                 if(!errorFila) {
                     validos++;
@@ -858,7 +859,7 @@
 
             guardarDB();
             cerrarModal('modal-importacion');
-            showToast(`IMPORTACIÃ“N COMPLETADA: ${creadas} nuevas, ${actualizadas} actualizadas.`);
+            showToast(`IMPORTACIÓN COMPLETADA: ${creadas} nuevas, ${actualizadas} actualizadas.`);
             
             if(currentArticulo && datosAImportar[currentArticulo.id]) {
                 seleccionarArticulo(currentArticulo.id);
@@ -976,7 +977,7 @@ async function procesarExcelGrid() {
             };
         }
         
-        // Si la fila actual tiene un nombre, se lo actualizamos por si la primera no lo tenía
+        // Si la fila actual tiene un nombre, se lo actualizamos por si la primera no lo ten�a
         if (artNombre && nuevasRutas[currentArticulo].nombre_articulo.startsWith("Art. ")) {
             nuevasRutas[currentArticulo].nombre_articulo = artNombre;
         }
@@ -992,7 +993,7 @@ async function procesarExcelGrid() {
     });
     
     if(procesadas === 0) {
-        alert("No se detectaron datos válidos. Asegúrese de pegar las 10 columnas correctamente.");
+        alert("No se detectaron datos v�lidos. Aseg�rese de pegar las 10 columnas correctamente.");
         return;
     }
     
@@ -1010,7 +1011,7 @@ async function procesarExcelGrid() {
                 familia: "General" 
             });
         } else {
-            // Actualizar nombre si ya existía pero lo traemos nuevo
+            // Actualizar nombre si ya exist�a pero lo traemos nuevo
             existingArt.nombre = nuevasRutas[art].nombre_articulo;
         }
     }
@@ -1018,11 +1019,15 @@ async function procesarExcelGrid() {
     await guardarDB();
     renderRutas();
     cerrarModal('modal-importacion');
-    showToast("Se cargaron " + Object.keys(nuevasRutas).length + " rutas con éxito.");
+    showToast("Se cargaron " + Object.keys(nuevasRutas).length + " rutas con �xito.");
 }
 </script>
 </body>
 </html>
+
+
+
+
 
 
 
