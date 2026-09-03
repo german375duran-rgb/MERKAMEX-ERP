@@ -419,7 +419,7 @@
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                     <div class="card">
                         <h3 style="color:var(--gold-primary); margin-bottom:15px; font-size:1.1rem;">CENTROS DE TRABAJO (CT)</h3>
                         <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
@@ -436,15 +436,21 @@
                             </table>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3 style="color:var(--gold-primary); margin-bottom:15px; font-size:1.1rem;">RECURSOS / MÁQUINAS (CR)</h3>
-                        <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+                    <div class="card" id="panel-cr" style="display: none;">
+                        <h3 style="color:var(--gold-primary); margin-bottom:15px; font-size:1.1rem;" id="titulo-panel-cr">RECURSOS DEL CT</h3>
+                        <input type="hidden" id="cr-ct-seleccionado">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <input type="text" id="busqueda-add-cr" class="form-control" placeholder="Buscar recurso para agregar..." style="flex: 1;" onkeyup="sugerirCRAdd()">
+                        </div>
+                        <div id="dropdown-add-cr" style="display: none; position: absolute; background: var(--bg-black); border: 1px solid var(--gold-dark); max-height: 200px; overflow-y: auto; z-index: 1000; width: 40%;"></div>
+                        <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                             <table class="table">
                                 <thead>
                                     <tr>
                                         <th>CÓDIGO</th>
                                         <th>NOMBRE</th>
-                                        <th style="text-align: center;">ACCIÓN</th>
+                                        <th style="text-align: center;">DESVINCULAR</th>
+                                        <th style="text-align: center;">BORRAR</th>
                                     </tr>
                                 </thead>
                                 <tbody id="tbody-cr"></tbody>
@@ -665,15 +671,13 @@
             }
         }
 
-        function renderCatalogos() {
+                function renderCatalogos() {
             if(!appDb.catalogos) initializeCatalogos();
             const filtroArea = document.getElementById('filtro-area').value;
             const filtroTexto = document.getElementById('filtro-texto').value.toLowerCase().trim();
             
             const tbodyCT = document.getElementById('tbody-ct');
-            const tbodyCR = document.getElementById('tbody-cr');
             tbodyCT.innerHTML = '';
-            tbodyCR.innerHTML = '';
             
             for (const [code, ct] of Object.entries(appDb.catalogos.ct)) {
                 if (filtroArea !== "TODAS" && ct.area !== filtroArea) continue;
@@ -687,39 +691,73 @@
                         <td>${ct.nombre}</td>
                         <td style="text-align: center;">${ct.area}</td>
                         <td style="text-align: center;">
-                            <button class="btn btn-secondary" onclick="gestionarLigas('${code}')" title="Vincular CRs" style="padding:5px 10px; font-size:0.8rem; margin-right:5px;"><i class="fa-solid fa-link"></i> ${linkedCount}</button>
+                            <button class="btn btn-primary" onclick="verRecursos('${code}')" title="Ver CRs" style="padding:5px 10px; font-size:0.8rem; margin-right:5px; background:var(--gold-dark); color:#000;">CRs: ${linkedCount}</button>
                             <button class="btn btn-danger" onclick="eliminarCatalogo('ct', '${code}')" style="padding:5px 10px; font-size:0.8rem;"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
                 `;
             }
+
+            // Si hay un CT seleccionado, actualizamos la tabla CR
+            const selectedCT = document.getElementById('cr-ct-seleccionado')?.value;
+            if(selectedCT && appDb.catalogos.ct[selectedCT]) {
+                verRecursos(selectedCT);
+            }
+        }
+
+        function verRecursos(ctCode) {
+            document.getElementById('cr-ct-seleccionado').value = ctCode;
+            document.getElementById('panel-cr').style.display = 'block';
+            const ctInfo = appDb.catalogos.ct[ctCode];
+            document.getElementById('titulo-panel-cr').textContent = `RECURSOS EN: ${ctCode} (${ctInfo.nombre})`;
+            
+            const tbodyCR = document.getElementById('tbody-cr');
+            tbodyCR.innerHTML = '';
+            
+            const ligados = appDb.catalogos.ct_cr[ctCode] || [];
+            
+            ligados.forEach(crCode => {
+                const crInfo = appDb.catalogos.cr[crCode];
+                if(crInfo) {
+                    tbodyCR.innerHTML += `
+                        <tr>
+                            <td><strong>${crCode}</strong></td>
+                            <td>${crInfo.nombre}</td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-secondary" onclick="toggleLiga('${ctCode}', '${crCode}', false)" style="padding:5px 10px; font-size:0.8rem;" title="Desvincular"><i class="fa-solid fa-unlink"></i></button>
+                            </td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-danger" onclick="eliminarCatalogo('cr', '${crCode}')" style="padding:5px 10px; font-size:0.8rem;" title="Eliminar CR del Sistema"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+        }
+
+        function sugerirCRAdd() {
+            const input = document.getElementById('busqueda-add-cr');
+            const dropdown = document.getElementById('dropdown-add-cr');
+            const val = input.value.trim().toLowerCase();
+            const ctCode = document.getElementById('cr-ct-seleccionado').value;
+            
+            if(val.length < 1) { dropdown.style.display = 'none'; return; }
+            
+            const ligados = appDb.catalogos.ct_cr[ctCode] || [];
+            let html = '';
+            let count = 0;
             
             for (const [code, cr] of Object.entries(appDb.catalogos.cr)) {
-                if (filtroTexto && !code.toLowerCase().includes(filtroTexto) && !cr.nombre.toLowerCase().includes(filtroTexto)) continue;
-                
-                if (filtroArea !== "TODAS") {
-                    let matchesArea = false;
-                    for(const [ctCode, crList] of Object.entries(appDb.catalogos.ct_cr)) {
-                        if (crList.includes(code)) {
-                            if(appDb.catalogos.ct[ctCode] && appDb.catalogos.ct[ctCode].area === filtroArea) {
-                                matchesArea = true;
-                                break;
-                            }
-                        }
-                    }
-                    if(!matchesArea) continue;
+                if(ligados.includes(code)) continue; // ya esta ligado
+                if(code.toLowerCase().includes(val) || cr.nombre.toLowerCase().includes(val)) {
+                    html += `<div style="padding: 10px; cursor: pointer; border-bottom: 1px solid #333;" onmouseover="this.style.background='rgba(212,175,55,0.3)'" onmouseout="this.style.background='transparent'" onclick="toggleLiga('${ctCode}', '${code}', true); document.getElementById('busqueda-add-cr').value=''; document.getElementById('dropdown-add-cr').style.display='none';"><strong>${code}</strong> - ${cr.nombre}</div>`;
+                    count++;
                 }
-
-                tbodyCR.innerHTML += `
-                    <tr>
-                        <td><strong>${code}</strong></td>
-                        <td>${cr.nombre}</td>
-                        <td style="text-align: center;">
-                            <button class="btn btn-danger" onclick="eliminarCatalogo('cr', '${code}')" style="padding:5px 10px; font-size:0.8rem;"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
+                if(count >= 10) break;
             }
+            
+            if(html === '') { dropdown.style.display = 'none'; }
+            else { dropdown.innerHTML = html; dropdown.style.display = 'block'; }
         }
 
         function abrirModalCatalogo(tipo) {
@@ -744,6 +782,12 @@
                 if(!appDb.catalogos.ct_cr[codigo]) appDb.catalogos.ct_cr[codigo] = [];
             } else {
                 appDb.catalogos.cr[codigo] = { nombre: nombre };
+                // Opcional: auto-vincular al CT seleccionado si hay uno activo
+                const activeCT = document.getElementById('cr-ct-seleccionado')?.value;
+                if(activeCT) {
+                    if(!appDb.catalogos.ct_cr[activeCT]) appDb.catalogos.ct_cr[activeCT] = [];
+                    if(!appDb.catalogos.ct_cr[activeCT].includes(codigo)) appDb.catalogos.ct_cr[activeCT].push(codigo);
+                }
             }
             
             guardarPiso();
@@ -758,6 +802,10 @@
             if(tipo === 'ct') {
                 delete appDb.catalogos.ct[codigo];
                 delete appDb.catalogos.ct_cr[codigo];
+                if(document.getElementById('cr-ct-seleccionado').value === codigo) {
+                    document.getElementById('panel-cr').style.display = 'none';
+                    document.getElementById('cr-ct-seleccionado').value = '';
+                }
             } else {
                 delete appDb.catalogos.cr[codigo];
                 for(let ctCode in appDb.catalogos.ct_cr) {
@@ -770,36 +818,6 @@
             showToast(`${tipo.toUpperCase()} eliminado.`);
         }
 
-        function gestionarLigas(ctCode) {
-            document.getElementById('ligar-ct-id').value = ctCode;
-            const ctNombre = appDb.catalogos.ct[ctCode].nombre;
-            document.getElementById('lbl-ligar-ct').textContent = `${ctCode} - ${ctNombre}`;
-            document.getElementById('search-cr-link').value = '';
-            renderLigasCR();
-            document.getElementById('modal-ligar-cr').style.display = 'flex';
-        }
-
-        function renderLigasCR() {
-            const ctCode = document.getElementById('ligar-ct-id').value;
-            const filtro = document.getElementById('search-cr-link').value.toLowerCase().trim();
-            const lista = document.getElementById('lista-ligas-cr');
-            lista.innerHTML = '';
-            
-            const ligados = appDb.catalogos.ct_cr[ctCode] || [];
-            
-            for (const [code, cr] of Object.entries(appDb.catalogos.cr)) {
-                if(filtro && !code.toLowerCase().includes(filtro) && !cr.nombre.toLowerCase().includes(filtro)) continue;
-                
-                const isChecked = ligados.includes(code);
-                lista.innerHTML += `
-                    <label style="display:flex; align-items:center; gap:10px; cursor:pointer; padding:5px; background:rgba(0,0,0,0.3); border-radius:4px;">
-                        <input type="checkbox" onchange="toggleLiga('${ctCode}', '${code}', this.checked)" ${isChecked ? 'checked' : ''}>
-                        <span style="color:var(--text-main);"><strong>${code}</strong> - ${cr.nombre}</span>
-                    </label>
-                `;
-            }
-        }
-
         function toggleLiga(ctCode, crCode, isLinked) {
             if(!appDb.catalogos.ct_cr[ctCode]) appDb.catalogos.ct_cr[ctCode] = [];
             
@@ -807,6 +825,13 @@
                 if(!appDb.catalogos.ct_cr[ctCode].includes(crCode)) {
                     appDb.catalogos.ct_cr[ctCode].push(crCode);
                 }
+            } else {
+                appDb.catalogos.ct_cr[ctCode] = appDb.catalogos.ct_cr[ctCode].filter(c => c !== crCode);
+            }
+            
+            guardarPiso();
+            renderCatalogos();
+        }
             } else {
                 appDb.catalogos.ct_cr[ctCode] = appDb.catalogos.ct_cr[ctCode].filter(c => c !== crCode);
             }
@@ -1417,32 +1442,51 @@
            ======================================================== */
         const canvas = document.getElementById('gold-network');
         const ctx = canvas.getContext('2d');
-        let width, height, particles;
+        let width, height, lines;
 
         function initCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            particles = [];
-            const pc = width < 768 ? 30 : 60;
-            for(let i=0; i<pc; i++) particles.push({ x: Math.random()*width, y: Math.random()*height, vx: (Math.random()-0.5)*0.4, vy: (Math.random()-0.5)*0.4, r: Math.random()*1.5+0.5 });
+            lines = [];
+            const numLines = width < 768 ? 20 : 40;
+            for(let i=0; i<numLines; i++) {
+                lines.push({ 
+                    x: Math.random()*width, 
+                    y: Math.random()*height, 
+                    length: Math.random()*150 + 50,
+                    speed: Math.random()*4 + 2,
+                    opacity: Math.random() * 0.5 + 0.5
+                });
+            }
         }
         function drawCanvas() {
             requestAnimationFrame(drawCanvas);
-            ctx.clearRect(0,0,width,height);
-            ctx.fillStyle = 'rgba(212, 175, 55, 0.5)';
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if(p.x<0 || p.x>width) p.vx*=-1; if(p.y<0 || p.y>height) p.vy*=-1;
-                ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2); ctx.fill();
-            });
-            for(let i=0; i<particles.length; i++){
-                for(let j=i+1; j<particles.length; j++){
-                    let dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
-                    if(dist<140){
-                        ctx.beginPath(); ctx.strokeStyle=`rgba(212, 175, 55, ${(1-(dist/140))*0.15})`; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
-                    }
+            // Trail fade effect (instead of clearRect)
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.25)'; 
+            ctx.fillRect(0,0,width,height);
+            
+            lines.forEach(line => {
+                line.x += line.speed;
+                line.y -= line.speed * 0.3; // subtle upward angle
+                
+                if(line.x > width + line.length || line.y < -line.length) {
+                    line.x = -line.length;
+                    line.y = Math.random()*height + height*0.3;
+                    line.speed = Math.random()*5 + 2;
                 }
-            }
+                
+                const grad = ctx.createLinearGradient(line.x, line.y, line.x - line.length, line.y + line.length*0.3);
+                grad.addColorStop(0, `rgba(212, 175, 55, ${line.opacity})`); // Head of the line (brightest)
+                grad.addColorStop(1, 'rgba(212, 175, 55, 0)'); // Tail fade
+                
+                ctx.beginPath();
+                ctx.moveTo(line.x, line.y);
+                ctx.lineTo(line.x - line.length, line.y + line.length*0.3);
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 1.5;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            });
         }
         window.addEventListener('resize', initCanvas);
         
@@ -1500,6 +1544,11 @@
     </div>
 </body>
 </html>
+
+
+
+
+
 
 
 
