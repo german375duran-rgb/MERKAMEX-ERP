@@ -211,7 +211,7 @@
             </div>
             <div style="display: flex; gap: 15px;">
                 <button class="btn btn-secondary" onclick="abrirModalImportacion()"><i class="fa-solid fa-upload"></i> Carga Masiva</button>
-                <button class="btn btn-primary" onclick="iniciarNuevaRuta()"><i class="fa-solid fa-plus"></i> Nueva Ruta</button>
+                
             </div>
         </header>
 
@@ -355,6 +355,7 @@
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <button class="btn btn-primary" onclick="procesarExcelGrid()"><i class="fa-solid fa-save"></i> PROCESAR Y GUARDAR RUTAS</button>
                 <button class="btn btn-secondary" onclick="limpiarGrid()"><i class="fa-solid fa-eraser"></i> LIMPIAR HOJA</button>
+                <button class="btn btn-danger" onclick="cerrarModal('modal-importacion')"><i class="fa-solid fa-arrow-left"></i> VOLVER</button>
             </div>
 
             <div class="excel-wrapper">
@@ -487,7 +488,7 @@
         /* --------------------------------------------------------
            3. BUSCADOR DE articulos
            -------------------------------------------------------- */
-                function buscarArticulo() {
+                        function buscarArticulo() {
             const inputVal = document.getElementById('input-busqueda').value;
             if(!inputVal) return;
             const query = inputVal.toLowerCase().trim();
@@ -504,9 +505,9 @@
 
             let resultadosHtml = '';
             
-            // Limit to max 100 results for massive performance boost
+            // Limit to max 10 results for massive performance boost
             let matches = 0;
-            const maxResults = 100;
+            const maxResults = 10;
 
             for (let i = 0; i < appDb.articulos.length; i++) {
                 const a = appDb.articulos[i];
@@ -1057,6 +1058,9 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
+
+
 
 
 
