@@ -231,8 +231,11 @@
         <div class="controls-bar no-print">
         <div class="form-group" style="width: 100%; max-width: 600px;">
             <label class="form-label">BUSCAR POR OT O CÓDIGO DE ARTÍCULO</label>
-            <div style="display: flex; gap: 10px;">
-                <input type="text" class="form-control" id="input-busqueda-hoja" placeholder="Ingrese OT (ej. OT61943) o Artículo (ej. E2501020)..." onkeydown="if(event.key === 'Enter') procesarBusquedaHoja()">
+                        <div style="display: flex; gap: 10px; width: 100%;">
+                <div style="position: relative; flex: 1;">
+                    <input type="text" class="form-control" id="input-busqueda-hoja" placeholder="Ingrese OT (ej. OT61943) o Artículo (ej. E2501020)..." autocomplete="off" onkeyup="sugerirHojaViajera(event)" onkeydown="if(event.key === 'Enter') procesarBusquedaHoja()">
+                    <div id="dropdown-sugerencias-hoja" style="display:none; position:absolute; top:100%; left:0; right:0; background:var(--bg-glass); border:1px solid var(--border-glass); max-height:250px; overflow-y:auto; z-index:1000; box-shadow:0 5px 15px rgba(0,0,0,0.5);"></div>
+                </div>
                 <button class="btn btn-primary" onclick="procesarBusquedaHoja()"><i class="fa-solid fa-search"></i> BUSCAR</button>
             </div>
             <select class="form-control" id="select-ot" onchange="cargarOT()" style="display: none; margin-top: 10px;">
@@ -367,12 +370,106 @@
                     const art = JSON.parse(artData);
                     const ruta = { operaciones: JSON.parse(rutaData) };
                     cargarRutaMaster(art, ruta);
-                    setTimeout(() => window.print(), 500); // Imprimir automático
+                    
                 }
             }
         };
 
-                async function procesarBusquedaHoja() {
+                                let appDbCache = null;
+        let isFetchingCache = false;
+
+        async function sugerirHojaViajera(e) {
+            if(e.key === 'Enter') return;
+            const input = document.getElementById('input-busqueda-hoja');
+            const dropdown = document.getElementById('dropdown-sugerencias-hoja');
+            const val = input.value.trim().toLowerCase();
+            
+            if(val.length < 1) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            // Iniciar la precarga en background si no existe
+            if(!appDbCache && !isFetchingCache) {
+                isFetchingCache = true;
+                db.collection("sistema").doc("erp_rutas").get().then(doc => {
+                    if(doc.exists) appDbCache = doc.data();
+                    isFetchingCache = false;
+                }).catch(() => isFetchingCache = false);
+            }
+
+            let resultados = [];
+            
+            DB.ots.forEach(o => {
+                if(o.ot.toLowerCase().includes(val) || 
+                   o.articulo.toLowerCase().includes(val) || 
+                   o.descArticulo.toLowerCase().includes(val)) {
+                    resultados.push({
+                        tipo: 'OT',
+                        codigo: o.ot,
+                        desc: `${o.articulo} - ${o.descArticulo}`,
+                        valorBusqueda: o.ot
+                    });
+                }
+            });
+            
+            if(resultados.length < 10 && appDbCache) {
+                appDbCache.articulos.forEach(a => {
+                    if(resultados.length >= 10) return;
+                    if(a.id.toLowerCase().includes(val) || a.nombre.toLowerCase().includes(val)) {
+                        const yaExiste = resultados.find(r => r.tipo === 'ARTÍCULO' && r.codigo === a.id);
+                        if(!yaExiste) {
+                            resultados.push({
+                                tipo: 'ARTÍCULO',
+                                codigo: a.id,
+                                desc: a.nombre,
+                                valorBusqueda: a.id
+                            });
+                        }
+                    }
+                });
+            }
+            
+            if(resultados.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            dropdown.innerHTML = '';
+            resultados.slice(0, 10).forEach(r => {
+                const div = document.createElement('div');
+                div.style.padding = '10px';
+                div.style.borderBottom = '1px solid var(--border-glass)';
+                div.style.cursor = 'pointer';
+                div.style.color = 'var(--text-main)';
+                div.style.backgroundColor = 'transparent';
+                div.innerHTML = `<strong style="color:var(--gold-light)">${r.tipo}: ${r.codigo}</strong><br><span style="font-size:0.8rem;color:var(--text-muted)">${r.desc}</span>`;
+                
+                div.onmouseover = () => div.style.backgroundColor = 'rgba(212, 175, 55, 0.2)';
+                div.onmouseout = () => div.style.backgroundColor = 'transparent';
+                div.onclick = () => {
+                    input.value = r.valorBusqueda;
+                    dropdown.style.display = 'none';
+                    procesarBusquedaHoja();
+                };
+                
+                dropdown.appendChild(div);
+            });
+            
+            dropdown.style.display = 'block';
+        }
+
+        document.addEventListener('click', function(e) {
+            const dropdown = document.getElementById('dropdown-sugerencias-hoja');
+            const input = document.getElementById('input-busqueda-hoja');
+            if(dropdown && input) {
+                if(!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            }
+        });
+
+        async function procesarBusquedaHoja() {
             const val = document.getElementById('input-busqueda-hoja').value.trim().toUpperCase();
             if(!val) return;
             
@@ -407,11 +504,15 @@
                 select.style.display = 'block';
                 alert("Este artículo está en varios proyectos. Por favor, seleccione la OT en el menú desplegable que acaba de aparecer.");
             } 
-            else {
+                        else {
                 try {
-                    const doc = await db.collection("sistema").doc("erp_rutas").get();
-                    if(doc.exists) {
-                        const appDb = doc.data();
+                    let appDb = appDbCache;
+                    if(!appDb) {
+                        const doc = await db.collection("sistema").doc("erp_rutas").get();
+                        if(doc.exists) appDb = doc.data();
+                    }
+                    
+                    if(appDb) {
                         const art = appDb.articulos.find(a => a.id.toUpperCase() === val);
                         const ruta = appDb.rutas.find(r => r.id_articulo.toUpperCase() === val);
                         
@@ -421,6 +522,11 @@
                             alert("No se encontró el artículo en las OTs actuales ni en el Catálogo Master.");
                         }
                     }
+                } catch(e) {
+                    console.error("Error consultando Firebase:", e);
+                    alert("Error consultando la base de datos maestra.");
+                }
+            }
                 } catch(e) {
                     console.error("Error consultando Firebase:", e);
                     alert("Error consultando la base de datos maestra.");
@@ -565,6 +671,11 @@
     </script>
 </body>
 </html>
+
+
+
+
+
 
 
 
