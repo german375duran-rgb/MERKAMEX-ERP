@@ -263,7 +263,7 @@
                 <div class="card-header">
                     <span><i class="fa-solid fa-route"></i> DETALLE DE RUTA: <span id="lbl-ruta-id" style="color:var(--text-main)"></span></span>
                     <div class="no-print" style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> IMPRIMIR</button>
+                        <button class="btn btn-secondary" onclick="imprimirHojaViajera()"><i class="fa-solid fa-print"></i> IMPRIMIR</button>
                         <button class="btn btn-success" id="btn-add-op" onclick="agregarFilaOperacion()"><i class="fa-solid fa-plus"></i> AGREGAR OPERACIÓN</button>
                     </div>
                 </div>
@@ -626,6 +626,12 @@
         document.getElementById('seccion-info-articulo').style.display = 'block';
         document.getElementById('seccion-ruta').style.display = 'block';
         modal.style.display = 'block';
+    }
+
+        function imprimirHojaViajera() {
+        localStorage.setItem("temp_print_art", JSON.stringify(currentArticulo));
+        localStorage.setItem("temp_print_ruta", JSON.stringify(currentRutaOps));
+        window.location.href = "HOJA VIAJERA.HTML?print=1";
     }
 
     function seleccionarArticulo(idArticulo) {
@@ -1131,6 +1137,7 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
 
 
 
