@@ -140,7 +140,7 @@
             @page { size: A4 landscape; margin: 10mm; }
             body { background: #fff !important; color: #000 !important; display: block; }
             .header, .search-section, .no-print, .side-nav, .nav-toggle-tab, .nav-overlay { display: none !important; }
-            #gold-network { display: none !important; } /* Ocultar partÃ­culas al imprimir */
+            #gold-network { display: none !important; } /* Ocultar partÃ­culas al IMPRIMIR */
             .main-wrapper { margin: 0; }
             .content { padding: 0; gap: 15px; }
             
@@ -225,19 +225,19 @@
             <section class="card search-section no-print">
                 <div class="card-header">BUSCAR ARTÍCULO</div>
                 <div style="display: flex; gap: 15px;">
-                    <input type="text" id="input-busqueda" código o descripción del artículo (Ej. ART-001 o Panel)..." onkeyup="buscarArticulo()">
-                    <button class="btn btn-primary" onclick="buscarArticulo()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
+                    <input type="text" id="input-busqueda" placeholder="CÓDIGO O DESCRIPCIÓN DEL ARTÍCULO (EJ. ART-001 O PANEL)..." class="form-control" onkeyup="buscarArticulo()">
+                    <button class="btn btn-primary" onclick="buscarArticulo()"><i class="fa-solid fa-magnifying-glass"></i> BUSCAR</button>
                 </div>
                 
                 <div id="resultados-busqueda" class="table-responsive" style="display: none; margin-top: 20px;">
                     <table id="tabla-resultados">
                         <thead>
                             <tr>
-                                <th>código</th>
-                                <th>artículo / descripción</th>
+                                <th>CÓDIGO</th>
+                                <th>ARTÍCULO / DESCRIPCIÓN</th>
                                 <th>RUTA ASIGNADA</th>
                                 <th>ESTADO</th>
-                                <th>ACCIÃ“N</th>
+                                <th>ACCIÓN</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-resultados"></tbody>
@@ -247,7 +247,7 @@
 
             <section class="card" id="seccion-info-articulo" style="display: none;">
                 <div class="card-header">
-                    DATOS DEL artículo
+                    DATOS DEL ARTÍCULO
                     <span id="badge-estado-ruta" class="badge"></span>
                 </div>
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;">
@@ -255,7 +255,7 @@
                     <div style="grid-column: span 2;"><span style="font-size: 0.7rem; color: var(--text-muted);">descripción</span><div id="lbl-art-desc" style="font-weight: 600;"></div></div>
                     <div><span style="font-size: 0.7rem; color: var(--text-muted);">UNIDAD</span><div id="lbl-art-uni"></div></div>
                     <div><span style="font-size: 0.7rem; color: var(--text-muted);">FAMILIA</span><div id="lbl-art-fam"></div></div>
-                    <div><span style="font-size: 0.7rem; color: var(--text-muted);">RUTAS ASIGNADAS</span><div id="lbl-art-ruta" style="color: var(--neon-blue); font-weight: 700;"></div></div>
+                    
                 </div>
             </section>
 
@@ -263,8 +263,8 @@
                 <div class="card-header">
                     <span><i class="fa-solid fa-route"></i> DETALLE DE RUTA: <span id="lbl-ruta-id" style="color:var(--text-main)"></span></span>
                     <div class="no-print" style="display: flex; gap: 10px;">
-                        <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> Imprimir</button>
-                        <button class="btn btn-success" id="btn-add-op" onclick="agregarFilaOperacion()"><i class="fa-solid fa-plus"></i> Agregar Operación</button>
+                        <button class="btn btn-secondary" onclick="window.print()"><i class="fa-solid fa-print"></i> IMPRIMIR</button>
+                        <button class="btn btn-success" id="btn-add-op" onclick="agregarFilaOperacion()"><i class="fa-solid fa-plus"></i> AGREGAR OPERACIÓN</button>
                     </div>
                 </div>
 
@@ -274,11 +274,11 @@
                             <tr>
                                 <th style="width: 8%;">SEC.</th>
                                 <th style="width: 15%;">CENTRO (CT)</th>
-                                <th style="width: 20%;">descripción CT</th>
+                                <th style="width: 20%;">DESCRIPCIÓN CT</th>
                                 <th style="width: 15%;">RECURSO (CR)</th>
-                                <th style="width: 20%;">descripción CR</th>
+                                <th style="width: 20%;">DESCRIPCIÓN CR</th>
                                 <th style="width: 12%;">MIN / PZ</th>
-                                <th style="width: 10%; text-align: center;" class="no-print">ACCIÃ“N</th>
+                                <th style="width: 10%; text-align: center;" class="no-print">ACCIÓN</th>
                             </tr>
                         </thead>
                         <tbody id="tbody-ruta">
@@ -287,15 +287,14 @@
                 </div>
 
                 <div class="summary-grid">
-                    <div class="summary-item"><span>TOTAL operaciones</span><strong id="res-ops">0</strong></div>
+                    <div class="summary-item"><span>TOTAL OPERACIONES</span><strong id="res-ops">0</strong></div>
                     <div class="summary-item"><span>TIEMPO TOTAL (MIN/PZ)</span><strong id="res-tiempo" style="color: var(--neon-blue);">0.00</strong></div>
-                    <div class="summary-item"><span>CT DISTINTOS</span><strong id="res-ct">0</strong></div>
-                    <div class="summary-item"><span>CR DISTINTOS</span><strong id="res-cr">0</strong></div>
+                    
                 </div>
 
                 <div class="no-print" style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 25px; border-top: 1px solid var(--border-glass); padding-top: 20px;">
-                    <button class="btn btn-secondary" onclick="cancelarCambios()"><i class="fa-solid fa-xmark"></i> Cancelar / Descartar</button>
-                    <button class="btn btn-primary" onclick="guardarRuta()"><i class="fa-solid fa-floppy-disk"></i> Guardar Ruta</button>
+                    <button class="btn btn-secondary" onclick="cancelarCambios()"><i class="fa-solid fa-xmark"></i> CANCELAR / DESCARTAR</button>
+                    <button class="btn btn-primary" onclick="guardarRuta()"><i class="fa-solid fa-floppy-disk"></i> GUARDAR RUTA</button>
                 </div>
             </section>
 
@@ -371,7 +370,7 @@
                             <th>SETUP</th>
                             <th>TIEMPO</th>
                             <th>UM</th>
-                            <th>Operación</th>
+                            <th>OPERACIÓN</th>
                         </tr>
                     </thead>
                     <tbody id="excel-grid-body">
@@ -727,14 +726,14 @@
                     <td><select class="table-select" onchange="actualizarCR(${index}, this.value)">${crOptions}</select></td>
                     <td><input type="number" step="0.01" min="0" class="table-input" value="${op.tiempo}" onchange="actualizarDatoFila(${index}, 'tiempo', this.value)" style="text-align:right; width: 80px;"></td>
                     <td class="no-print" style="text-align:center;">
-                        <button class="btn-danger" onclick="eliminarOperacion(${index})" title="Eliminar Operación"><i class="fa-solid fa-trash"></i></button>
+                        <button class="btn-danger" onclick="eliminarOperacion(${index})" title="ELIMINAR OPERACIÓN"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
             `;
         });
 
         if(currentRutaOps.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar Operación".</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">SIN OPERACIONES ASIGNADAS. PRESIONE "+ AGREGAR OPERACIÓN".</td></tr>`;
         }
 
         calcularTotalesResumen();
@@ -744,7 +743,7 @@
         let maxSeq = 0;
         currentRutaOps.forEach(op => { if(op.seq > maxSeq) maxSeq = op.seq; });
         currentRutaOps.push({
-            seq: maxSeq + 10,
+            seq: maxSeq + 1,
             ct: "",
             cr: "",
             desc_operacion: "",
@@ -753,7 +752,70 @@
         renderTablaRuta();
     } 
 
-        function cancelarCambios()  {
+            function eliminarOperacion(index) {
+        if(confirm("¿Seguro que desea eliminar esta operación?")) {
+            currentRutaOps.splice(index, 1);
+            renderTablaRuta();
+        }
+    }
+
+    function calcularTotalesResumen() {
+        const spanOps = document.getElementById('res-ops');
+        const spanTiempo = document.getElementById('res-tiempo');
+        
+        if(!spanOps || !spanTiempo) return; // Prevent crashes if elements don't exist
+        
+        let totalTiempo = 0;
+        
+        currentRutaOps.forEach(op => {
+            totalTiempo += (parseFloat(op.tiempo) || 0);
+        });
+        
+        spanOps.textContent = currentRutaOps.length;
+        spanTiempo.textContent = totalTiempo.toFixed(2);
+    }
+
+    async function guardarRuta() {
+        if(currentRutaOps.length === 0) {
+            alert("No hay operaciones en la ruta. Agregue al menos una.");
+            return;
+        }
+        
+        let isValid = true;
+        currentRutaOps.forEach((op, index) => {
+            if(!op.ct || !op.cr) {
+                alert(`La operación en la secuencia ${op.seq} no tiene CT o CR válido.`);
+                isValid = false;
+            }
+        });
+        
+        if(!isValid) return;
+
+        // Actualizar o crear la ruta
+        let rutaIndex = appDb.rutas.findIndex(r => r.id_articulo === currentArticulo.id);
+        
+        if (rutaIndex >= 0) {
+            appDb.rutas[rutaIndex].operaciones = JSON.parse(JSON.stringify(currentRutaOps));
+        } else {
+            appDb.rutas.push({
+                id_ruta: lastGeneredRouteId,
+                id_articulo: currentArticulo.id,
+                estado: "ACTIVA",
+                operaciones: JSON.parse(JSON.stringify(currentRutaOps))
+            });
+        }
+        
+        // Guardar en firebase
+        await guardarDB();
+        
+        // Refrescar modal y busqueda
+        showToast("Ruta guardada exitosamente");
+        document.getElementById('modal-editor-ruta').style.display = 'none';
+        document.getElementById('resultados-busqueda').style.display = 'block';
+        buscarArticulo(); 
+    }
+
+    function cancelarCambios() {
             if(confirm("Â¿EstÃ¡s seguro de cancelar? Se perderÃ¡n las modificaciones no guardadas.")) {
                 seleccionarArticulo(currentArticulo.id); 
             }
@@ -1069,6 +1131,18 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
