@@ -576,7 +576,7 @@
         /* --------------------------------------------------------
            5. RENDERIZADO Y EDICIÃ“N DE TABLA DE operaciones
            -------------------------------------------------------- */
-                function renderTablaRuta() {
+                        function renderTablaRuta() {
             const tbody = document.getElementById('tbody-ruta');
             tbody.innerHTML = '';
 
@@ -588,47 +588,47 @@
                 const ctDesc = ctEncontrado?.desc || op.desc_operacion || '';
                 const crDesc = crEncontrado?.desc || op.desc_operacion || '';
 
-                let ctSelectHtml = <select class="table-select" onchange="actualizarCT(${index}, this.value)">;
-                ctSelectHtml += <option value="">-- SELECCIONE CT --</option>;
+                let ctSelectHtml = `<select class="table-select" onchange="actualizarCT(${index}, this.value)">`;
+                ctSelectHtml += `<option value="">-- SELECCIONE CT --</option>`;
                 let foundCt = false;
                 appDb.centrosTrabajo.forEach(ct => {
                     if (ct.id === op.ct) foundCt = true;
-                    ctSelectHtml += <option value="${ct.id}" >${ct.id} - ${ct.desc}</option>;
+                    ctSelectHtml += `<option value="${ct.id}" ${ct.id === op.ct ? 'selected' : ''}>${ct.id} - ${ct.desc}</option>`;
                 });
                 if(!foundCt && op.ct) {
-                    ctSelectHtml += <option value="${op.ct}" selected>${op.ct} (De Excel)</option>;
+                    ctSelectHtml += `<option value="${op.ct}" selected>${op.ct} (De Excel)</option>`;
                 }
-                ctSelectHtml += </select>;
+                ctSelectHtml += `</select>`;
 
                 let crOptions = '<option value="">-- SELECCIONE CR --</option>';
                 let foundCr = false;
                 if(op.ct) {
                     appDb.recursos.filter(r => r.id_ct === op.ct).forEach(cr => {
                         if (cr.id === op.cr) foundCr = true;
-                        crOptions += <option value="${cr.id}" >${cr.id} - ${cr.desc}</option>;
+                        crOptions += `<option value="${cr.id}" ${cr.id === op.cr ? 'selected' : ''}>${cr.id} - ${cr.desc}</option>`;
                     });
                 }
                 if(!foundCr && op.cr) {
-                    crOptions += <option value="${op.cr}" selected>${op.cr} (De Excel)</option>;
+                    crOptions += `<option value="${op.cr}" selected>${op.cr} (De Excel)</option>`;
                 }
 
-                tbody.innerHTML += 
+                tbody.innerHTML += `
                     <tr>
                         <td><input type="number" class="table-input" value="${op.seq}" onchange="actualizarDatoFila(${index}, 'seq', this.value)" style="text-align:center; font-weight:bold;"></td>
-                        <td></td>
-                        <td style="color:var(--text-muted); font-size:0.75rem;"></td>
-                        <td><select class="table-select" onchange="actualizarCR(${index}, this.value)"></select></td>
-                        <td style="color:var(--text-muted); font-size:0.75rem; font-weight:bold; color:var(--gold-light);"></td>
+                        <td>${ctSelectHtml}</td>
+                        <td style="color:var(--text-muted); font-size:0.75rem;">${ctDesc}</td>
+                        <td><select class="table-select" onchange="actualizarCR(${index}, this.value)">${crOptions}</select></td>
+                        <td style="color:var(--text-muted); font-size:0.75rem; font-weight:bold; color:var(--gold-light);">${op.desc_operacion || crDesc}</td>
                         <td><input type="number" step="0.01" min="0" class="table-input" value="${op.tiempo}" onchange="actualizarDatoFila(${index}, 'tiempo', this.value)" style="text-align:right;"></td>
                         <td class="no-print" style="text-align:center;">
                             <button class="btn-danger" onclick="eliminarOperacion(${index})" title="Eliminar Operación"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
-                ;
+                `;
             });
 
             if(currentRutaOps.length === 0) {
-                tbody.innerHTML = <tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar Operación".</td></tr>;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px; color:var(--text-muted);">Sin operaciones asignadas. Presione "+ Agregar Operación".</td></tr>`;
             }
 
             calcularTotalesResumen();
@@ -1045,6 +1045,7 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
 
 
 
