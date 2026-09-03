@@ -375,7 +375,21 @@
             }
         };
 
-                                let appDbCache = null;
+                                const diccCR = {
+      "CR0101": "Centro Corte Sierra Cinta", "CR0102": "Centro Corte Metalera Bufalo", "CR0103": "Centro Corte Plasma Est.", "CR0104": "Centro Cortadora de Disco Est.", "CR0105": "Centro Corte Soplete Est.", "CR0106": "Centro Rolado RN100", "CR0107": "Centro Taladro Fundoya-Barrenado", "CR0108": "Centro Troqueladora Comamet", "CR0109": "Centro Troqueladora Bufalo", "CR0110": "Centro Troqueladora de Monten", "CR0111": "Centro Troqueladora MEISTER 90", "CR0112": "Centro Troqueladora MEISTER 120", "CR0113": "Centro Roscado", "CR0114": "Centro Doblez Icaro", "CR0115": "Centro Soldadura Polin", "CR0116": "Centro Soldadura 1Per", "CR0117": "Centro Soldadura (2 Personas)", "CR0118": "Centro de Montacargas", "CR0119": "Centro Armado (2 Personas)",
+      "CR0201": "Centro Estirado Automático", "CR0202": "Corte de Alambre", "CR0203": "Centro Estirado Manual", "CR0204": "Centro Birlo", "CR0205": "Centro Wafios 1", "CR0206": "Centro Wafios 2", "CR0207": "Centro Schlatter 1", "CR0208": "Centro Schlatter 2", "CR0209": "Centro Schlatter 3", "CR0210": "Centro Schlatter 4", "CR0211": "Centro Posiweld 1", "CR0212": "Centro Posiweld 2", "CR0213": "Centro Punteado 1", "CR0214": "Centro Punteado 2", "CR0215": "Centro Punteado 3", "CR0216": "Centro Punteado 4", "CR0217": "Centro Punteado 5", "CR0218": "Centro Punteado 6", "CR0219": "Centro Punteado 7", "CR0220": "Centro Punteado 8", "CR0221": "Centro Terminación Recorte 1", "CR0222": "Centro Terminación Recorte 2", "CR0223": "Centro Terminación Recorte 3", "CR0224": "Centro Terminación Recorte 4", "CR0225": "Centro Terminación Recorte 5", "CR0226": "Centro Terminación Recorte 6", "CR0227": "Centro Terminación Recorte 7", "CR0228": "Centro Terminación Recorte 8", "CR0229": "Centro Terminación Recorte 9", "CR0230": "Centro Terminación Recorte 10", "CR0231": "Centro Terminación Doblez 1", "CR0232": "Centro Terminación Ventana", "CR0233": "Centro Empaque Alambre", "CR0236": "Centro Galvanizado",
+      "CR0301": "Centro Inyección Engel", "CR0302": "Centro Inyección Haitian", "CR0303": "Centro Inyección Negri Bossi", "CR0304": "Centro Extrusión SJSZ 1", "CR0305": "Centro Extrusión SJSZ 2", "CR0306": "Centro Extrusión Baussano", "CR0307": "Centro Curvado y Acampanado", "CR0308": "Centro Pegado Silleta", "CR0309": "Centro Mezclado", "CR0310": "Centro de Empaque Plásticos", "CR0311": "vacio",
+      "CR0401": "Centro Torneado", "CR0402": "Maquinado externo", "CR0403": "Centro Ajuste Tornos", "CR0404": "Centro de Trabajo Desbaste Tornos", "CR0405": "Centro Fresado", "CR0406": "Centro Cepillado", "CR0407": "Centro Barrenado Tornos", "CR0408": "Centro Machueleado", "CR0409": "Centro Prensado Tornos", "CR0410": "Centro Perfilado", "CR0411": "Centro Rectificado", "CR0412": "Centro Erosionado", "CR0413": "Centro Corte Sierra Cinta #1", "CR0414": "Centro Corte Sierra Cinta #2", "CR0415": "Centro Torno CNC", "CR0416": "Centro CNC Vertical", "CR0417": "Centro Revolver", "CR0418": "Centro Ensamblado Tornos", "CR0419": "Avellanado Tornos", "CR0420": "Empaque Tornos",
+      "CR0501": "Centro Cortado Mec.", "CR0502": "Centro Corte Disco Mec.", "CR0503": "Centro Rolado Comedero (4Per)", "CR0504": "Centro Rolado Bipie-Riel", "CR0505": "Centro Rolado Columna", "CR0506": "Centro Punzonado Unipunch", "CR0507": "Centro Troquelado Mec.", "CR0508": "Centro Doblado Mec.", "CR0509": "Centro Prensa Mec.", "CR0510": "Centro Machucado Mec.", "CR0511": "Centro de Engargolado", "CR0512": "Centro Prensado Accurpress", "CR0513": "Centro de Klinchado", "CR0514": "Centro Soldado Mec.", "CR0515": "Punteado Mec.", "CR0516": "Centro Armado Mec.", "CR0517": "Centro Ensamblado Mec.", "CR0518": "Centro Barrenado Mec.", "CR0519": "Empaque y Emplayado", "CR0520": "Centro Pulido Mec.",
+      "CR0601": "Empaque Paileria", "CR0602": "Paileria-Inst. Foranea", "CR0603": "Paileria-Inst. Torres y Tambos", "CR0604": "Centro Corte Disco Paileria", "CR0605": "Centro Corte Cizalla Paileria", "CR0606": "Centro de Rolado Paileria", "CR0607": "Centro de Doblado Paileria", "CR0608": "Centro de Armado Paileria", "CR0609": "Centro de Soldado Paileria", "CR0610": "Vuelta de Camioneta", "CR0611": "Centro de Barrenado Paileria", "CR0612": "vacio",
+      "CR0701": "Centro de Corte Exhibidores", "CR0702": "Centro de Rolado Exhibidores", "CR0703": "Centro de Doblez Exhibidores", "CR0704": "Centro de Punteado Soldadura Exhibidores", "CR0705": "Centro de Armado y Soldadura Exhibidores", "CR0706": "Centro de Punteado de Cenefas Exhibidores", "CR0707": "Centro de Barrenado Exhibidores", "CR0708": "Centro Pintura Electrostatica", "CR0709": "Centro de Ensamblado Exhibidores", "CR0710": "Centro de Pegado de Artes Exhibidores", "CR0711": "Centro de Empaque Exhibidores",
+      "CR0801": "Centro Electrificacion (Miguel)", "CR0802": "Centro Electrificacion (Ayudante)", "CR0803": "vacio",
+      "CR0901": "Centro Pintura Estopa", "CR0902": "Centro Pintura Aspersion", "CR0903": "Centro Pintura Manual",
+      "CR1001": "Centro Nivelado-Corte Lamina", "CR1002": "Centro Amada", "CR1003": "Centro Bystronic Nitrogeno 1", "CR1004": "Centro Bystronic Nitrogeno 2", "CR1005": "Centro Corte Plasma", "CR1006": "vacio",
+      "CR1101": "Centro Instalaciones", "CR1102": "Instalacion Electrica", "CR1103": "Instalacion de Sist. de Llenado", "CR1104": "Inst. de Bases", "CR1105": "Inst. Armar y Tapar"
+    };
+
+        let appDbCache = null;
         let isFetchingCache = false;
 
         async function sugerirHojaViajera(e) {
@@ -534,7 +548,7 @@
             }
         }
 
-        function cargarRutaMaster(art, ruta) {
+                function cargarRutaMaster(art, ruta) {
             document.getElementById('doc-proy').textContent = "RUTA MASTER (SIN OT)";
             document.getElementById('doc-cod').textContent = art.id;
             document.getElementById('doc-desc').textContent = art.nombre;
@@ -546,7 +560,12 @@
             
             ruta.operaciones.sort((a,b) => a.seq - b.seq).forEach(paso => {
                 let desc = paso.desc_operacion || "";
-                if(!desc && paso.cr) desc = "CR " + paso.cr;
+                if(!desc && paso.cr && typeof diccCR !== 'undefined' && diccCR[paso.cr]) {
+                    desc = diccCR[paso.cr];
+                } else if(!desc && paso.cr) {
+                    desc = "CR " + paso.cr;
+                }
+                
                 agregarFilaData({ ct: paso.ct || '', cr: paso.cr || '', desc: desc });
                 for(let i = 0; i < 4; i++) {
                     agregarFilaVacia();
@@ -671,6 +690,7 @@
     </script>
 </body>
 </html>
+
 
 
 
