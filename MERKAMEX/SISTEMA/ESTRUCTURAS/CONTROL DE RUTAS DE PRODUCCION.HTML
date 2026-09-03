@@ -514,7 +514,7 @@
                 const safeNombre = a.nombre ? a.nombre.toLowerCase() : '';
                 const safeDesc = a.desc ? a.desc.toLowerCase() : '';
 
-                if (safeId.includes(query) || safeNombre.includes(query) || safeDesc.includes(query)) {
+                if (safeId.includes(query) || safeNombre.includes(query)) {
                     const rutaInfo = appDb.rutas.find(r => r.id_articulo === a.id);
                     const tieneRuta = !!rutaInfo;
                     
@@ -642,13 +642,13 @@
         const badge = document.getElementById('badge-estado-ruta');
         
         if (rutaExistente) {
-            document.getElementById('lbl-art-ruta').textContent = rutaExistente.id_ruta;
+            if(document.getElementById('lbl-art-ruta')) document.getElementById('lbl-art-ruta').textContent = rutaExistente.id_ruta;
             badge.className = 'badge bg-success';
             badge.textContent = '✔️ RUTA ENCONTRADA';
             lastGeneredRouteId = rutaExistente.id_ruta;
             currentRutaOps = JSON.parse(JSON.stringify(rutaExistente.operaciones)); 
         } else {
-            document.getElementById('lbl-art-ruta').textContent = "POR ASIGNAR";
+            if(document.getElementById('lbl-art-ruta')) document.getElementById('lbl-art-ruta').textContent = "POR ASIGNAR";
             badge.className = 'badge bg-warning';
             badge.textContent = '⚠️ SIN RUTA ASIGNADA';
             lastGeneredRouteId = "RT-" + Math.floor(Math.random() * 9000 + 1000);
@@ -1131,6 +1131,11 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
+
+
+
+
+
 
 
 
