@@ -1,0 +1,77 @@
+﻿<style>
+.excel-grid {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: #fff;
+    color: #000;
+}
+.excel-grid th {
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 8px;
+    font-size: 0.8rem;
+    text-align: center;
+    color: #333;
+    position: sticky;
+    top: 0;
+}
+.excel-grid td {
+    border: 1px solid #ccc;
+    padding: 6px;
+    font-size: 0.85rem;
+    min-width: 80px;
+    outline: none;
+    background: #fff;
+}
+.excel-grid td:focus {
+    background: #e6f2ff;
+    border: 2px solid #0066cc;
+}
+.excel-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: auto;
+    background: #fff;
+    border-radius: 4px;
+}
+</style>
+
+<div class="modal-overlay-custom" id="modal-importacion">
+    <div class="modal-content" style="max-width: 95vw; width: 1200px;">
+        <div class="card-header">
+            HOJA DE EXCEL - CARGA MASIVA DE RUTAS
+            <button style="background:none; border:none; color:var(--text-main); font-size:1.2rem; cursor:pointer;" onclick="cerrarModal('modal-importacion')">X</button>
+        </div>
+        
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+            Haga clic en la primera celda y <strong>presione Ctrl+V</strong> para pegar directamente desde su archivo de Excel.
+        </p>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button class="btn btn-primary" onclick="procesarExcelGrid()"><i class="fa-solid fa-save"></i> PROCESAR Y GUARDAR RUTAS</button>
+            <button class="btn btn-secondary" onclick="limpiarGrid()"><i class="fa-solid fa-eraser"></i> LIMPIAR HOJA</button>
+        </div>
+
+        <div class="excel-wrapper">
+            <table class="excel-grid" id="excel-grid-table">
+                <thead>
+                    <tr>
+                        <th>ARTÍCULO</th>
+                        <th>SECUENCIA</th>
+                        <th>CT</th>
+                        <th>CR</th>
+                        <th>DESC. CR</th>
+                        <th>SETUP</th>
+                        <th>TIEMPO</th>
+                        <th>UM</th>
+                        <th>OPERACIÓN</th>
+                    </tr>
+                </thead>
+                <tbody id="excel-grid-body">
+                    <!-- Javascript generates this -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

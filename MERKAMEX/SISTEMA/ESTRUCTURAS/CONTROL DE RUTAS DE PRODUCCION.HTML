@@ -161,6 +161,11 @@
         }
         #print-header { display: none; }
     </style>
+
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../../firebase-config.js"></script>
 </head>
 <body>
 
@@ -297,48 +302,81 @@
         </div>
     </div>
 
+    <style>
+    .excel-grid {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background: #fff;
+        color: #000;
+    }
+    .excel-grid th {
+        background: #f0f0f0;
+        border: 1px solid #ccc;
+        padding: 8px;
+        font-size: 0.8rem;
+        text-align: center;
+        color: #333;
+        position: sticky;
+        top: 0;
+    }
+    .excel-grid td {
+        border: 1px solid #ccc;
+        padding: 6px;
+        font-size: 0.85rem;
+        min-width: 80px;
+        outline: none;
+        background: #fff;
+    }
+    .excel-grid td:focus {
+        background: #e6f2ff;
+        border: 2px solid #0066cc;
+    }
+    .excel-wrapper {
+        max-height: 500px;
+        overflow-y: auto;
+        overflow-x: auto;
+        background: #fff;
+        border-radius: 4px;
+    }
+    </style>
+
     <div class="modal-overlay-custom" id="modal-importacion">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 95vw; width: 1200px;">
             <div class="card-header">
-                IMPORTAR RUTAS MASIVAMENTE
+                HOJA DE EXCEL - CARGA MASIVA DE RUTAS
                 <button style="background:none; border:none; color:var(--text-main); font-size:1.2rem; cursor:pointer;" onclick="cerrarModal('modal-importacion')">×</button>
             </div>
             
-            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
-                Seleccione un archivo Excel (.xlsx) o CSV con el formato correcto de columnas: <br>
-                <strong style="color:var(--gold-light)">CODIGO_ARTICULO | CODIGO_RUTA | SECUENCIA | CT | CR | TIEMPO_PZ</strong>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+                Haga clic en la primera celda y <strong>presione Ctrl+V</strong> para pegar directamente desde su archivo de Excel.
             </p>
 
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <input type="file" id="file-excel" accept=".xlsx, .xls, .csv" class="form-control" style="padding: 9px;">
-                <button class="btn btn-primary" onclick="leerExcel()"><i class="fa-solid fa-file-excel"></i> Leer Archivo</button>
-            </div>
-            
-            <div style="text-align: center; margin-bottom: 20px;">
-                <p style="font-size: 0.8rem; margin: 10px 0;">O si lo prefiere:</p>
-                <button class="btn btn-secondary" onclick="alert('Conexión con Google Drive pendiente de configuración API. Funcionalidad preparada en arquitectura.')"><i class="fa-brands fa-google-drive"></i> Importar desde Google Drive</button>
+            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <button class="btn btn-primary" onclick="procesarExcelGrid()"><i class="fa-solid fa-save"></i> PROCESAR Y GUARDAR RUTAS</button>
+                <button class="btn btn-secondary" onclick="limpiarGrid()"><i class="fa-solid fa-eraser"></i> LIMPIAR HOJA</button>
             </div>
 
-            <div id="preview-importacion" style="display: none; border-top: 1px solid var(--border-glass); padding-top: 20px;">
-                <h3 style="font-size: 1rem; color: var(--neon-blue); margin-bottom: 10px;">PREVISUALIZACIÓN Y VALIDACIÓN</h3>
-                <div class="summary-grid" style="margin-bottom: 15px;">
-                    <div class="summary-item"><span>RUTAS A CREAR/ACTUALIZAR</span><strong id="imp-rutas">0</strong></div>
-                    <div class="summary-item"><span>REGISTROS VÁLIDOS</span><strong id="imp-validos" style="color:var(--success-color)">0</strong></div>
-                    <div class="summary-item"><span>ERRORES DETECTADOS</span><strong id="imp-errores" style="color:var(--danger-color)">0</strong></div>
-                </div>
-
-                <div id="tabla-errores-container" style="display:none; max-height: 150px; overflow-y: auto; margin-bottom: 15px;">
-                    <table style="font-size: 0.75rem;">
-                        <thead><tr><th>Fila</th><th>Artículo</th><th>Error Detectado</th></tr></thead>
-                        <tbody id="tbody-errores" style="color: var(--danger-color);"></tbody>
-                    </table>
-                </div>
-
-                <div style="text-align: right;">
-                    <button class="btn btn-success" id="btn-confirmar-import" onclick="confirmarImportacion()" style="display:none;"><i class="fa-solid fa-check"></i> CONFIRMAR E IMPORTAR</button>
-                </div>
+            <div class="excel-wrapper">
+                <table class="excel-grid" id="excel-grid-table">
+                    <thead>
+                        <tr>
+                            <th>ARTÍCULO</th>
+                            <th>SECUENCIA</th>
+                            <th>CT</th>
+                            <th>CR</th>
+                            <th>DESC. CR</th>
+                            <th>SETUP</th>
+                            <th>TIEMPO</th>
+                            <th>UM</th>
+                            <th>OPERACIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="excel-grid-body">
+                        <!-- Javascript generates this -->
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </div>
 
@@ -402,7 +440,7 @@
         };
 
         // Estado de la aplicación
-        let db = {};
+        let appDb = {};
         let currentArticulo = null;
         let currentRutaOps = []; 
         let lastGeneredRouteId = null;
@@ -411,21 +449,30 @@
         /* --------------------------------------------------------
            2. INICIALIZACIÓN
            -------------------------------------------------------- */
-        window.onload = () => {
-            const localData = localStorage.getItem('erp_rutas_db');
-            if (localData) {
-                db = JSON.parse(localData);
-            } else {
-                db = JSON.parse(JSON.stringify(defaultData));
-                guardarDB();
-            }
-            
+        window.onload = async () => {
             initCanvas(); 
             drawCanvas();
+            
+            try {
+                const doc = await appDb.collection("sistema").doc("erp_rutas").get();
+                if (doc.exists) {
+                    appDb = doc.data();
+                } else {
+                    window.appappDb = JSON.parse(JSON.stringify(defaultData));
+                    await guardarDB();
+                }
+            } catch(e) {
+                console.error("Error cargando db de Firebase", e);
+                window.appappDb = JSON.parse(JSON.stringify(defaultData));
+            }
         };
 
-        function guardarDB() {
-            localStorage.setItem('erp_rutas_db', JSON.stringify(db));
+        async function guardarDB() {
+            try {
+                await appDb.collection("sistema").doc("erp_rutas").set(appDb);
+            } catch(e) {
+                console.error("Error guardando db en Firebase", e);
+            }
         }
 
         function showToast(msg) {
@@ -453,7 +500,7 @@
 
             tbody.innerHTML = '';
             
-            const resultados = db.articulos.filter(a => 
+            const resultados = appDb.articulos.filter(a => 
                 a.id.toLowerCase().includes(query) || 
                 a.nombre.toLowerCase().includes(query) || 
                 a.desc.toLowerCase().includes(query)
@@ -463,7 +510,7 @@
                 tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger-color);">✕ EL ARTÍCULO NO EXISTE EN EL CATÁLOGO.</td></tr>`;
             } else {
                 resultados.forEach(art => {
-                    const rutaInfo = db.rutas.find(r => r.id_articulo === art.id);
+                    const rutaInfo = appDb.rutas.find(r => r.id_articulo === art.id);
                     const tieneRuta = !!rutaInfo;
                     
                     const badgeStr = tieneRuta ? `<span class="badge bg-success">ACTIVA</span>` : `<span class="badge bg-warning">SIN RUTA</span>`;
@@ -489,8 +536,8 @@
            4. SELECCIÓN Y CARGA DE RUTA
            -------------------------------------------------------- */
         function seleccionarArticulo(idArticulo) {
-            currentArticulo = db.articulos.find(a => a.id === idArticulo);
-            const rutaExistente = db.rutas.find(r => r.id_articulo === idArticulo);
+            currentArticulo = appDb.articulos.find(a => a.id === idArticulo);
+            const rutaExistente = appDb.rutas.find(r => r.id_articulo === idArticulo);
 
             document.getElementById('resultados-busqueda').style.display = 'none';
 
@@ -532,25 +579,25 @@
             tbody.innerHTML = '';
 
             let ctOptions = '<option value="">-- SELECCIONE CT --</option>';
-            db.centrosTrabajo.forEach(ct => {
+            appDb.centrosTrabajo.forEach(ct => {
                 ctOptions += `<option value="${ct.id}">${ct.id} - ${ct.desc}</option>`;
             });
 
             currentRutaOps.sort((a,b) => a.seq - b.seq).forEach((op, index) => {
                 
-                const ctDesc = db.centrosTrabajo.find(c => c.id === op.ct)?.desc || '';
-                const crDesc = db.recursos.find(c => c.id === op.cr)?.desc || '';
+                const ctDesc = appDb.centrosTrabajo.find(c => c.id === op.ct)?.desc || '';
+                const crDesc = appDb.recursos.find(c => c.id === op.cr)?.desc || '';
 
                 let crOptions = '<option value="">-- SELECCIONE CR --</option>';
                 if(op.ct) {
-                    db.recursos.filter(r => r.id_ct === op.ct).forEach(cr => {
+                    appDb.recursos.filter(r => r.id_ct === op.ct).forEach(cr => {
                         crOptions += `<option value="${cr.id}" ${cr.id === op.cr ? 'selected' : ''}>${cr.id} - ${cr.desc}</option>`;
                     });
                 }
 
                 let ctSelectHtml = `<select class="table-select" onchange="actualizarCT(${index}, this.value)">`;
                 ctSelectHtml += `<option value="">-- SELECCIONE CT --</option>`;
-                db.centrosTrabajo.forEach(ct => {
+                appDb.centrosTrabajo.forEach(ct => {
                     ctSelectHtml += `<option value="${ct.id}" ${ct.id === op.ct ? 'selected' : ''}>${ct.id} - ${ct.desc}</option>`;
                 });
                 ctSelectHtml += `</select>`;
@@ -650,12 +697,12 @@
 
             currentRutaOps.sort((a,b) => a.seq - b.seq);
 
-            const indexRuta = db.rutas.findIndex(r => r.id_articulo === currentArticulo.id);
+            const indexRuta = appDb.rutas.findIndex(r => r.id_articulo === currentArticulo.id);
             
             if (indexRuta >= 0) {
-                db.rutas[indexRuta].operaciones = JSON.parse(JSON.stringify(currentRutaOps));
+                appDb.rutas[indexRuta].operaciones = JSON.parse(JSON.stringify(currentRutaOps));
             } else {
-                db.rutas.push({
+                appDb.rutas.push({
                     id_ruta: lastGeneredRouteId,
                     id_articulo: currentArticulo.id,
                     estado: "ACTIVA",
@@ -694,7 +741,7 @@
             document.getElementById('btn-confirmar-import').style.display = 'none';
             datosAImportar = null;
             
-            document.getElementById('modal-importacion').classList.add('active');
+            document.getElementById('modal-importacion').classList.add('active'); iniciarGrid();
         }
 
         function cerrarModal(id) {
@@ -743,21 +790,22 @@
                 let errorFila = false;
 
                 if(!codArt) { errores.push({ f: numFila, a: 'N/A', err: 'Falta código de artículo.'}); errorFila = true; }
-                else if (!db.articulos.some(a => a.id === codArt)) { errores.push({ f: numFila, a: codArt, err: 'Artículo no existe en catálogo.'}); errorFila = true; }
+                else if (!appDb.articulos.some(a => a.id === codArt)) { errores.push({ f: numFila, a: codArt, err: 'Artículo no existe en catálogo.'}); errorFila = true; }
                 
                 if(!codRuta) { errores.push({ f: numFila, a: codArt, err: 'Falta código de ruta.'}); errorFila = true; }
                 if(isNaN(seq) || seq <= 0) { errores.push({ f: numFila, a: codArt, err: 'Secuencia inválida.'}); errorFila = true; }
                 
-                if(!db.centrosTrabajo.some(c => c.id === ct)) { errores.push({ f: numFila, a: codArt, err: `CT '${ct}' no existe.`}); errorFila = true; }
-                if(!db.recursos.some(r => r.id === cr)) { errores.push({ f: numFila, a: codArt, err: `CR '${cr}' no existe.`}); errorFila = true; }
-                else if (!db.recursos.some(r => r.id === cr && r.id_ct === ct)) { errores.push({ f: numFila, a: codArt, err: `CR '${cr}' no pertenece al CT '${ct}'.`}); errorFila = true; }
+                if(!appDb.centrosTrabajo.some(c => c.id === ct)) { errores.push({ f: numFila, a: codArt, err: `CT '${ct}' no existe.`}); errorFila = true; }
+                if(!appDb.recursos.some(r => r.id === cr)) { errores.push({ f: numFila, a: codArt, err: `CR '${cr}' no existe.`}); errorFila = true; }
+                else if (!appDb.recursos.some(r => r.id === cr && r.id_ct === ct)) { errores.push({ f: numFila, a: codArt, err: `CR '${cr}' no pertenece al CT '${ct}'.`}); errorFila = true; }
                 
                 if(isNaN(tiempo) || tiempo <= 0) { errores.push({ f: numFila, a: codArt, err: 'Tiempo inválido.'}); errorFila = true; }
 
                 if(!errorFila) {
                     validos++;
                     if(!rutasMap[codArt]) rutasMap[codArt] = { id_ruta: codRuta, operaciones: [] };
-                    rutasMap[codArt].operaciones.push({ seq: seq, ct: ct, cr: cr, tiempo: tiempo });
+                    rutasMap[codArt].operaciones.push({ seq: seq, ct: ct, cr: cr,
+            desc_operacion: (tds[8] ? tds[8].innerText.trim() : ''), tiempo: tiempo });
                 }
             });
 
@@ -796,13 +844,13 @@
             for(const [idArticulo, data] of Object.entries(datosAImportar)) {
                 data.operaciones.sort((a,b) => a.seq - b.seq);
                 
-                const idx = db.rutas.findIndex(r => r.id_articulo === idArticulo);
+                const idx = appDb.rutas.findIndex(r => r.id_articulo === idArticulo);
                 if(idx >= 0) {
-                    db.rutas[idx].operaciones = data.operaciones;
-                    db.rutas[idx].id_ruta = data.id_ruta;
+                    appDb.rutas[idx].operaciones = data.operaciones;
+                    appDb.rutas[idx].id_ruta = data.id_ruta;
                     actualizadas++;
                 } else {
-                    db.rutas.push({
+                    appDb.rutas.push({
                         id_ruta: data.id_ruta,
                         id_articulo: idArticulo,
                         estado: "ACTIVA",
@@ -855,6 +903,112 @@
         }
         window.addEventListener('resize', initCanvas);
         
-    </script>
+    
+function iniciarGrid() {
+    const tbody = document.getElementById('excel-grid-body');
+    if(!tbody) return;
+    limpiarGrid();
+    
+    tbody.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+        const rows = text.split(/\r?\n/);
+        
+        tbody.innerHTML = '';
+        
+        rows.forEach(row => {
+            if(!row.trim()) return;
+            const cols = row.split('\t');
+            const tr = document.createElement('tr');
+            for(let i=0; i<9; i++) {
+                const td = document.createElement('td');
+                td.contentEditable = "true";
+                td.innerText = cols[i] !== undefined ? cols[i] : '';
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+    });
+}
+
+function limpiarGrid() {
+    const tbody = document.getElementById('excel-grid-body');
+    tbody.innerHTML = '';
+    for(let r=0; r<15; r++) {
+        const tr = document.createElement('tr');
+        for(let i=0; i<9; i++) {
+            const td = document.createElement('td');
+            td.contentEditable = "true";
+            tr.appendChild(td);
+        }
+        tbody.appendChild(tr);
+    }
+}
+
+async function procesarExcelGrid() {
+    const tbody = document.getElementById('excel-grid-body');
+    const trs = tbody.querySelectorAll('tr');
+    let procesadas = 0;
+    let currentArticulo = "";
+    
+    let nuevasRutas = {}; 
+    
+    trs.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if(tds.length < 9) return;
+        
+        const art = tds[0].innerText.trim();
+        if(art) currentArticulo = art; 
+        
+        if(!currentArticulo) return;
+        
+        const seq = parseInt(tds[1].innerText.trim());
+        const ct = tds[2].innerText.trim();
+        const cr = tds[3].innerText.trim();
+        const tiempo = parseFloat(tds[6].innerText.trim()) || 0;
+        
+        if(isNaN(seq) || !ct || !cr) return; 
+        
+        if(!nuevasRutas[currentArticulo]) {
+            nuevasRutas[currentArticulo] = {
+                id_ruta: "RT-" + currentArticulo + "-" + Math.floor(Math.random()*1000), 
+                id_articulo: currentArticulo,
+                estado: "ACTIVA",
+                operaciones: []
+            };
+        }
+        
+        nuevasRutas[currentArticulo].operaciones.push({
+            seq: seq,
+            ct: ct,
+            cr: cr,
+            desc_operacion: (tds[8] ? tds[8].innerText.trim() : ''),
+            tiempo: tiempo
+        });
+        procesadas++;
+    });
+    
+    if(procesadas === 0) {
+        alert("No se detectaron datos v�lidos. Aseg�rese de pegar las columnas correctamente.");
+        return;
+    }
+    
+    for(let art in nuevasRutas) {
+        appDb.rutas = appDb.rutas.filter(r => r.id_articulo !== art);
+        appDb.rutas.push(nuevasRutas[art]);
+        
+        if(!appDb.articulos.find(a => a.id === art)) {
+            appDb.articulos.push({ id: art, nombre: "Art. " + art, desc: "Importado autom�ticamente", unidad: "PZA", familia: "General" });
+        }
+    }
+    
+    await guardarDB();
+    renderRutas();
+    cerrarModal('modal-importacion');
+    showToast("Se cargaron " + Object.keys(nuevasRutas).length + " rutas con �xito.");
+}
+
+</script>
 </body>
 </html>
+

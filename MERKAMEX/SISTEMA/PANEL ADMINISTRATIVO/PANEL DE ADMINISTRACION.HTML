@@ -153,6 +153,11 @@
             .form-grid { grid-template-columns: 1fr; }
         }
     </style>
+
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../../firebase-config.js"></script>
 </head>
 <body>
 
@@ -405,42 +410,50 @@
         /* -----------------------------------------
            LÓGICA DE DATOS (FUSIONAR BD FIJA + LOCAL)
            ----------------------------------------- */
-        function cargarTodosLosUsuarios() {
-            usuariosApp = [];
-            let dbFija = (typeof baseOperadores !== 'undefined') ? baseOperadores : {};
-            let dbNuevos = JSON.parse(localStorage.getItem("MERKAMEX_nuevos_operadores")) || {};
-            let todosLosCodigos = { ...dbFija, ...dbNuevos };
-
-            // Validar si el código maestro 1799 existe
-            if(!todosLosCodigos["1799"]) todosLosCodigos["1799"] = "ARQ. JUAN GERMÁN SÁNCHEZ DURÁN";
-
-            for (let cod in todosLosCodigos) {
-                let nombreFallback = todosLosCodigos[cod];
-                let dataLocal = localStorage.getItem("perfil_MERKAMEX_" + cod);
+        async function cargarTodosLosUsuarios() {
+            try {
+                usuariosApp = [];
+                let dbFija = (typeof baseOperadores !== 'undefined') ? baseOperadores : {};
                 
-                if (dataLocal) {
-                    let parsedUser = JSON.parse(dataLocal);
-                    // PARCHE: Si el usuario guardado no tiene "tipo", se lo asignamos por defecto para evitar "undefined"
-                    if (!parsedUser.tipo) parsedUser.tipo = (cod === "1799") ? "ADMINISTRADOR" : "OPERADOR";
-                    usuariosApp.push(parsedUser);
-                } else {
-                    // Generar perfil base si nunca ha entrado
-                    let esAdmin = (cod === "1799");
-                    usuariosApp.push({
-                        codigo: cod,
-                        nombre: nombreFallback,
-                        tipo: esAdmin ? "ADMINISTRADOR" : "OPERADOR",
-                        puesto: esAdmin ? "ADMINISTRADOR" : "OPERADOR",
-                        estado: "ACTIVO",
-                        vacaciones: 0,
-                        password: esAdmin ? "2684" : "",
-                        permisos: { modulos: {}, especiales: {} },
-                        foto: `https://ui-avatars.com/api/?name=${nombreFallback.substring(0,2)}&background=D4AF37&color=050505&size=150`
-                    });
+                const snapshot = await db.collection("usuarios").get();
+                let fbUsers = {};
+                snapshot.forEach(doc => {
+                    fbUsers[doc.id] = doc.data();
+                });
+
+                let todosLosCodigos = { ...dbFija };
+                for(let key in fbUsers) todosLosCodigos[key] = fbUsers[key].nombre;
+
+                if(!todosLosCodigos["1799"]) todosLosCodigos["1799"] = "ARQ. JUAN GERMÁN SÁNCHEZ DURÁN";
+
+                for (let cod in todosLosCodigos) {
+                    let nombreFallback = todosLosCodigos[cod];
+                    let dataFb = fbUsers[cod];
+                    
+                    if (dataFb) {
+                        if (!dataFb.tipo) dataFb.tipo = (cod === "1799") ? "ADMINISTRADOR" : "OPERADOR";
+                        usuariosApp.push(dataFb);
+                    } else {
+                        let esAdmin = (cod === "1799");
+                        usuariosApp.push({
+                            codigo: cod,
+                            nombre: nombreFallback,
+                            tipo: esAdmin ? "ADMINISTRADOR" : "OPERADOR",
+                            puesto: esAdmin ? "ADMINISTRADOR" : "OPERADOR",
+                            estado: "ACTIVO",
+                            vacaciones: 0,
+                            password: esAdmin ? "2684" : "",
+                            permisos: { modulos: {}, especiales: {} },
+                            foto: `https://ui-avatars.com/api/?name=${nombreFallback.substring(0,2)}&background=D4AF37&color=050505&size=150`
+                        });
+                    }
                 }
+                mostrarUsuarios();
+                llenarSelectsSecundarios();
+            } catch(e) {
+                console.error("Error al cargar usuarios:", e);
+                alert("Error al sincronizar con la base de datos.");
             }
-            mostrarUsuarios();
-            llenarSelectsSecundarios();
         }
 
         /* -----------------------------------------
@@ -572,7 +585,7 @@
             document.getElementById('f-group-pass').style.display = (t === "ADMINISTRADOR" || t === "ENCARGADO") ? "block" : "none";
         }
 
-        function guardarUsuario() {
+        async function guardarUsuario() {
             const nom = document.getElementById('f-nombre').value.trim();
             const cod = document.getElementById('f-codigo').value.trim();
             const tipo = document.getElementById('f-tipo').value;
@@ -596,43 +609,35 @@
             userObj.password = pass;
             if(!userObj.foto) userObj.foto = `https://ui-avatars.com/api/?name=${nom.substring(0,2)}&background=D4AF37&color=050505&size=150`;
 
-            // Guardar localmente
-            localStorage.setItem("perfil_MERKAMEX_" + cod, JSON.stringify(userObj));
-
-            if(usuarioEditandoActual === "NUEVO") {
-                let dbNuevos = JSON.parse(localStorage.getItem("MERKAMEX_nuevos_operadores")) || {};
-                dbNuevos[cod] = nom;
-                localStorage.setItem("MERKAMEX_nuevos_operadores", JSON.stringify(dbNuevos));
+            try {
+                await db.collection("usuarios").doc(cod).set(userObj);
+                mostrarToast("USUARIO GUARDADO EN LA NUBE");
+                await cargarTodosLosUsuarios(); 
+                document.querySelectorAll('.nav-item')[0].click(); 
+            } catch(e) {
+                console.error(e);
+                alert("Error al guardar en la base de datos.");
             }
-
-            mostrarToast("USUARIO GUARDADO CORRECTAMENTE");
-            cargarTodosLosUsuarios(); // Refrescar listas
-            document.querySelectorAll('.nav-item')[0].click(); // Volver a lista
         }
 
         // FUNCION NUEVA: ELIMINAR USUARIO
-        function eliminarUsuario() {
+        async function eliminarUsuario() {
             if(usuarioEditandoActual === "NUEVO") return;
             if(usuarioEditandoActual === "1799") { 
                 alert("Por seguridad del sistema, no puedes eliminar al administrador maestro."); 
                 return; 
             }
 
-            if(confirm("⚠️ ¿Estás seguro de que deseas eliminar a este usuario permanentemente? Esta acción no se puede deshacer.")) {
-                
-                // Borrar perfil individual
-                localStorage.removeItem("perfil_MERKAMEX_" + usuarioEditandoActual);
-                
-                // Borrarlo de la lista de operadores "nuevos" creados si es que estaba ahí
-                let dbNuevos = JSON.parse(localStorage.getItem("MERKAMEX_nuevos_operadores")) || {};
-                if(dbNuevos[usuarioEditandoActual]) {
-                    delete dbNuevos[usuarioEditandoActual];
-                    localStorage.setItem("MERKAMEX_nuevos_operadores", JSON.stringify(dbNuevos));
+            if(confirm("⚠️ ¿Estás seguro de que deseas eliminar a este usuario de la Nube permanentemente?")) {
+                try {
+                    await db.collection("usuarios").doc(usuarioEditandoActual).delete();
+                    mostrarToast("USUARIO ELIMINADO DE LA NUBE");
+                    await cargarTodosLosUsuarios();
+                    document.querySelectorAll('.nav-item')[0].click();
+                } catch(e) {
+                    console.error(e);
+                    alert("Error al eliminar.");
                 }
-                
-                mostrarToast("USUARIO ELIMINADO CORRECTAMENTE");
-                cargarTodosLosUsuarios();
-                document.querySelectorAll('.nav-item')[0].click(); // Regresa a usuarios registrados
             }
         }
 
@@ -697,7 +702,7 @@
             document.getElementById('vac-disponibles').textContent = u ? u.vacaciones : 0;
         }
 
-        function registrarVacaciones() {
+        async function registrarVacaciones() {
             let cod = document.getElementById('vac-operador-hidden').value;
             let fIni = document.getElementById('vac-inicio').value;
             let fFin = document.getElementById('vac-fin').value;
@@ -715,11 +720,16 @@
             }
 
             u.vacaciones -= diffDays;
-            localStorage.setItem("perfil_MERKAMEX_" + cod, JSON.stringify(u));
-            cargarInfoVacaciones();
-            mostrarToast(`PERIODO REGISTRADO. SE DESCONTARON ${diffDays} DÍAS.`);
             
-            document.getElementById('vac-inicio').value = ""; document.getElementById('vac-fin').value = "";
+            try {
+                await db.collection("usuarios").doc(cod).update({ vacaciones: u.vacaciones });
+                cargarInfoVacaciones();
+                mostrarToast(`PERIODO REGISTRADO EN LA NUBE. SE DESCONTARON ${diffDays} DÍAS.`);
+                document.getElementById('vac-inicio').value = ""; document.getElementById('vac-fin').value = "";
+            } catch (error) {
+                console.error(error);
+                alert("Error al guardar vacaciones en la Nube.");
+            }
         }
 
         /* -----------------------------------------
@@ -770,7 +780,7 @@
             });
         }
 
-        function guardarPermisos() {
+        async function guardarPermisos() {
             let cod = document.getElementById('perm-operador').value;
             if(!cod) { alert("Selecciona un usuario primero."); return; }
             
@@ -780,8 +790,13 @@
             modulosERP.forEach(mod => { u.permisos.modulos[mod] = document.getElementById(`perm-mod-${mod}`).checked; });
             permisosEsp.forEach(esp => { u.permisos.especiales[esp] = document.getElementById(`perm-esp-${esp}`).checked; });
 
-            localStorage.setItem("perfil_MERKAMEX_" + cod, JSON.stringify(u));
-            mostrarToast("PERMISOS ACTUALIZADOS CORRECTAMENTE");
+            try {
+                await db.collection("usuarios").doc(cod).update({ permisos: u.permisos });
+                mostrarToast("PERMISOS ACTUALIZADOS EN LA NUBE");
+            } catch (e) {
+                console.error(e);
+                alert("Error al actualizar permisos en la Nube.");
+            }
         }
 
         /* -----------------------------------------

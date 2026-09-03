@@ -114,6 +114,11 @@
         </div>
     </div>
 
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../firebase-config.js"></script>
+
     <!-- IMPORTACIÓN DE LA BASE DE DATOS -->
     <script src="../OPERADORES/db_operadores.js"></script>
 
@@ -181,7 +186,7 @@
         let pasoLogin = 1;
         let infoSesionGlobal = { codigo: "", nombre: "", passEsperada: "" };
 
-        function iniciarSesion(event) {
+        async function iniciarSesion(event) {
             event.preventDefault(); 
             
             if (pasoLogin === 1) {
@@ -191,29 +196,33 @@
                     const btn = document.getElementById('btn-submit');
                     btn.classList.add('loading');
                     
-                    setTimeout(() => {
-                        btn.classList.remove('loading');
-                        
+                    try {
                         let dbFija = (typeof baseOperadores !== 'undefined') ? baseOperadores : {};
-                        let dbNuevos = JSON.parse(localStorage.getItem("MERKAMEX_nuevos_operadores")) || {};
-                        let todosLosOperadores = { ...dbFija, ...dbNuevos };
-
-                        const nombreOperador = todosLosOperadores[codigo];
+                        let nombreOperador = dbFija[codigo];
+                        let passAlmacenada = "";
                         
+                        // Revisar Firestore
+                        const userDoc = await db.collection("usuarios").doc(codigo).get();
+                        
+                        if (userDoc.exists) {
+                            if (!nombreOperador) {
+                                nombreOperador = userDoc.data().nombre;
+                            }
+                            passAlmacenada = userDoc.data().password || "";
+                        }
+                        
+                        // Hardcode password para admin principal
+                        if (codigo === "1799" && !passAlmacenada) {
+                            passAlmacenada = "2684";
+                        }
+                        
+                        btn.classList.remove('loading');
+
                         if (nombreOperador) {
                             let pidePassword = false;
-                            let passAlmacenada = "";
                             
-                            const perfilGuardado = localStorage.getItem("perfil_MERKAMEX_" + codigo);
-                            if (perfilGuardado) {
-                                const perfil = JSON.parse(perfilGuardado);
-                                if (perfil.password && perfil.password.trim() !== "") {
-                                    pidePassword = true;
-                                    passAlmacenada = perfil.password; 
-                                }
-                            } else if (codigo === "1799") { 
+                            if (passAlmacenada && passAlmacenada.trim() !== "") {
                                 pidePassword = true;
-                                passAlmacenada = "2684";
                             }
 
                             if (pidePassword) {
@@ -239,7 +248,11 @@
                             alert("Acceso Denegado: Código no reconocido.");
                             document.getElementById('codigoUsuario').value = "";
                         }
-                    }, 500);
+                    } catch (error) {
+                        console.error("Error al conectar con Firebase:", error);
+                        btn.classList.remove('loading');
+                        alert("Error al conectar con la Nube. Revisa tu conexión a internet.");
+                    }
                 }
             } else if (pasoLogin === 2) {
                 const passIngresada = document.getElementById('passUsuario').value;

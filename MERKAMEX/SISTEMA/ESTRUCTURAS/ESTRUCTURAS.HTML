@@ -289,6 +289,10 @@
             #view-hoja-viajera * { visibility: visible; }
         }
     </style>
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../../firebase-config.js"></script>
 </head>
 <body>
 
@@ -592,7 +596,7 @@
         /* ========================================================
            BASE DE DATOS MOCK RELACIONAL
            ======================================================== */
-        const DB = {
+        let appDb = {
             proyectos: [
                 { id: "PRO1995", cliente: "LUIS RODRIGO CRUZ GONZALES", nombre: "PRO1995 LUIS RODRIGO CRUZ" },
                 { id: "PRO2024", cliente: "CONSTRUCTORA MEXICANA SA DE CV", nombre: "PRO2024 CONSTRUCTORA" },
@@ -654,20 +658,30 @@
         let filtroGlobalPiso = "TODAS";
         let busquedaGlobalPiso = "";
 
-        window.onload = () => { 
-            // Poblar historial de prueba
-            registrarHistorial("OT61911", "PRO1995", "E2501020", 3, "BARRENADO", "VICENTE", "CT02", "CR0110", "OPERACIÓN TERMINADA", 4, "");
-            registrarHistorial("OT61911", "PRO1995", "E2501020", 4, "ARMADO", "JUAN PÉREZ", "CT03", "CR0119", "OT INICIADA", 0, "Inicia proceso de armado");
-            registrarHistorial("OT61912", "PRO1995", "E2501021", 2, "SOLDADURA PLACAS", "SR. CÓDIGO 599", "CT04", "CR0118", "PAUSA", 0, "MOTIVO: FALTA DE MATERIAL");
-            
-            renderPiso(); 
-            // Global timer tick
-            setInterval(updateRunningTimers, 1000);
-
-            // Iniciar animación de partículas
+                let dbSub = null;
+        window.onload = async () => { 
             initCanvas(); 
             drawCanvas();
+
+            try {
+                const ref = db.collection('sistema').doc('produccion_dashboard');
+                dbSub = ref.onSnapshot(doc => {
+                    if(doc.exists) {
+                        appDb = doc.data();
+                    } else {
+                        ref.set(appDb);
+                    }
+                    renderPiso();
+                    if(currentOTId) openModalOT(currentOTId);
+                });
+            } catch (e) { console.error(e); }
+
+            setInterval(updateRunningTimers, 1000);
         };
+
+        async function guardarPiso() {
+            try { await db.collection('sistema').doc('produccion_dashboard').set(appDb); } catch(e) { console.error(e); }
+        }
 
         /* ========================================================
            HELPERS
@@ -720,13 +734,13 @@
 
             const proyectosEnPiso = {};
             
-            DB.ots.forEach(ot => {
+            appDb.ots.forEach(ot => {
                 const estadoOT = getEstadoOT(ot);
                 
                 // Filtros
                 if(filtroGlobalPiso !== "TODAS" && estadoOT !== filtroGlobalPiso) return;
                 
-                const proy = DB.proyectos.find(p => p.id === ot.proyectoId) || { id: ot.proyectoId, nombre: '' };
+                const proy = appDb.proyectos.find(p => p.id === ot.proyectoId) || { id: ot.proyectoId, nombre: '' };
                 const txt = `${ot.ot} ${ot.articulo} ${ot.descArticulo} ${proy.id} ${proy.nombre}`.toLowerCase();
                 if(busquedaGlobalPiso && !txt.includes(busquedaGlobalPiso)) return;
 
@@ -804,8 +818,8 @@
            ======================================================== */
         function openModalOT(otId) {
             currentOTId = otId;
-            const ot = DB.ots.find(o => o.ot === otId);
-            const proy = DB.proyectos.find(p => p.id === ot.proyectoId);
+            const ot = appDb.ots.find(o => o.ot === otId);
+            const proy = appDb.proyectos.find(p => p.id === ot.proyectoId);
             
             document.getElementById('mot-proy-title').textContent = `${proy.id} — ${proy.nombre}`;
             document.getElementById('mot-ot-title').textContent = ot.ot;
@@ -814,7 +828,7 @@
             let opAct = getActiveOp(ot);
             currentSeq = opAct.secuencia;
 
-            renderRutaOT(ot);
+            guardarPiso(); renderRutaOT(ot);
             seleccionarOperacion(currentSeq);
             
             document.getElementById('modal-ot-giant').classList.add('active');
@@ -869,7 +883,7 @@
 
         function seleccionarOperacion(seq) {
             currentSeq = seq;
-            const ot = DB.ots.find(o => o.ot === currentOTId);
+            const ot = appDb.ots.find(o => o.ot === currentOTId);
             const op = ot.ruta.find(r => r.secuencia === seq);
             const activeOpReal = getActiveOp(ot); 
 
@@ -934,7 +948,7 @@
             // Historial
             const histList = document.getElementById('ctrl-historial');
             histList.innerHTML = "";
-            const filtH = DB.historial.filter(h => h.ot === ot.ot && h.secuencia === op.secuencia).reverse();
+            const filtH = appDb.historial.filter(h => h.ot === ot.ot && h.secuencia === op.secuencia).reverse();
             
             if(filtH.length === 0) {
                 histList.innerHTML = `<li class="hist-item" style="border:none; justify-content:center; color:var(--text-muted);">Sin movimientos registrados.</li>`;
@@ -953,7 +967,7 @@
 
         // Loop Global de Timers
         function updateRunningTimers() {
-            DB.ots.forEach(ot => {
+            appDb.ots.forEach(ot => {
                 ot.ruta.forEach(op => {
                     if (op.estado === 'EN PROCESO') {
                         op.timeSegundos++;
@@ -969,7 +983,7 @@
            LÓGICA FORMULARIOS DE ACCIÓN (MODAL PEQUEÑO)
            ======================================================== */
         function openFormAction(tipoAccion, seq) {
-            const ot = DB.ots.find(o => o.ot === currentOTId);
+            const ot = appDb.ots.find(o => o.ot === currentOTId);
             const op = ot.ruta.find(r => r.secuencia === seq);
             
             document.getElementById('mf-action-type').value = tipoAccion;
@@ -980,7 +994,7 @@
             const d = now.toISOString().split('T')[0];
             const h = now.toTimeString().split('T')[1].substring(0,5);
 
-            let optsOp = DB.operadores.map(o => `<option value="${o}" ${o===op.operador?'selected':''}>${o}</option>`).join('');
+            let optsOp = appDb.operadores.map(o => `<option value="${o}" ${o===op.operador?'selected':''}>${o}</option>`).join('');
 
             let html = `
                 <div class="form-group"><label class="form-label">FECHA</label><input type="date" class="form-control" id="frm-fecha" value="${d}" required ${tipoAccion!=='AVANCE_MANUAL'?'readonly':''}></div>
@@ -1002,7 +1016,7 @@
             }
             else if (tipoAccion === 'PAUSAR') {
                 title.textContent = "REGISTRAR PAUSA";
-                let optsPausa = DB.motivosPausa.map(m => `<option value="${m}">${m}</option>`).join('');
+                let optsPausa = appDb.motivosPausa.map(m => `<option value="${m}">${m}</option>`).join('');
                 html += `
                     <div class="form-group full"><label class="form-label" style="color:var(--warning-color);">MOTIVO DE PAUSA</label><select class="form-control" id="frm-motivo" required style="border-color:var(--warning-color);">${optsPausa}</select></div>
                     <div class="form-group full"><label class="form-label">OBSERVACIONES ADICIONALES</label><input type="text" class="form-control" id="frm-obs" placeholder="Opcional..."></div>
@@ -1014,7 +1028,7 @@
         }
 
         function accionDirecta(tipoAccion, seq) {
-            const ot = DB.ots.find(o => o.ot === currentOTId);
+            const ot = appDb.ots.find(o => o.ot === currentOTId);
             const op = ot.ruta.find(r => r.secuencia === seq);
             
             if(tipoAccion === 'REANUDAR') {
@@ -1022,7 +1036,7 @@
                 op.motivoPausa = "";
                 registrarHistorial(ot.ot, ot.proyectoId, ot.articulo, op.secuencia, op.operacion, op.operador, op.descCT, op.recurso, "REANUDACIÓN", 0, "Se reanuda cronómetro");
                 showToast("OPERACIÓN REANUDADA");
-                renderRutaOT(ot);
+                guardarPiso(); renderRutaOT(ot);
                 seleccionarOperacion(seq);
             }
         }
@@ -1030,7 +1044,7 @@
         function handleFormSubmit(e) {
             e.preventDefault();
             const action = document.getElementById('mf-action-type').value;
-            const ot = DB.ots.find(o => o.ot === currentOTId);
+            const ot = appDb.ots.find(o => o.ot === currentOTId);
             const op = ot.ruta.find(r => r.secuencia === currentSeq);
             
             const fecha = document.getElementById('frm-fecha').value;
@@ -1079,14 +1093,14 @@
                 }
             }
 
-            closeModal('modal-form-accion');
-            renderRutaOT(ot);
+            closeModal('modal-form-accion'); guardarPiso();
+            guardarPiso(); renderRutaOT(ot);
             seleccionarOperacion(currentSeq);
         }
 
         function registrarHistorial(otId, proyId, art, seq, op, operador, centro, recurso, accion, cant, obs) {
             const now = new Date();
-            DB.historial.push({
+            appDb.historial.push({
                 fecha: now.toISOString().split('T')[0],
                 hora: now.toTimeString().split('T')[1].substring(0,5),
                 ot: otId, proyecto: proyId, codigo: art, secuencia: seq, operacion: op,
@@ -1100,7 +1114,7 @@
            ======================================================== */
         function exportarCSV() {
             let csvContent = "data:text/csv;charset=utf-8,FECHA,HORA,OT,PROYECTO,CÓDIGO,ACCIÓN,OPERACIÓN,OPERADOR,CENTRO,RECURSO,CANTIDAD,OBSERVACIONES\n";
-            DB.historial.forEach(h => {
+            appDb.historial.forEach(h => {
                 csvContent += `${h.fecha},${h.hora},${h.ot},${h.proyecto},${h.codigo},${h.accion},${h.operacion},${h.operador},${h.centro},${h.recurso},${h.cantidad},"${h.observaciones}"\n`;
             });
             const encodedUri = encodeURI(csvContent);
@@ -1116,14 +1130,14 @@
         function loadHojaViajeraSelect() {
             const sel = document.getElementById('sel-hoja-ot');
             sel.innerHTML = '<option value="">-- ELIJA UNA OT --</option>';
-            DB.ots.forEach(o => { sel.innerHTML += `<option value="${o.ot}">${o.ot} - Art: ${o.articulo}</option>`; });
+            appDb.ots.forEach(o => { sel.innerHTML += `<option value="${o.ot}">${o.ot} - Art: ${o.articulo}</option>`; });
         }
 
         function generarHojaViajera() {
             const otId = document.getElementById('sel-hoja-ot').value;
             if(!otId) { document.getElementById('hoja-viajera-doc').style.display = 'none'; return; }
-            const ot = DB.ots.find(o => o.ot === otId);
-            const proy = DB.proyectos.find(p => p.id === ot.proyectoId);
+            const ot = appDb.ots.find(o => o.ot === otId);
+            const proy = appDb.proyectos.find(p => p.id === ot.proyectoId);
             document.getElementById('hv-ot').textContent = ot.ot;
             document.getElementById('hv-proy').textContent = proy ? proy.nombre : ot.proyectoId;
             document.getElementById('hv-art').textContent = ot.articulo;
@@ -1174,3 +1188,4 @@
     </script>
 </body>
 </html>
+
