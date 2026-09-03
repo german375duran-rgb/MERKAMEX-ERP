@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERKAMEX - Punto de Venta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-ebony: #0B0D14;
+            --bg-panel: rgba(17, 20, 28, 0.65);
+            --emerald-green: #00965e;
+            --emerald-dark: #006b43; 
+            --emerald-glow: rgba(0, 150, 94, 0.4);
+            --text-main: #FFFFFF;
+            --text-silver: #a0a5a8;
+            --border-glass: rgba(255, 255, 255, 0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+        body, html { width: 100%; height: 100vh; overflow: hidden; background-color: var(--bg-ebony); color: var(--text-main); }
+        
+        #tech-background { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+        .login-wrapper { position: relative; z-index: 1; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .login-container { background: var(--bg-panel); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--border-glass); border-radius: 24px; padding: 48px; width: 100%; max-width: 420px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1); text-align: center; animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; transform: translateY(30px); opacity: 0; }
+
+        @keyframes slideUpFade { to { transform: translateY(0); opacity: 1; } }
+
+        .logo-container { position: relative; margin-bottom: 25px; display: flex; justify-content: center; }
+        .logo-glow { position: absolute; width: 120px; height: 40px; background: var(--emerald-green); filter: blur(45px); opacity: 0.5; z-index: -1; top: 50%; left: 50%; transform: translate(-50%, -50%); animation: pulseGlow 4s infinite alternate; }
+        
+        @keyframes pulseGlow { 0% { opacity: 0.3; transform: translate(-50%, -50%) scale(0.9); } 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.2); } }
+        
+        .logo-container img { width: 220px; height: auto; transition: transform 0.3s ease; object-fit: contain; }
+        .logo-container img:hover { transform: scale(1.03); }
+        h1 { color: var(--text-main); font-size: 1.3rem; font-weight: 600; margin-bottom: 30px; letter-spacing: 0.5px; }
+
+        .input-group { position: relative; margin-bottom: 30px; text-align: left; }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-silver); margin-bottom: 8px; font-weight: 500; }
+        .input-wrapper { position: relative; display: flex; align-items: center; }
+        
+        .input-group input { width: 100%; background: rgba(0, 0, 0, 0.2); border: 1px solid var(--border-glass); border-radius: 12px; padding: 15px 45px 15px 20px; color: var(--text-main); font-size: 1rem; outline: none; transition: all 0.3s ease; }
+        .input-group input:focus { border-color: var(--emerald-green); box-shadow: 0 0 0 4px var(--emerald-glow); background: rgba(0, 0, 0, 0.4); }
+        .input-group input::placeholder { color: var(--text-silver); opacity: 0.7; }
+
+        .toggle-password { position: absolute; right: 16px; background: none; border: none; color: var(--text-silver); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: color 0.3s ease; }
+        .toggle-password:hover { color: var(--emerald-green); }
+        .eye-icon { width: 20px; height: 20px; }
+
+        .btn-entrar { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--emerald-green), var(--emerald-dark)); color: white; font-size: 1.1rem; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; position: relative; overflow: hidden; transition: all 0.3s ease; box-shadow: 0 10px 20px -10px var(--emerald-green); display: flex; justify-content: center; align-items: center; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-entrar:hover { transform: translateY(-2px); box-shadow: 0 15px 25px -10px var(--emerald-green); background: linear-gradient(135deg, #00b370, var(--emerald-green)); }
+        .btn-entrar:active { transform: translateY(1px); box-shadow: 0 5px 15px -10px var(--emerald-green); }
+
+        .loader { display: none; width: 22px; height: 22px; border: 3px solid rgba(255, 255, 255, 0.3); border-radius: 50%; border-top-color: white; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .btn-entrar.loading .btn-text { display: none; }
+        .btn-entrar.loading .loader { display: block; }
+        .btn-entrar.loading { pointer-events: none; opacity: 0.9; }
+
+        @media (max-width: 480px) {
+            .login-container { padding: 32px 24px; border-radius: 16px; background: rgba(17, 20, 28, 0.85); }
+            .logo-container img { width: 180px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="tech-background"></canvas>
+
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="logo-container">
+                <div class="logo-glow"></div>
+                <img src="../LOGO/LOGO%20JPG.jpg" alt="Logotipo MERKAMEX">
+            </div>
+            
+            <h1>Acceso al Sistema POS</h1>
+
+            <form action="#" method="POST" onsubmit="iniciarSesion(event)">
+                
+                <div class="input-group" id="group-codigo">
+                    <label for="codigoUsuario">Código de usuario</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="codigoUsuario" placeholder="Ingresa tu código" required autocomplete="off">
+                        <button type="button" class="toggle-password" id="toggle-pwd" aria-label="Mostrar código">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-group" id="group-password" style="display: none;">
+                    <label for="passUsuario" style="color: var(--emerald-green);">Contraseña de Acceso</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="passUsuario" placeholder="Ingresa tu contraseña" autocomplete="off">
+                        <button type="button" class="toggle-password" id="toggle-pass" aria-label="Mostrar contraseña">
+                            <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-entrar" id="btn-submit">
+                    <span class="btn-text">Entrar</span>
+                    <div class="loader"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../firebase-config.js"></script>
+
+    <!-- IMPORTACIÓN DE LA BASE DE DATOS -->
+    <script src="../OPERADORES/db_operadores.js"></script>
+
+    <script>
+        const canvas = document.getElementById('tech-background');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            const particleCount = width < 768 ? 40 : 80;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width, y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5, vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 2 + 0.5
+                });
+            }
+        }
+
+        function animateCanvas() {
+            requestAnimationFrame(animateCanvas);
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.8)';
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
+            });
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 150, 94, ${0.15 - distance/120})`;
+                        ctx.lineWidth = 1; ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        initCanvas(); animateCanvas(); window.addEventListener('resize', initCanvas);
+
+        const togglePwdBtn = document.getElementById('toggle-pwd');
+        const codigoInput = document.getElementById('codigoUsuario');
+        togglePwdBtn.addEventListener('click', () => {
+            const type = codigoInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            codigoInput.setAttribute('type', type);
+            togglePwdBtn.style.color = type === 'text' ? 'var(--emerald-green)' : 'var(--text-silver)';
+        });
+
+        const togglePassBtn = document.getElementById('toggle-pass');
+        const passInput = document.getElementById('passUsuario');
+        togglePassBtn.addEventListener('click', () => {
+            const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passInput.setAttribute('type', type);
+            togglePassBtn.style.color = type === 'text' ? 'var(--emerald-green)' : 'var(--text-silver)';
+        });
+
+        let pasoLogin = 1;
+        let infoSesionGlobal = { codigo: "", nombre: "", passEsperada: "" };
+
+        async function iniciarSesion(event) {
+            event.preventDefault(); 
+            
+            if (pasoLogin === 1) {
+                const codigo = document.getElementById('codigoUsuario').value.trim(); 
+                
+                if(codigo) {
+                    const btn = document.getElementById('btn-submit');
+                    btn.classList.add('loading');
+                    
+                    try {
+                        let dbFija = (typeof baseOperadores !== 'undefined') ? baseOperadores : {};
+                        let nombreOperador = dbFija[codigo];
+                        let passAlmacenada = "";
+                        
+                        // Revisar Firestore
+                        const userDoc = await db.collection("usuarios").doc(codigo).get();
+                        
+                        if (userDoc.exists) {
+                            if (!nombreOperador) {
+                                nombreOperador = userDoc.data().nombre;
+                            }
+                            passAlmacenada = userDoc.data().password || "";
+                        }
+                        
+                        // Hardcode password para admin principal
+                        if (codigo === "1799" && !passAlmacenada) {
+                            passAlmacenada = "2684";
+                        }
+                        
+                        btn.classList.remove('loading');
+
+                        if (nombreOperador) {
+                            let pidePassword = false;
+                            
+                            if (passAlmacenada && passAlmacenada.trim() !== "") {
+                                pidePassword = true;
+                            }
+
+                            if (pidePassword) {
+                                pasoLogin = 2;
+                                infoSesionGlobal.codigo = codigo;
+                                infoSesionGlobal.nombre = nombreOperador;
+                                infoSesionGlobal.passEsperada = passAlmacenada;
+
+                                document.getElementById('group-codigo').style.display = 'none';
+                                document.getElementById('codigoUsuario').removeAttribute('required');
+                                
+                                document.getElementById('group-password').style.display = 'block';
+                                document.getElementById('passUsuario').setAttribute('required', 'true');
+                                document.getElementById('passUsuario').focus();
+                                document.getElementById('btn-submit').querySelector('.btn-text').textContent = "VALIDAR";
+                            } else {
+                                localStorage.setItem("operadorActivo", nombreOperador);
+                                localStorage.setItem("codigoActivo", codigo); 
+                                window.location.href = "../SISTEMA/sistema.html";
+                            }
+
+                        } else {
+                            alert("Acceso Denegado: Código no reconocido.");
+                            document.getElementById('codigoUsuario').value = "";
+                        }
+                    } catch (error) {
+                        console.error("Error al conectar con Firebase:", error);
+                        btn.classList.remove('loading');
+                        alert("Error al conectar con la Nube. Revisa tu conexión a internet.");
+                    }
+                }
+            } else if (pasoLogin === 2) {
+                const passIngresada = document.getElementById('passUsuario').value;
+                const btn = document.getElementById('btn-submit');
+                btn.classList.add('loading');
+                
+                setTimeout(() => {
+                    btn.classList.remove('loading');
+                    
+                    if (passIngresada === infoSesionGlobal.passEsperada) {
+                        localStorage.setItem("operadorActivo", infoSesionGlobal.nombre);
+                        localStorage.setItem("codigoActivo", infoSesionGlobal.codigo); 
+                        window.location.href = "../SISTEMA/sistema.html";
+                    } else {
+                        alert("Contraseña de acceso incorrecta. Intenta de nuevo.");
+                        document.getElementById('passUsuario').value = "";
+                        document.getElementById('passUsuario').focus();
+                    }
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>

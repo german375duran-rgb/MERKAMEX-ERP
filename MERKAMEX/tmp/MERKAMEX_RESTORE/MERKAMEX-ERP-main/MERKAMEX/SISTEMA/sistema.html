@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SISTEMA MERKAMEX - ERP Industrial</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-black: #030303;
+            --bg-card: rgba(15, 15, 18, 0.65);
+            --bg-glass: rgba(15, 15, 18, 0.75);
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #997A00;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --emerald-green: #00965e;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --border-glass: rgba(212, 175, 55, 0.15);
+            --border-hover: rgba(212, 175, 55, 0.8);
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body, html { width: 100%; min-height: 100vh; background-color: var(--bg-black); color: var(--text-main); overflow-x: hidden; }
+
+        #gold-network { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.8; }
+
+        .dashboard-wrapper { position: relative; z-index: 1; width: 100%; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px; }
+
+        /* PANEL USUARIO FIJO */
+        .user-panel { position: fixed; top: 25px; right: 25px; display: flex; align-items: center; gap: 15px; background: var(--bg-glass); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 50px; padding: 8px 25px 8px 8px; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6); z-index: 90; }
+        .user-panel:hover { border-color: var(--border-hover); transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 20px var(--gold-glow); }
+        .user-panel-avatar { width: 55px; height: 55px; border-radius: 50%; border: 2px solid var(--gold-primary); object-fit: cover; transition: transform 0.4s ease; }
+        .user-panel:hover .user-panel-avatar { transform: scale(1.08); box-shadow: 0 0 15px var(--gold-glow); }
+        .user-panel-info { display: flex; flex-direction: column; justify-content: center; }
+        .user-panel-name { font-size: 0.95rem; font-weight: 700; color: var(--text-main); letter-spacing: 1px; text-transform: uppercase; }
+        .user-panel-vacaciones { font-size: 0.75rem; color: var(--gold-primary); font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; }
+        .user-panel-puesto { font-size: 0.75rem; color: var(--emerald-green); font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px; }
+        .user-panel-code { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* HEADER */
+        .main-header { text-align: center; margin-top: 30px; margin-bottom: 50px; animation: fadeInDown 1s ease-out forwards; }
+        .main-title { font-size: 2.8rem; font-weight: 800; letter-spacing: 2px; margin-bottom: 15px; color: var(--text-main); text-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+        .main-title span { color: var(--gold-primary); }
+        .subtitle { font-size: 1.1rem; color: var(--text-muted); font-weight: 300; letter-spacing: 3px; }
+
+        /* GRID Y TARJETAS */
+        .areas-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; width: 100%; max-width: 1300px; padding-bottom: 50px; }
+        .card { background: var(--bg-card); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 16px; overflow: hidden; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); position: relative; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); opacity: 0; transform: translateY(30px); animation: fadeInUp 0.8s forwards; }
+        .card:nth-child(1) { animation-delay: 0.1s; } .card:nth-child(2) { animation-delay: 0.2s; } .card:nth-child(3) { animation-delay: 0.3s; } .card:nth-child(4) { animation-delay: 0.4s; } .card:nth-child(5) { animation-delay: 0.5s; } .card:nth-child(6) { animation-delay: 0.6s; } .card:nth-child(7) { animation-delay: 0.7s; } .card:nth-child(8) { animation-delay: 0.8s; } .card:nth-child(9) { animation-delay: 0.9s; }
+        .card-image { height: 160px; background: linear-gradient(180deg, rgba(20,20,20,0) 0%, rgba(5,5,5,0.8) 100%); display: flex; justify-content: center; align-items: center; overflow: hidden; position: relative; border-bottom: 1px solid rgba(255, 255, 255, 0.03); }
+        .card-image svg { width: 65px; height: 65px; stroke: var(--text-muted); transition: all 0.4s ease; z-index: 2; }
+        .card-image::before { content: ''; position: absolute; width: 150px; height: 150px; background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%); opacity: 0; transition: opacity 0.4s ease; z-index: 1; }
+        .card-content { padding: 22px; text-align: center; background: rgba(0, 0, 0, 0.4); position: relative; z-index: 2; }
+        .card-title { font-size: 1.15rem; font-weight: 600; color: var(--text-main); letter-spacing: 2px; transition: all 0.3s ease; }
+        .card:hover { transform: translateY(-8px); border-color: var(--border-hover); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.8), 0 0 20px var(--gold-glow), inset 0 0 15px rgba(212, 175, 55, 0.1); }
+        .card:hover .card-image svg { stroke: var(--gold-primary); transform: scale(1.15); filter: drop-shadow(0 0 8px var(--gold-glow)); }
+        .card:hover .card-image::before { opacity: 0.6; }
+        .card:hover .card-title { color: var(--gold-light); text-shadow: 0 0 10px var(--gold-glow); }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.4s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-glass); border: 1px solid var(--border-hover); border-radius: 16px; width: 100%; max-width: 550px; padding: 40px; position: relative; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px var(--gold-glow); transform: scale(0.9) translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); max-height: 90vh; overflow-y: auto; }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-content::-webkit-scrollbar { width: 8px; } .modal-content::-webkit-scrollbar-track { background: transparent; } .modal-content::-webkit-scrollbar-thumb { background: var(--gold-dark); border-radius: 4px; } .modal-content::-webkit-scrollbar-thumb:hover { background: var(--gold-primary); }
+        
+        .btn-close { position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.3s ease; }
+        .btn-close:hover { color: var(--gold-primary); }
+        .modal-header { text-align: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 1px solid var(--border-glass); }
+        .modal-title { font-size: 1.5rem; font-weight: 700; color: var(--gold-primary); letter-spacing: 3px; }
+
+        /* VISTA PERFIL */
+        .profile-view { display: flex; flex-direction: column; align-items: center; }
+        .profile-avatar-container { position: relative; margin-bottom: 25px; }
+        .profile-avatar { width: 140px; height: 140px; border-radius: 50%; border: 3px solid var(--gold-primary); object-fit: cover; box-shadow: 0 0 25px var(--gold-glow); }
+        .profile-data-grid { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .data-item { background: rgba(0, 0, 0, 0.4); padding: 15px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .data-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .data-value { font-size: 1rem; font-weight: 600; color: var(--text-main); }
+        
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; background: rgba(46, 204, 113, 0.15); color: var(--success-color); border: 1px solid rgba(46, 204, 113, 0.3); }
+        .status-badge.inactivo { background: rgba(231, 76, 60, 0.15); color: var(--danger-color); border-color: rgba(231, 76, 60, 0.3); }
+        .status-badge.vacaciones { background: rgba(241, 196, 15, 0.15); color: #f1c40f; border-color: rgba(241, 196, 15, 0.3); }
+        .status-badge.incapacidad { background: rgba(155, 89, 182, 0.15); color: #9b59b6; border-color: rgba(155, 89, 182, 0.3); }
+        .status-badge.permiso { background: rgba(52, 152, 219, 0.15); color: #3498db; border-color: rgba(52, 152, 219, 0.3); }
+
+        /* BOTONES GLOBALES */
+        .btn { padding: 12px 25px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; border: none; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-primary { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: var(--bg-black); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); width: 100%; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(212, 175, 55, 0.5); background: linear-gradient(135deg, var(--gold-light), var(--gold-primary)); }
+        .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid var(--text-muted); width: 100%; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.05); color: var(--text-main); border-color: var(--text-main); }
+        .btn-admin { background: transparent; color: var(--emerald-green); border: 1px solid var(--emerald-green); margin-top: 15px; width: 100%; font-size: 0.85rem;}
+        .btn-admin:hover { background: rgba(0, 150, 94, 0.15); box-shadow: 0 0 10px var(--emerald-glow); }
+
+        /* FORMULARIO DE EDICIÓN */
+        .profile-edit { display: none; flex-direction: column; }
+        .edit-avatar-wrapper { position: relative; margin: 0 auto 30px; cursor: pointer; width: 140px; height: 140px; }
+        .edit-avatar-wrapper:hover .edit-avatar-overlay { opacity: 1; }
+        .edit-avatar-overlay { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.6); border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--gold-primary); opacity: 0; transition: opacity 0.3s ease; font-size: 0.75rem; font-weight: 600; text-align: center; }
+        .form-group { margin-bottom: 20px; width: 100%; }
+        .form-label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .form-control { width: 100%; background: rgba(0, 0, 0, 0.5); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px 15px; color: var(--text-main); font-size: 0.95rem; outline: none; transition: all 0.3s ease; }
+        .form-control:focus { border-color: var(--gold-primary); box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2); }
+        .form-control:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        select.form-control { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
+        select.form-control option { background: var(--bg-black); color: var(--text-main); }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-action-group { display: flex; gap: 15px; margin-top: 30px; }
+
+        /* NOTIFICACIÓN */
+        .notification { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: rgba(15, 15, 18, 0.95); border: 1px solid var(--gold-primary); color: var(--gold-light); padding: 15px 30px; border-radius: 50px; font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px var(--gold-glow); z-index: 1000; display: flex; align-items: center; gap: 10px; transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .notification.show { bottom: 40px; }
+
+        /* ANIMACIONES Y MEDIA QUERIES */
+        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) {
+            .main-title { font-size: 2rem; } .subtitle { font-size: 0.9rem; } .areas-grid { gap: 20px; } .card-image { height: 140px; }
+            .user-panel { top: 15px; right: 15px; padding: 5px 15px 5px 5px; } .user-panel-info { display: none; }
+            .modal-content { padding: 25px; } .profile-data-grid, .form-grid { grid-template-columns: 1fr; } .btn-action-group { flex-direction: column; }
+        }
+    </style>
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../firebase-config.js"></script>
+</head>
+<body>
+
+    <canvas id="gold-network"></canvas>
+
+    <div class="dashboard-wrapper">
+        
+        <!-- PANEL DE USUARIO -->
+        <div class="user-panel" id="btn-open-profile" onclick="abrirModal()">
+            <img src="" alt="Avatar" class="user-panel-avatar" id="panel-avatar">
+            <div class="user-panel-info">
+                <span class="user-panel-name" id="panel-nombre">CARGANDO...</span>
+                <span class="user-panel-vacaciones" id="panel-vacaciones">...</span>
+                <span class="user-panel-puesto" id="panel-puesto">...</span>
+                <span class="user-panel-code" id="panel-codigo">...</span>
+            </div>
+        </div>
+
+        <header class="main-header">
+            <h1 class="main-title">MERKAMEX <span>ERP</span></h1>
+            <p class="subtitle">SELECCIONE UN ÁREA PARA CONTINUAR</p>
+        </header>
+
+        <div class="areas-grid">
+            <div class="card" onclick="abrirArea('ESTRUCTURAS')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div><div class="card-content"><h2 class="card-title">ESTRUCTURAS</h2></div></div>
+            <div class="card" onclick="abrirArea('PINTURA')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div><div class="card-content"><h2 class="card-title">PINTURA</h2></div></div>
+            <div class="card" onclick="abrirArea('PAILERIA')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg></div><div class="card-content"><h2 class="card-title">PAILERIA</h2></div></div>
+            <div class="card" onclick="abrirArea('EXIBIDORES')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg></div><div class="card-content"><h2 class="card-title">EXIBIDORES</h2></div></div>
+            <div class="card" onclick="abrirArea('MECANIZACIONES')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg></div><div class="card-content"><h2 class="card-title">MECANIZACIONES</h2></div></div>
+            <div class="card" onclick="abrirArea('CORTE LASER')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="22" y1="12" x2="18" y2="12"></line><line x1="6" y1="12" x2="2" y2="12"></line><line x1="12" y1="6" x2="12" y2="2"></line><line x1="12" y1="22" x2="12" y2="18"></line></svg></div><div class="card-content"><h2 class="card-title">CORTE LASER</h2></div></div>
+            <div class="card" onclick="abrirArea('PLASTICO')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg></div><div class="card-content"><h2 class="card-title">PLASTICO</h2></div></div>
+            <div class="card" onclick="abrirArea('TORNOS')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></div><div class="card-content"><h2 class="card-title">TORNOS</h2></div></div>
+            <div class="card" onclick="abrirArea('ALAMBRE')"><div class="card-image"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg></div><div class="card-content"><h2 class="card-title">ALAMBRE</h2></div></div>
+        </div>
+    </div>
+
+    <!-- MODAL PERFIL DEL OPERADOR -->
+    <div class="modal-overlay" id="profile-modal">
+        <div class="modal-content">
+            <button class="btn-close" onclick="cerrarModal()">×</button>
+            
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-main-title">PERFIL DEL OPERADOR</h2>
+            </div>
+
+            <!-- VISTA DE PERFIL -->
+            <div class="profile-view" id="view-mode">
+                <div class="profile-avatar-container">
+                    <img src="" alt="Avatar Operador" class="profile-avatar" id="view-avatar">
+                </div>
+                
+                <div class="profile-data-grid">
+                    <div class="data-item">
+                        <div class="data-label">NOMBRE COMPLETO</div>
+                        <div class="data-value" id="view-nombre">...</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">CÓDIGO</div>
+                        <div class="data-value" id="view-codigo">...</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">PUESTO PRINCIPAL</div>
+                        <div class="data-value" id="view-puesto">...</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">DÍAS DE VACACIONES</div>
+                        <div class="data-value" id="view-vacaciones">...</div>
+                    </div>
+                    <div class="data-item">
+                        <div class="data-label">ESTADO</div>
+                        <div class="data-value" id="view-estado-container">
+                            <span class="status-badge" id="view-estado">...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTÓN EDITAR PERFIL: OCULTO POR DEFECTO, MOSTRADO POR JS SOLO SI ES ADMIN -->
+                <button class="btn btn-primary" id="btn-editar-perfil" onclick="activarEdicion(operadorData.codigo)" style="display: none;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    EDITAR MI PERFIL
+                </button>
+
+                <!-- BOTÓN REDIRIGE AL PANEL DE ADMINISTRACIÓN -->
+                <button class="btn btn-admin" id="btn-admin-panel" onclick="irAPanelAdmin()" style="display: none;">
+                    ⚙️ PANEL DE ADMINISTRACIÓN
+                </button>
+            </div>
+
+            <!-- FORMULARIO DE EDICIÓN -->
+            <div class="profile-edit" id="edit-mode">
+                
+                <div class="edit-avatar-wrapper" onclick="document.getElementById('file-upload').click()">
+                    <img src="" alt="Avatar Operador" class="profile-avatar" id="edit-avatar">
+                    <div class="edit-avatar-overlay">
+                        CAMBIAR FOTO
+                    </div>
+                    <input type="file" id="file-upload" style="display: none;" accept="image/*" onchange="cambiarFotografia(event)">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">NOMBRE COMPLETO</label>
+                    <input type="text" class="form-control" id="input-nombre">
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">CÓDIGO DE OPERADOR</label>
+                        <input type="text" class="form-control" id="input-codigo">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">ESTADO</label>
+                        <select class="form-control" id="input-estado">
+                            <option value="ACTIVO">ACTIVO</option>
+                            <option value="INACTIVO">INACTIVO</option>
+                            <option value="VACACIONES">VACACIONES</option>
+                            <option value="PERMISO">PERMISO</option>
+                            <option value="INCAPACIDAD">INCAPACIDAD</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">PUESTO PRINCIPAL</label>
+                        <select class="form-control" id="input-puesto">
+                            <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                            <option value="SOLDADOR">SOLDADOR</option>
+                            <option value="PINTOR">PINTOR</option>
+                            <option value="AYUDANTE">AYUDANTE</option>
+                            <option value="PAILERO">PAILERO</option>
+                            <option value="MECANIZADOR">MECANIZADOR</option>
+                            <option value="OPERADOR">OPERADOR</option>
+                            <option value="OPERADOR DE MAQUINARIA">OPERADOR DE MAQUINARIA</option>
+                            <option value="TÉCNICO">TÉCNICO</option>
+                            <option value="SUPERVISOR">SUPERVISOR</option>
+                            <option value="ENCARGADO">ENCARGADO</option>
+                            <option value="JEFE DE ÁREA">JEFE DE ÁREA</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">DÍAS DE VACACIONES</label>
+                        <input type="number" class="form-control" id="input-vacaciones" min="0" step="1">
+                    </div>
+                </div>
+
+                <!-- CAMPO EXTRA: CONTRASEÑA SOLO PARA ADMINISTRADORES/ENCARGADOS -->
+                <div class="form-group" id="group-edit-password" style="display: none; margin-top: 15px;">
+                    <label class="form-label" style="color: var(--emerald-green);">CONTRASEÑA DE ACCESO</label>
+                    <input type="text" class="form-control" id="input-password" placeholder="Establece una contraseña">
+                </div>
+
+                <div class="btn-action-group">
+                    <button class="btn btn-secondary" onclick="cancelarEdicion()">CANCELAR</button>
+                    <button class="btn btn-primary" onclick="guardarCambios()">GUARDAR CAMBIOS</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NOTIFICACIÓN -->
+    <div class="notification" id="toast">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <span id="toast-msg">✓ GUARDADO CORRECTAMENTE</span>
+    </div>
+
+    <!-- IMPORTACIÓN DE LA BASE DE DATOS JS -->
+    <script src="../OPERADORES/db_operadores.js"></script>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        function abrirArea(area) {
+            // === RUTA CORREGIDA HACIA LA SUBCARPETA ===
+            if (area === 'ESTRUCTURAS') {
+                window.location.href = 'ESTRUCTURAS/ESTRUCTURAS.HTML';
+                return;
+            }
+            
+            // El resto sigue igual para las otras áreas:
+            const nombreArchivo = area.toLowerCase().replace(/\s+/g, '-') + '.html';
+            window.location.href = nombreArchivo;
+        }
+
+        function irAPanelAdmin() {
+            window.location.href = "PANEL ADMINISTRATIVO/PANEL DE ADMINISTRACION.HTML";
+        }
+
+        let operadorData = { nombre: "", codigo: "", puesto: "OPERADOR", vacaciones: 0, estado: "ACTIVO", foto: "", password: "", tipo: "OPERADOR", permisos: {modulos:{}, especiales:{}} };
+        let edicionTemporal = {};
+        let codigoEditandoActual = ""; 
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const nombreGuardado = localStorage.getItem("operadorActivo");
+            const codigoGuardado = localStorage.getItem("codigoActivo");
+            
+            if(codigoGuardado) {
+                operadorData = obtenerInfoCompleta(codigoGuardado, nombreGuardado);
+            }
+            cargarInterfazUsuario();
+        });
+
+        function obtenerInfoCompleta(codigoBuscado, nombreFallback) {
+            const datosPersistentes = localStorage.getItem("perfil_MERKAMEX_" + codigoBuscado);
+            if(datosPersistentes) {
+                return JSON.parse(datosPersistentes);
+            }
+
+            let puestoInicial = "OPERADOR";
+            let passInicial = "";
+            let tipoInicial = "OPERADOR";
+            
+            if(codigoBuscado === "1799") { 
+                puestoInicial = "ADMINISTRADOR"; 
+                tipoInicial = "ADMINISTRADOR";
+                passInicial = "2684";
+            } 
+
+            const iniciales = nombreFallback ? nombreFallback.split(" ").map(n => n[0]).join("").substring(0,2) : "OP";
+            
+            return {
+                nombre: nombreFallback || "NUEVO OPERADOR",
+                codigo: codigoBuscado,
+                puesto: puestoInicial,
+                vacaciones: 0,
+                estado: "ACTIVO",
+                password: passInicial,
+                tipo: tipoInicial,
+                permisos: {modulos:{}, especiales:{}},
+                foto: `https://ui-avatars.com/api/?name=${iniciales}&background=D4AF37&color=050505&size=150`
+            };
+        }
+
+        function esAdministrador() {
+            return operadorData.tipo === "ADMINISTRADOR" || operadorData.puesto === "ADMINISTRADOR";
+        }
+
+        function cargarInterfazUsuario() {
+            document.getElementById('panel-nombre').textContent = operadorData.nombre;
+            document.getElementById('panel-vacaciones').textContent = operadorData.vacaciones + " DÍAS DE VACACIONES";
+            document.getElementById('panel-puesto').textContent = operadorData.puesto; 
+            document.getElementById('panel-codigo').textContent = operadorData.codigo;
+            document.getElementById('panel-avatar').src = operadorData.foto;
+
+            document.getElementById('btn-admin-panel').style.display = esAdministrador() ? "block" : "none";
+            
+            const btnEditarPerfil = document.getElementById('btn-editar-perfil');
+            if(btnEditarPerfil) {
+                btnEditarPerfil.style.display = esAdministrador() ? "flex" : "none";
+            }
+
+            actualizarVistaPerfil(operadorData);
+        }
+
+        function actualizarVistaPerfil(datosMostrados) {
+            document.getElementById('view-nombre').textContent = datosMostrados.nombre;
+            document.getElementById('view-codigo').textContent = datosMostrados.codigo;
+            document.getElementById('view-puesto').textContent = datosMostrados.puesto;
+            document.getElementById('view-vacaciones').textContent = datosMostrados.vacaciones + (datosMostrados.vacaciones == 1 ? " DÍA" : " DÍAS");
+            document.getElementById('view-avatar').src = datosMostrados.foto;
+            
+            const statusBadge = document.getElementById('view-estado');
+            statusBadge.textContent = datosMostrados.estado;
+            statusBadge.className = 'status-badge ' + datosMostrados.estado.toLowerCase();
+        }
+
+        const modal = document.getElementById('profile-modal');
+        function abrirModal() { modal.classList.add('active'); cancelarEdicion(); }
+        function cerrarModal() { modal.classList.remove('active'); }
+        modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); });
+
+        function activarEdicion(targetCodigo = operadorData.codigo, datosExtra = null) {
+            codigoEditandoActual = targetCodigo;
+            document.getElementById('modal-main-title').textContent = "EDITAR OPERADOR";
+            edicionTemporal = datosExtra ? JSON.parse(JSON.stringify(datosExtra)) : JSON.parse(JSON.stringify(operadorData));
+            
+            document.getElementById('input-codigo').disabled = true; 
+            document.getElementById('input-codigo').style.opacity = "0.7";
+            document.getElementById('input-codigo').style.cursor = "not-allowed";
+
+            const inputEstado = document.getElementById('input-estado');
+            const inputPuesto = document.getElementById('input-puesto');
+            const inputVacaciones = document.getElementById('input-vacaciones');
+
+            if (!esAdministrador()) {
+                inputEstado.disabled = true; inputPuesto.disabled = true; inputVacaciones.disabled = true;
+                inputEstado.style.opacity = "0.7"; inputPuesto.style.opacity = "0.7"; inputVacaciones.style.opacity = "0.7";
+            } else {
+                inputEstado.disabled = false; inputPuesto.disabled = false; inputVacaciones.disabled = false;
+                inputEstado.style.opacity = "1"; inputPuesto.style.opacity = "1"; inputVacaciones.style.opacity = "1";
+            }
+            
+            document.getElementById('input-nombre').value = edicionTemporal.nombre;
+            document.getElementById('input-codigo').value = edicionTemporal.codigo;
+            document.getElementById('input-estado').value = edicionTemporal.estado;
+            document.getElementById('input-puesto').value = edicionTemporal.puesto;
+            document.getElementById('input-vacaciones').value = edicionTemporal.vacaciones;
+            document.getElementById('input-password').value = edicionTemporal.password || "";
+            document.getElementById('edit-avatar').src = edicionTemporal.foto;
+
+            if (edicionTemporal.tipo === "ADMINISTRADOR" || edicionTemporal.tipo === "ENCARGADO") {
+                document.getElementById('group-edit-password').style.display = "block";
+            } else {
+                document.getElementById('group-edit-password').style.display = "none";
+            }
+
+            document.getElementById('view-mode').style.display = 'none';
+            document.getElementById('edit-mode').style.display = 'flex';
+        }
+
+        function cancelarEdicion() {
+            document.getElementById('edit-mode').style.display = 'none';
+            document.getElementById('view-mode').style.display = 'flex';
+            document.getElementById('modal-main-title').textContent = "PERFIL DEL OPERADOR";
+            edicionTemporal = {}; 
+            codigoEditandoActual = "";
+            cargarInterfazUsuario(); 
+        }
+
+        function guardarCambios() {
+            const nombreForm = document.getElementById('input-nombre').value.trim();
+            const codigoForm = document.getElementById('input-codigo').value.trim();
+            const vacacionesForm = document.getElementById('input-vacaciones').value;
+            const puestoForm = document.getElementById('input-puesto').value;
+            
+            if(!nombreForm || !codigoForm) {
+                alert("El nombre y código son obligatorios."); return;
+            }
+
+            let passA_Guardar = edicionTemporal.password;
+            if (edicionTemporal.tipo === "ADMINISTRADOR" || edicionTemporal.tipo === "ENCARGADO") {
+                passA_Guardar = document.getElementById('input-password').value.trim();
+                if (!passA_Guardar) {
+                    alert("Es OBLIGATORIO establecer una contraseña para mantener tu nivel de acceso."); return;
+                }
+            } else {
+                passA_Guardar = "";
+            }
+
+            const datosActualizados = {
+                nombre: nombreForm,
+                codigo: codigoForm,
+                estado: document.getElementById('input-estado').value,
+                puesto: puestoForm,
+                vacaciones: parseInt(vacacionesForm) || 0,
+                password: passA_Guardar,
+                foto: document.getElementById('edit-avatar').src,
+                tipo: edicionTemporal.tipo || "OPERADOR", 
+                permisos: edicionTemporal.permisos || { modulos: {}, especiales: {} } 
+            };
+
+            // Guardar localmente
+            localStorage.setItem("perfil_MERKAMEX_" + codigoForm, JSON.stringify(datosActualizados));
+
+            if(codigoForm === operadorData.codigo) {
+                operadorData = datosActualizados;
+                localStorage.setItem("operadorActivo", operadorData.nombre); 
+            }
+
+            cancelarEdicion();
+            mostrarNotificacion();
+        }
+
+        function cambiarFotografia(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) { document.getElementById('edit-avatar').src = e.target.result; }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function mostrarNotificacion() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        /* -----------------------------------------
+           Animación del Fondo Canvas
+           ----------------------------------------- */
+        const canvas = document.getElementById('gold-network');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+            particles = [];
+            const particleCount = width < 768 ? 40 : 80;
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * width, y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, radius: Math.random() * 1.5 + 0.5 
+                });
+            }
+        }
+
+        function animateCanvas() {
+            requestAnimationFrame(animateCanvas);
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(212, 175, 55, 0.6)';
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
+            });
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 130) {
+                        ctx.beginPath(); const opacity = (1 - (distance / 130)) * 0.3;
+                        ctx.strokeStyle = `rgba(212, 175, 55, ${opacity})`; ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        initCanvas(); animateCanvas(); window.addEventListener('resize', initCanvas);
+    </script>
+</body>
+</html>

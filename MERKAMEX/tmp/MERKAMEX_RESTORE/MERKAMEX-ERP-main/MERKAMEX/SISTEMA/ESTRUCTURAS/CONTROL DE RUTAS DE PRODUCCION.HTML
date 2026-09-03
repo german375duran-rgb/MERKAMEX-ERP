@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rutas de Producción | MERKAMEX</title>
+    <title>Rutas de ProducciÃ³n | MERKAMEX</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -207,7 +207,7 @@
         <header class="header no-print">
             <div style="display: flex; align-items: center; gap: 20px;">
                 <a href="ESTRUCTURAS.HTML" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> VOLVER</a>
-                <h1>CONTROL DE RUTAS DE PRODUCCIÓN</h1>
+                <h1>CONTROL DE RUTAS DE PRODUCCIÃ“N</h1>
             </div>
             <div style="display: flex; gap: 15px;">
                 <button class="btn btn-secondary" onclick="abrirModalImportacion()"><i class="fa-solid fa-upload"></i> Carga Masiva</button>
@@ -223,9 +223,9 @@
             </div>
 
             <section class="card search-section no-print">
-                <div class="card-header">BUSCAR ARTÍCULO</div>
+                <div class="card-header">BUSCAR artículo</div>
                 <div style="display: flex; gap: 15px;">
-                    <input type="text" id="input-busqueda" código o descripción del artículo (Ej. ART-001 o Panel)..." onkeyup="buscarArticulo()">
+                    <input type="text" id="input-busqueda" class="form-control" placeholder="Ingrese código o descripción del artículo (Ej. ART-001 o Panel)..." onkeyup="buscarArticulo()">
                     <button class="btn btn-primary" onclick="buscarArticulo()"><i class="fa-solid fa-magnifying-glass"></i> Buscar</button>
                 </div>
                 
@@ -355,7 +355,6 @@
             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                 <button class="btn btn-primary" onclick="procesarExcelGrid()"><i class="fa-solid fa-save"></i> PROCESAR Y GUARDAR RUTAS</button>
                 <button class="btn btn-secondary" onclick="limpiarGrid()"><i class="fa-solid fa-eraser"></i> LIMPIAR HOJA</button>
-                <button class="btn btn-danger" onclick="cerrarModal('modal-importacion')"><i class="fa-solid fa-arrow-left"></i> VOLVER</button>
                 <button class="btn btn-danger" onclick="cerrarModal('modal-importacion')"><i class="fa-solid fa-arrow-left"></i> VOLVER</button>
             </div>
 
@@ -1059,7 +1058,6 @@ async function procesarExcelGrid() {
 </script>
 </body>
 </html>
-
 
 
 

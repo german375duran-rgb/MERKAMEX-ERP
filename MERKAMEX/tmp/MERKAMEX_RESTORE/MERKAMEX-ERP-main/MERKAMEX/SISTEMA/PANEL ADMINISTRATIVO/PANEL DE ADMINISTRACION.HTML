@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PANEL ADMINISTRATIVO - MERKAMEX</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- ESTILOS GLOBALES Y DE LA INTERFAZ -->
+    <style>
+        :root {
+            --bg-black: #030303;
+            --bg-panel: rgba(15, 15, 18, 0.85);
+            --bg-card: rgba(25, 25, 30, 0.65);
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #997A00;
+            --gold-glow: rgba(212, 175, 55, 0.4);
+            --emerald-green: #00965e;
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --border-glass: rgba(212, 175, 55, 0.25);
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f1c40f;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body, html { width: 100%; height: 100vh; background-color: var(--bg-black); color: var(--text-main); overflow: hidden; }
+
+        /* ANIMACIÓN DEL FONDO (CANVAS) */
+        #gold-network { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.6; }
+
+        /* LAYOUT PRINCIPAL */
+        .admin-layout { position: relative; z-index: 1; display: flex; width: 100%; height: 100vh; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+        /* MENÚ LATERAL */
+        .sidebar { width: 280px; background: rgba(10, 10, 12, 0.95); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; box-shadow: 5px 0 20px rgba(0,0,0,0.8); }
+        .sidebar-header { padding: 30px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .sidebar-title { color: var(--gold-primary); font-size: 1.2rem; font-weight: 800; letter-spacing: 2px; }
+        .sidebar-subtitle { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; margin-top: 5px; }
+        .nav-menu { padding: 20px 0; flex: 1; overflow-y: auto; }
+        .nav-item { padding: 15px 25px; display: flex; align-items: center; gap: 15px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; border-left: 3px solid transparent; }
+        .nav-item:hover { background: rgba(212, 175, 55, 0.05); color: var(--text-main); }
+        .nav-item.active { background: rgba(212, 175, 55, 0.1); border-left-color: var(--gold-primary); color: var(--gold-primary); }
+        
+        /* ÁREA DE CONTENIDO */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        
+        /* HEADER SUPERIOR */
+        .topbar { height: 80px; background: rgba(15, 15, 18, 0.6); border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; padding: 0 40px; }
+        .topbar-title { font-size: 1.5rem; font-weight: 700; color: var(--text-main); letter-spacing: 1px; }
+        .topbar-user { display: flex; align-items: center; gap: 15px; }
+        .topbar-user-info { text-align: right; }
+        .topbar-name { font-size: 0.9rem; font-weight: 700; color: var(--gold-light); display: block; }
+        .topbar-role { font-size: 0.7rem; color: var(--emerald-green); font-weight: 600; letter-spacing: 1px; }
+        .topbar-avatar { width: 45px; height: 45px; border-radius: 50%; border: 2px solid var(--gold-primary); }
+        .btn-close-panel { margin-left: 20px; background: transparent; border: 1px solid var(--danger-color); color: var(--danger-color); padding: 8px 15px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 0.8rem; letter-spacing: 1px;}
+        .btn-close-panel:hover { background: var(--danger-color); color: white; box-shadow: 0 0 15px rgba(231, 76, 60, 0.5); }
+
+        /* CONTENEDOR DE SECCIONES */
+        .content-area { flex: 1; padding: 40px; overflow-y: auto; }
+        .section-view { display: none; animation: fadeIn 0.5s ease forwards; }
+        .section-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ELEMENTOS COMUNES */
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .section-title { font-size: 1.3rem; color: var(--gold-primary); letter-spacing: 1.5px; }
+        
+        .filters-bar { display: flex; gap: 15px; background: rgba(0,0,0,0.5); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;}
+        .form-control { background: rgba(15, 15, 18, 0.8); border: 1px solid var(--border-glass); border-radius: 8px; padding: 12px 15px; color: var(--text-main); font-size: 0.9rem; outline: none; width: 100%; transition: all 0.3s ease; }
+        .form-control:focus { border-color: var(--gold-primary); box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2); }
+        select.form-control { appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 15px center; background-size: 16px; }
+        select.form-control option { background: var(--bg-black); color: var(--text-main); }
+
+        .btn { padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease; border: none; display: inline-flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: var(--bg-black); box-shadow: 0 4px 10px rgba(212, 175, 55, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(212, 175, 55, 0.5); background: linear-gradient(135deg, var(--gold-light), var(--gold-primary)); }
+        .btn-outline { background: transparent; color: var(--gold-primary); border: 1px solid var(--gold-primary); }
+        .btn-outline:hover { background: rgba(212, 175, 55, 0.1); }
+        
+        .btn-danger { background: rgba(231, 76, 60, 0.1); color: var(--danger-color); border: 1px solid var(--danger-color); }
+        .btn-danger:hover { background: var(--danger-color); color: white; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4); }
+
+        /* BUSCADOR AUTOCOMPLETADO (VACACIONES) */
+        .autocomplete-wrapper { position: relative; width: 100%; }
+        .autocomplete-list { position: absolute; top: calc(100% + 5px); left: 0; right: 0; background: var(--bg-panel); border: 1px solid var(--gold-dark); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 100; display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.8); }
+        .autocomplete-item { padding: 12px 15px; cursor: pointer; color: var(--text-main); font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; }
+        .autocomplete-item:hover { background: rgba(212, 175, 55, 0.2); color: var(--gold-primary); }
+        .autocomplete-item:last-child { border-bottom: none; }
+
+        /* TARJETAS DE USUARIOS */
+        .users-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .user-card { background: var(--bg-card); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 25px; position: relative; transition: all 0.3s ease; }
+        .user-card:hover { border-color: var(--border-glass); transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.8); }
+        .card-header { display: flex; gap: 15px; margin-bottom: 20px; }
+        .card-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--gold-primary); object-fit: cover; flex-shrink: 0; }
+        .card-info { flex: 1; padding-right: 85px; } 
+        .card-name { font-weight: 700; font-size: 0.95rem; color: var(--text-main); margin-bottom: 4px; line-height: 1.3; word-wrap: break-word; overflow-wrap: break-word; }
+        .card-code { font-size: 0.75rem; color: var(--text-muted); line-height: 1.2; }
+        .card-role { font-size: 0.75rem; color: var(--emerald-green); font-weight: 600; margin-top: 4px; line-height: 1.2; }
+        
+        .status-badge { position: absolute; top: 20px; right: 20px; padding: 4px 10px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; border: 1px solid; text-align: center; }
+        .status-badge.activo { background: rgba(46, 204, 113, 0.1); color: var(--success-color); border-color: rgba(46, 204, 113, 0.3); }
+        .status-badge.inactivo { background: rgba(231, 76, 60, 0.1); color: var(--danger-color); border-color: rgba(231, 76, 60, 0.3); }
+        .status-badge.vacaciones { background: rgba(241, 196, 15, 0.1); color: var(--warning-color); border-color: rgba(241, 196, 15, 0.3); }
+
+        .card-actions { display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; margin-top: 15px; }
+        .btn-sm { padding: 6px 12px; font-size: 0.7rem; flex: 1; }
+
+        /* FORMULARIOS COMUNES */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; background: var(--bg-card); padding: 35px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .form-group { width: 100%; margin-bottom: 15px;}
+        .form-label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+        .full-width { grid-column: span 2; }
+        
+        .alert-box { padding: 15px 20px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; display: none; align-items: center; gap: 10px; margin-top: 15px;}
+        .alert-admin { background: rgba(231, 76, 60, 0.1); border: 1px solid var(--danger-color); color: var(--danger-color); }
+        .alert-encargado { background: rgba(241, 196, 15, 0.1); border: 1px solid var(--warning-color); color: var(--warning-color); }
+
+        /* INTERRUPTORES (TOGGLES) PARA PERMISOS */
+        .permissions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .perm-card { background: rgba(0,0,0,0.5); padding: 15px 20px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .perm-name { font-size: 0.9rem; font-weight: 600; }
+        
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.1); border-radius: 24px; transition: .4s; border: 1px solid rgba(255,255,255,0.2); }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--text-muted); border-radius: 50%; transition: .4s; }
+        input:checked + .slider { background-color: rgba(212, 175, 55, 0.2); border-color: var(--gold-primary); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: var(--gold-light); box-shadow: 0 0 10px var(--gold-glow); }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(212, 175, 55, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-primary); }
+
+        /* NOTIFICACIÓN */
+        .toast { position: fixed; bottom: -100px; right: 40px; background: var(--bg-panel); border: 1px solid var(--gold-primary); padding: 15px 25px; border-radius: 8px; color: white; display: flex; align-items: center; gap: 10px; transition: bottom 0.4s ease; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        .toast.show { bottom: 40px; }
+
+        @media (max-width: 900px) {
+            .admin-layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border-glass); }
+            .nav-menu { display: flex; overflow-x: auto; padding: 0; }
+            .nav-item { padding: 15px; border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+            .nav-item.active { border-left: none; border-bottom-color: var(--gold-primary); }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../../firebase-config.js"></script>
+</head>
+<body>
+
+    <!-- FONDO ANIMADO -->
+    <canvas id="gold-network"></canvas>
+
+    <div class="admin-layout">
+        
+        <!-- MENÚ LATERAL -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">PANEL DE CONTROL</div>
+                <div class="sidebar-subtitle">GESTIÓN DE PERSONAL</div>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active" onclick="showSection('sec-usuarios', this)">👥 USUARIOS REGISTRADOS</div>
+                <div class="nav-item" onclick="showSection('sec-nuevo', this)">➕ NUEVO USUARIO</div>
+                <div class="nav-item" onclick="showSection('sec-vacaciones', this)">🌴 VACACIONES</div>
+                <div class="nav-item" onclick="showSection('sec-permisos', this)">🔐 PERMISOS DE ACCESO</div>
+            </nav>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <div class="main-content">
+            
+            <!-- HEADER SUPERIOR -->
+            <header class="topbar">
+                <div class="topbar-title" id="page-title">USUARIOS REGISTRADOS</div>
+                <div class="topbar-user">
+                    <div class="topbar-user-info">
+                        <span class="topbar-name" id="admin-name">ADMINISTRADOR</span>
+                        <span class="topbar-role">SISTEMA MERKAMEX</span>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=AD&background=D4AF37&color=050505" class="topbar-avatar" id="admin-avatar">
+                    <button class="btn-close-panel" onclick="cerrarPanelAdmin()">CERRAR PANEL</button>
+                </div>
+            </header>
+
+            <main class="content-area">
+                
+                <!-- SECCIÓN 1: USUARIOS REGISTRADOS -->
+                <section id="sec-usuarios" class="section-view active">
+                    <div class="filters-bar">
+                        <div style="flex:2;">
+                            <input type="text" class="form-control" id="search-user" placeholder="Buscar por nombre o código..." onkeyup="filtrarUsuarios()">
+                        </div>
+                        <div style="flex:1;">
+                            <select class="form-control" id="filter-type" onchange="filtrarUsuarios()">
+                                <option value="TODOS">TODOS LOS TIPOS</option>
+                                <option value="ADMINISTRADOR">ADMINISTRADORES</option>
+                                <option value="ENCARGADO">ENCARGADOS</option>
+                                <option value="OPERADOR">OPERADORES NORMALES</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;">
+                            <select class="form-control" id="filter-status" onchange="filtrarUsuarios()">
+                                <option value="TODOS">CUALQUIER ESTADO</option>
+                                <option value="ACTIVO">ACTIVOS</option>
+                                <option value="INACTIVO">INACTIVOS / SUSPENDIDOS</option>
+                                <option value="VACACIONES">EN VACACIONES</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="users-grid" id="users-container">
+                        <!-- Las tarjetas se generan por JS -->
+                    </div>
+                </section>
+
+                <!-- SECCIÓN 2: FORMULARIO (NUEVO/EDITAR) -->
+                <section id="sec-nuevo" class="section-view">
+                    <div class="section-header">
+                        <h2 class="section-title" id="form-main-title">DAR DE ALTA NUEVO USUARIO</h2>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-danger" id="btn-eliminar-usuario" style="display: none;" onclick="eliminarUsuario()">🗑️ ELIMINAR</button>
+                            <button class="btn btn-primary" onclick="guardarUsuario()">GUARDAR DATOS</button>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <!-- COLUMNA 1 -->
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">NOMBRE COMPLETO</label>
+                                <input type="text" class="form-control" id="f-nombre" placeholder="Ej. Juan Pérez">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CÓDIGO DE ACCESO</label>
+                                <input type="text" class="form-control" id="f-codigo" placeholder="Ej. OP-001">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CORREO ELECTRÓNICO (Opcional)</label>
+                                <input type="email" class="form-control" id="f-correo" placeholder="correo@empresa.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">DÍAS DE VACACIONES ACUMULADOS</label>
+                                <input type="number" class="form-control" id="f-vacaciones" min="0" value="0">
+                            </div>
+                        </div>
+
+                        <!-- COLUMNA 2 -->
+                        <div>
+                            <div class="form-group">
+                                <label class="form-label">TIPO DE USUARIO (NIVEL DE ACCESO)</label>
+                                <select class="form-control" id="f-tipo" onchange="checkTipoUsuario()">
+                                    <option value="OPERADOR">OPERADOR NORMAL</option>
+                                    <option value="ENCARGADO">ENCARGADO DE ÁREA</option>
+                                    <option value="ADMINISTRADOR">ADMINISTRADOR DEL SISTEMA</option>
+                                </select>
+                            </div>
+                            
+                            <div class="alert-box alert-admin" id="warn-admin">
+                                ⚠️ LOS ADMINISTRADORES TIENEN ACCESO TOTAL Y PUEDEN CAMBIAR CONTRASEÑAS.
+                            </div>
+                            <div class="alert-box alert-encargado" id="warn-encargado">
+                                🔒 RECUERDA ASIGNAR LOS PERMISOS DE MÓDULOS PARA ESTE ENCARGADO EN LA PESTAÑA "PERMISOS".
+                            </div>
+
+                            <div class="form-group" id="f-group-pass" style="display: none; margin-top: 15px;">
+                                <label class="form-label" style="color: var(--gold-primary);">CONTRASEÑA DE ACCESO</label>
+                                <input type="text" class="form-control" id="f-pass" placeholder="Asigna una contraseña segura">
+                            </div>
+
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label class="form-label">PUESTO PRINCIPAL</label>
+                                <select class="form-control" id="f-puesto">
+                                    <option value="SOLDADOR">SOLDADOR</option>
+                                    <option value="PINTOR">PINTOR</option>
+                                    <option value="AYUDANTE">AYUDANTE</option>
+                                    <option value="PAILERO">PAILERO</option>
+                                    <option value="MECANIZADOR">MECANIZADOR</option>
+                                    <option value="OPERADOR DE MAQUINARIA">OPERADOR DE MAQUINARIA</option>
+                                    <option value="SUPERVISOR">SUPERVISOR</option>
+                                    <option value="JEFE DE ÁREA">JEFE DE ÁREA</option>
+                                    <option value="ADMINISTRADOR">ADMINISTRADOR</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">ESTADO ACTUAL</label>
+                                <select class="form-control" id="f-estado">
+                                    <option value="ACTIVO">ACTIVO</option>
+                                    <option value="INACTIVO">INACTIVO / BAJA</option>
+                                    <option value="VACACIONES">DE VACACIONES</option>
+                                    <option value="PERMISO">PERMISO ESPECIAL</option>
+                                    <option value="INCAPACIDAD">INCAPACIDAD MÈDICA</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN 3: VACACIONES -->
+                <section id="sec-vacaciones" class="section-view">
+                    <div class="section-header">
+                        <h2 class="section-title">ADMINISTRACIÓN DE VACACIONES</h2>
+                    </div>
+                    <div class="form-grid">
+                        <div>
+                            <!-- BUSCADOR INTELIGENTE -->
+                            <div class="form-group autocomplete-wrapper">
+                                <label class="form-label">BUSCAR OPERADOR (NOMBRE O CÓDIGO)</label>
+                                <input type="text" class="form-control" id="vac-operador-input" placeholder="Escribe para buscar..." onkeyup="filtrarAutocompleteVacaciones()" autocomplete="off">
+                                <input type="hidden" id="vac-operador-hidden">
+                                <div class="autocomplete-list" id="vac-autocomplete-list"></div>
+                            </div>
+                            
+                            <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px solid var(--border-glass);">
+                                <h3 style="font-size: 1rem; color: var(--gold-light); margin-bottom: 10px;">RESUMEN DE DÍAS</h3>
+                                <p style="font-size: 0.9rem; color: var(--text-muted);">Días Disponibles: <strong style="color: white; font-size: 1.2rem;" id="vac-disponibles">0</strong></p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 0.9rem; color: var(--gold-primary); margin-bottom: 15px;">REGISTRAR NUEVO PERIODO</h3>
+                            <div class="form-group">
+                                <label class="form-label">FECHA DE INICIO</label>
+                                <input type="date" class="form-control" id="vac-inicio">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">FECHA DE FINALIZACIÓN</label>
+                                <input type="date" class="form-control" id="vac-fin">
+                            </div>
+                            <button class="btn btn-outline" style="width: 100%;" onclick="registrarVacaciones()">AGREGAR PERIODO Y DESCONTAR DÍAS</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECCIÓN 4: PERMISOS -->
+                <section id="sec-permisos" class="section-view">
+                    <div class="section-header">
+                        <h2 class="section-title">CONTROL DE ACCESO Y MÓDULOS</h2>
+                        <button class="btn btn-primary" onclick="guardarPermisos()">GUARDAR PERMISOS</button>
+                    </div>
+
+                    <div class="form-group" style="max-width: 400px;">
+                        <label class="form-label">SELECCIONAR USUARIO (Solo Encargados/Admins)</label>
+                        <select class="form-control" id="perm-operador" onchange="cargarPermisosUsuario()">
+                            <!-- Llenado por JS -->
+                        </select>
+                    </div>
+
+                    <h3 style="font-size: 0.9rem; color: var(--gold-light); margin-top: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">ACCESO A MÓDULOS PRINCIPALES</h3>
+                    <div class="permissions-grid" id="modules-container">
+                        <!-- Generado por JS -->
+                    </div>
+
+                    <h3 style="font-size: 0.9rem; color: var(--gold-light); margin-top: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">PERMISOS ESPECIALES DE SISTEMA</h3>
+                    <div class="permissions-grid" id="special-container">
+                        <!-- Generado por JS -->
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <div class="toast" id="admin-toast">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+        <span id="admin-toast-msg">ACCIÓN REALIZADA CON ÉXITO</span>
+    </div>
+
+    <!-- IMPORTAR BD ORIGINAL PARA CRUZAR DATOS -->
+    <script src="../../OPERADORES/db_operadores.js"></script>
+
+    <script>
+        /* =========================================
+           BASE DE DATOS Y ESTADO GLOBAL
+           ========================================= */
+        let usuariosApp = [];
+        let usuarioEditandoActual = "NUEVO";
+
+        // Módulos del ERP para los permisos
+        const modulosERP = ["DASHBOARD", "ESTRUCTURAS", "PINTURA", "PAILERIA", "EXIBIDORES", "MECANIZACIONES", "CORTE LASER", "PLASTICO", "TORNOS", "ALAMBRE", "INVENTARIO", "VENTAS", "REPORTES"];
+        const permisosEsp = ["VER", "CREAR", "EDITAR", "ELIMINAR", "AUTORIZAR"];
+
+        /* -----------------------------------------
+           INICIALIZACIÓN
+           ----------------------------------------- */
+        document.addEventListener("DOMContentLoaded", () => {
+            // Identificar al Admin que abrió el panel
+            const nombreAdmin = localStorage.getItem("operadorActivo") || "ADMINISTRADOR";
+            document.getElementById('admin-name').textContent = nombreAdmin;
+            const ini = nombreAdmin.split(" ").map(n=>n[0]).join("").substring(0,2);
+            document.getElementById('admin-avatar').src = `https://ui-avatars.com/api/?name=${ini}&background=D4AF37&color=050505`;
+
+            cargarTodosLosUsuarios();
+            renderizarInterruptoresPermisos();
+        });
+
+        /* -----------------------------------------
+           LÓGICA DE DATOS (FUSIONAR BD FIJA + LOCAL)
+           ----------------------------------------- */
+        async function cargarTodosLosUsuarios() {
+            try {
+                usuariosApp = [];
+                let dbFija = (typeof baseOperadores !== 'undefined') ? baseOperadores : {};
+                
+                const snapshot = await db.collection("usuarios").get();
+                let fbUsers = {};
+                snapshot.forEach(doc => {
+                    fbUsers[doc.id] = doc.data();
+                });
+
+                let todosLosCodigos = { ...dbFija };
+                for(let key in fbUsers) todosLosCodigos[key] = fbUsers[key].nombre;
+
+                if(!todosLosCodigos["1799"]) todosLosCodigos["1799"] = "ARQ. JUAN GERMÁN SÁNCHEZ DURÁN";
+
+                for (let cod in todosLosCodigos) {
+                    let nombreFallback = todosLosCodigos[cod];
+                    let dataFb = fbUsers[cod];
+                    
+                    if (dataFb) {
+                        if (!dataFb.tipo) dataFb.tipo = (cod === "1799") ? "ADMINISTRADOR" : "OPERADOR";
+                        usuariosApp.push(dataFb);
+                    } else {
+                        let esAdmin = (cod === "1799");
+                        usuariosApp.push({
+                            codigo: cod,
+                            nombre: nombreFallback,
+                            tipo: esAdmin ? "ADMINISTRADOR" : "OPERADOR",
+                            puesto: esAdmin ? "ADMINISTRADOR" : "OPERADOR",
+                            estado: "ACTIVO",
+                            vacaciones: 0,
+                            password: esAdmin ? "2684" : "",
+                            permisos: { modulos: {}, especiales: {} },
+                            foto: `https://ui-avatars.com/api/?name=${nombreFallback.substring(0,2)}&background=D4AF37&color=050505&size=150`
+                        });
+                    }
+                }
+                mostrarUsuarios();
+                llenarSelectsSecundarios();
+            } catch(e) {
+                console.error("Error al cargar usuarios:", e);
+                alert("Error al sincronizar con la base de datos.");
+            }
+        }
+
+        /* -----------------------------------------
+           NAVEGACIÓN Y PANELES
+           ----------------------------------------- */
+        function showSection(sectionId, btnElement) {
+            document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            btnElement.classList.add('active');
+
+            if (sectionId === 'sec-usuarios') { document.getElementById('page-title').textContent = "USUARIOS REGISTRADOS"; mostrarUsuarios(); }
+            if (sectionId === 'sec-nuevo') { 
+                document.getElementById('page-title').textContent = "GESTOR DE USUARIOS";
+                prepararFormularioCreacion(); 
+            }
+            if (sectionId === 'sec-vacaciones') { document.getElementById('page-title').textContent = "ADMINISTRACIÓN DE VACACIONES"; }
+            if (sectionId === 'sec-permisos') { document.getElementById('page-title').textContent = "CONFIGURACIÓN DE ACCESOS"; }
+        }
+
+        function cerrarPanelAdmin() {
+            window.location.href = "../sistema.html";
+        }
+
+        function mostrarToast(msg) {
+            const t = document.getElementById('admin-toast');
+            document.getElementById('admin-toast-msg').textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        /* -----------------------------------------
+           SECCIÓN: USUARIOS REGISTRADOS
+           ----------------------------------------- */
+        function mostrarUsuarios() {
+            const container = document.getElementById('users-container');
+            const search = document.getElementById('search-user').value.toLowerCase();
+            const filterType = document.getElementById('filter-type').value;
+            const filterStatus = document.getElementById('filter-status').value;
+
+            container.innerHTML = "";
+
+            let filtrados = usuariosApp.filter(u => {
+                let matchSearch = u.nombre.toLowerCase().includes(search) || u.codigo.toLowerCase().includes(search);
+                let matchType = (filterType === "TODOS") || ((u.tipo || 'OPERADOR') === filterType);
+                let matchStatus = (filterStatus === "TODOS") || (u.estado === filterStatus);
+                return matchSearch && matchType && matchStatus;
+            });
+
+            filtrados.forEach(u => {
+                let card = document.createElement('div');
+                card.className = "user-card";
+                
+                // VERIFICAMOS SI EL USUARIO ES ADMIN O ENCARGADO PARA MOSTRAR EL BOTÓN
+                let btnPermisosHTML = "";
+                let tipoVisual = u.tipo || 'OPERADOR';
+                
+                if (tipoVisual === 'ADMINISTRADOR' || tipoVisual === 'ENCARGADO') {
+                    btnPermisosHTML = `<button class="btn btn-outline btn-sm" onclick="irAPermisos('${u.codigo}')">🔐 PERMISOS</button>`;
+                }
+
+                card.innerHTML = `
+                    <span class="status-badge ${u.estado.toLowerCase()}">${u.estado}</span>
+                    <div class="card-header">
+                        <img src="${u.foto}" class="card-avatar">
+                        <div class="card-info">
+                            <div class="card-name">${u.nombre}</div>
+                            <div class="card-code">${u.codigo} | ${tipoVisual}</div>
+                            <div class="card-role">${u.puesto}</div>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editarUsuarioDesdeLista('${u.codigo}')">✏️ EDITAR</button>
+                        ${btnPermisosHTML}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filtrarUsuarios() { mostrarUsuarios(); }
+
+        /* -----------------------------------------
+           SECCIÓN: FORMULARIO ALTA/EDICIÓN
+           ----------------------------------------- */
+        function prepararFormularioCreacion() {
+            usuarioEditandoActual = "NUEVO";
+            document.getElementById('form-main-title').textContent = "DAR DE ALTA NUEVO USUARIO";
+            document.getElementById('btn-eliminar-usuario').style.display = 'none'; // Escondemos botón eliminar en perfil nuevo
+            
+            document.getElementById('f-nombre').value = "";
+            document.getElementById('f-codigo').value = "";
+            document.getElementById('f-codigo').disabled = false;
+            document.getElementById('f-correo').value = "";
+            document.getElementById('f-vacaciones').value = "0";
+            document.getElementById('f-tipo').value = "OPERADOR";
+            document.getElementById('f-estado').value = "ACTIVO";
+            document.getElementById('f-puesto').value = "OPERADOR";
+            document.getElementById('f-pass').value = "";
+            checkTipoUsuario();
+        }
+
+        function editarUsuarioDesdeLista(codigo) {
+            let u = usuariosApp.find(user => user.codigo === codigo);
+            if(!u) return;
+            
+            // Forzamos el click virtual en la pestaña de Nuevo/Editar
+            document.querySelectorAll('.nav-item')[1].click();
+            
+            usuarioEditandoActual = codigo;
+            document.getElementById('form-main-title').textContent = "EDITAR USUARIO EXISTENTE";
+            document.getElementById('btn-eliminar-usuario').style.display = 'block'; // Mostramos botón eliminar
+            
+            document.getElementById('f-nombre').value = u.nombre;
+            document.getElementById('f-codigo').value = u.codigo;
+            document.getElementById('f-codigo').disabled = true; // No cambiar código existente
+            document.getElementById('f-vacaciones').value = u.vacaciones;
+            document.getElementById('f-tipo').value = u.tipo || "OPERADOR";
+            document.getElementById('f-estado').value = u.estado;
+            document.getElementById('f-puesto').value = u.puesto;
+            document.getElementById('f-pass').value = u.password || "";
+            checkTipoUsuario();
+        }
+
+        function checkTipoUsuario() {
+            let t = document.getElementById('f-tipo').value;
+            document.getElementById('warn-admin').style.display = (t === "ADMINISTRADOR") ? "flex" : "none";
+            document.getElementById('warn-encargado').style.display = (t === "ENCARGADO") ? "flex" : "none";
+            document.getElementById('f-group-pass').style.display = (t === "ADMINISTRADOR" || t === "ENCARGADO") ? "block" : "none";
+        }
+
+        async function guardarUsuario() {
+            const nom = document.getElementById('f-nombre').value.trim();
+            const cod = document.getElementById('f-codigo').value.trim();
+            const tipo = document.getElementById('f-tipo').value;
+            
+            if(!nom || !cod) { alert("Nombre y código obligatorios."); return; }
+
+            let pass = document.getElementById('f-pass').value;
+            if((tipo === "ADMINISTRADOR" || tipo === "ENCARGADO") && !pass) {
+                alert("Debes asignar una contraseña para niveles superiores."); return;
+            }
+
+            let uIndex = usuariosApp.findIndex(x => x.codigo === cod);
+            let userObj = (uIndex >= 0) ? usuariosApp[uIndex] : { permisos: { modulos: {}, especiales: {} } };
+
+            userObj.nombre = nom;
+            userObj.codigo = cod;
+            userObj.tipo = tipo;
+            userObj.puesto = document.getElementById('f-puesto').value;
+            userObj.estado = document.getElementById('f-estado').value;
+            userObj.vacaciones = parseInt(document.getElementById('f-vacaciones').value) || 0;
+            userObj.password = pass;
+            if(!userObj.foto) userObj.foto = `https://ui-avatars.com/api/?name=${nom.substring(0,2)}&background=D4AF37&color=050505&size=150`;
+
+            try {
+                await db.collection("usuarios").doc(cod).set(userObj);
+                mostrarToast("USUARIO GUARDADO EN LA NUBE");
+                await cargarTodosLosUsuarios(); 
+                document.querySelectorAll('.nav-item')[0].click(); 
+            } catch(e) {
+                console.error(e);
+                alert("Error al guardar en la base de datos.");
+            }
+        }
+
+        // FUNCION NUEVA: ELIMINAR USUARIO
+        async function eliminarUsuario() {
+            if(usuarioEditandoActual === "NUEVO") return;
+            if(usuarioEditandoActual === "1799") { 
+                alert("Por seguridad del sistema, no puedes eliminar al administrador maestro."); 
+                return; 
+            }
+
+            if(confirm("⚠️ ¿Estás seguro de que deseas eliminar a este usuario de la Nube permanentemente?")) {
+                try {
+                    await db.collection("usuarios").doc(usuarioEditandoActual).delete();
+                    mostrarToast("USUARIO ELIMINADO DE LA NUBE");
+                    await cargarTodosLosUsuarios();
+                    document.querySelectorAll('.nav-item')[0].click();
+                } catch(e) {
+                    console.error(e);
+                    alert("Error al eliminar.");
+                }
+            }
+        }
+
+
+        /* -----------------------------------------
+           SECCIÓN: VACACIONES CON BUSCADOR INTELIGENTE
+           ----------------------------------------- */
+        function llenarSelectsSecundarios() {
+            const selPerm = document.getElementById('perm-operador');
+            selPerm.innerHTML = '<option value="" disabled selected>SELECCIONAR USUARIO...</option>';
+            
+            usuariosApp.forEach(u => {
+                let opt = `<option value="${u.codigo}">[${u.codigo}] ${u.nombre}</option>`;
+                if(u.tipo === "ENCARGADO" || u.tipo === "ADMINISTRADOR") {
+                    selPerm.innerHTML += opt;
+                }
+            });
+        }
+
+        // FILTRO DE BUSQUEDA EN TIEMPO REAL
+        function filtrarAutocompleteVacaciones() {
+            const inputVal = document.getElementById('vac-operador-input').value.toLowerCase();
+            const lista = document.getElementById('vac-autocomplete-list');
+            lista.innerHTML = '';
+            
+            if(!inputVal) { lista.style.display = 'none'; return; }
+            
+            let filtrados = usuariosApp.filter(u => 
+                u.nombre.toLowerCase().includes(inputVal) || u.codigo.toLowerCase().includes(inputVal)
+            );
+
+            if(filtrados.length > 0) {
+                lista.style.display = 'block';
+                filtrados.forEach(u => {
+                    let div = document.createElement('div');
+                    div.className = 'autocomplete-item';
+                    div.innerHTML = `[${u.codigo}] ${u.nombre}`;
+                    div.onclick = function() {
+                        document.getElementById('vac-operador-input').value = `[${u.codigo}] ${u.nombre}`;
+                        document.getElementById('vac-operador-hidden').value = u.codigo;
+                        lista.style.display = 'none';
+                        cargarInfoVacaciones();
+                    };
+                    lista.appendChild(div);
+                });
+            } else {
+                lista.style.display = 'none';
+            }
+        }
+
+        // Si se borra el input, reseteamos la info
+        document.getElementById('vac-operador-input').addEventListener('input', function() {
+            if(this.value.trim() === '') {
+                document.getElementById('vac-operador-hidden').value = '';
+                document.getElementById('vac-disponibles').textContent = '0';
+            }
+        });
+
+        function cargarInfoVacaciones() {
+            let cod = document.getElementById('vac-operador-hidden').value;
+            let u = usuariosApp.find(x => x.codigo === cod);
+            document.getElementById('vac-disponibles').textContent = u ? u.vacaciones : 0;
+        }
+
+        async function registrarVacaciones() {
+            let cod = document.getElementById('vac-operador-hidden').value;
+            let fIni = document.getElementById('vac-inicio').value;
+            let fFin = document.getElementById('vac-fin').value;
+
+            if(!cod) { alert("Por favor, selecciona un operador de la lista."); return;}
+            if(!fIni || !fFin) { alert("Llena las fechas de inicio y finalización."); return; }
+
+            let d1 = new Date(fIni); let d2 = new Date(fFin);
+            let diffTime = Math.abs(d2 - d1);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            let u = usuariosApp.find(x => x.codigo === cod);
+            if (u.vacaciones < diffDays) {
+                alert(`El usuario solo tiene ${u.vacaciones} días. Este periodo solicita ${diffDays} días.`); return;
+            }
+
+            u.vacaciones -= diffDays;
+            
+            try {
+                await db.collection("usuarios").doc(cod).update({ vacaciones: u.vacaciones });
+                cargarInfoVacaciones();
+                mostrarToast(`PERIODO REGISTRADO EN LA NUBE. SE DESCONTARON ${diffDays} DÍAS.`);
+                document.getElementById('vac-inicio').value = ""; document.getElementById('vac-fin').value = "";
+            } catch (error) {
+                console.error(error);
+                alert("Error al guardar vacaciones en la Nube.");
+            }
+        }
+
+        /* -----------------------------------------
+           SECCIÓN: PERMISOS DE ACCESO
+           ----------------------------------------- */
+        function irAPermisos(codigo) {
+            let u = usuariosApp.find(x => x.codigo === codigo);
+            if(u.tipo === "OPERADOR" || !u.tipo) { alert("Los operadores normales no tienen módulo de permisos."); return; }
+            document.querySelectorAll('.nav-item')[3].click();
+            document.getElementById('perm-operador').value = codigo;
+            cargarPermisosUsuario();
+        }
+
+        function renderizarInterruptoresPermisos() {
+            const modCont = document.getElementById('modules-container');
+            const espCont = document.getElementById('special-container');
+            modCont.innerHTML = ""; espCont.innerHTML = "";
+
+            modulosERP.forEach(mod => {
+                modCont.innerHTML += `
+                    <div class="perm-card">
+                        <span class="perm-name">${mod}</span>
+                        <label class="switch"><input type="checkbox" id="perm-mod-${mod}"><span class="slider"></span></label>
+                    </div>`;
+            });
+
+            permisosEsp.forEach(esp => {
+                espCont.innerHTML += `
+                    <div class="perm-card">
+                        <span class="perm-name">${esp}</span>
+                        <label class="switch"><input type="checkbox" id="perm-esp-${esp}"><span class="slider"></span></label>
+                    </div>`;
+            });
+        }
+
+        function cargarPermisosUsuario() {
+            let cod = document.getElementById('perm-operador').value;
+            let u = usuariosApp.find(x => x.codigo === cod);
+            if(!u || !u.permisos) return;
+
+            modulosERP.forEach(mod => {
+                let chk = document.getElementById(`perm-mod-${mod}`);
+                chk.checked = u.permisos.modulos ? !!u.permisos.modulos[mod] : false;
+            });
+            permisosEsp.forEach(esp => {
+                let chk = document.getElementById(`perm-esp-${esp}`);
+                chk.checked = u.permisos.especiales ? !!u.permisos.especiales[esp] : false;
+            });
+        }
+
+        async function guardarPermisos() {
+            let cod = document.getElementById('perm-operador').value;
+            if(!cod) { alert("Selecciona un usuario primero."); return; }
+            
+            let u = usuariosApp.find(x => x.codigo === cod);
+            if(!u.permisos) u.permisos = { modulos: {}, especiales: {} };
+
+            modulosERP.forEach(mod => { u.permisos.modulos[mod] = document.getElementById(`perm-mod-${mod}`).checked; });
+            permisosEsp.forEach(esp => { u.permisos.especiales[esp] = document.getElementById(`perm-esp-${esp}`).checked; });
+
+            try {
+                await db.collection("usuarios").doc(cod).update({ permisos: u.permisos });
+                mostrarToast("PERMISOS ACTUALIZADOS EN LA NUBE");
+            } catch (e) {
+                console.error(e);
+                alert("Error al actualizar permisos en la Nube.");
+            }
+        }
+
+        /* -----------------------------------------
+           ANIMACIÓN CANVAS (Fondo)
+           ----------------------------------------- */
+        const canvas = document.getElementById('gold-network');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles;
+
+        function initCanvas() {
+            width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight;
+            particles = []; const pCount = width < 768 ? 40 : 90;
+            for (let i = 0; i < pCount; i++) {
+                particles.push({
+                    x: Math.random() * width, y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3, radius: Math.random() * 1.5 + 0.5 
+                });
+            }
+        }
+
+        function animateCanvas() {
+            requestAnimationFrame(animateCanvas);
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = 'rgba(212, 175, 55, 0.4)';
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0 || p.x > width) p.vx *= -1; if (p.y < 0 || p.y > height) p.vy *= -1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
+            });
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x; const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 150) {
+                        ctx.beginPath(); ctx.strokeStyle = `rgba(212, 175, 55, ${(1 - distance / 150) * 0.2})`; 
+                        ctx.lineWidth = 1; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        initCanvas(); animateCanvas(); window.addEventListener('resize', initCanvas);
+    </script>
+</body>
+</html>
