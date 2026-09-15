@@ -186,6 +186,13 @@
         let pasoLogin = 1;
         let infoSesionGlobal = { codigo: "", nombre: "", passEsperada: "" };
 
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         async function iniciarSesion(event) {
             event.preventDefault(); 
             
@@ -209,11 +216,6 @@
                                 nombreOperador = userDoc.data().nombre;
                             }
                             passAlmacenada = userDoc.data().password || "";
-                        }
-                        
-                        // Hardcode password para admin principal
-                        if (codigo === "1799" && !passAlmacenada) {
-                            passAlmacenada = "2684";
                         }
                         
                         btn.classList.remove('loading');
@@ -259,10 +261,13 @@
                 const btn = document.getElementById('btn-submit');
                 btn.classList.add('loading');
                 
+                const passHasheada = await hashPassword(passIngresada);
+                
                 setTimeout(() => {
                     btn.classList.remove('loading');
                     
-                    if (passIngresada === infoSesionGlobal.passEsperada) {
+                    // Comprobar tanto hash (nuevo estándar) como texto plano (por compatibilidad con antiguas contraseñas)
+                    if (passHasheada === infoSesionGlobal.passEsperada || passIngresada === infoSesionGlobal.passEsperada) {
                         localStorage.setItem("operadorActivo", infoSesionGlobal.nombre);
                         localStorage.setItem("codigoActivo", infoSesionGlobal.codigo); 
                         window.location.href = "../SISTEMA/sistema.html";

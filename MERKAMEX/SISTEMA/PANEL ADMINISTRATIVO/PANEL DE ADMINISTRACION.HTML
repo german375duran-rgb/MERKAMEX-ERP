@@ -585,6 +585,13 @@
             document.getElementById('f-group-pass').style.display = (t === "ADMINISTRADOR" || t === "ENCARGADO") ? "block" : "none";
         }
 
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
         async function guardarUsuario() {
             const nom = document.getElementById('f-nombre').value.trim();
             const cod = document.getElementById('f-codigo').value.trim();
@@ -593,7 +600,7 @@
             if(!nom || !cod) { alert("Nombre y código obligatorios."); return; }
 
             let pass = document.getElementById('f-pass').value;
-            if((tipo === "ADMINISTRADOR" || tipo === "ENCARGADO") && !pass) {
+            if((tipo === "ADMINISTRADOR" || tipo === "ENCARGADO") && !pass && usuarioEditandoActual === "NUEVO") {
                 alert("Debes asignar una contraseña para niveles superiores."); return;
             }
 
@@ -606,7 +613,12 @@
             userObj.puesto = document.getElementById('f-puesto').value;
             userObj.estado = document.getElementById('f-estado').value;
             userObj.vacaciones = parseInt(document.getElementById('f-vacaciones').value) || 0;
-            userObj.password = pass;
+            
+            // Only update password if a new one was provided
+            if (pass) {
+                userObj.password = await hashPassword(pass);
+            }
+            
             if(!userObj.foto) userObj.foto = `https://ui-avatars.com/api/?name=${nom.substring(0,2)}&background=D4AF37&color=050505&size=150`;
 
             try {
