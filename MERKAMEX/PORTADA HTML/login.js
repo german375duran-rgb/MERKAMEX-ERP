@@ -121,16 +121,32 @@ async function iniciarSesion(event) {
         try {
             // Utilizamos un email ficticio basado en el código para Firebase Auth
             const email = infoSesionGlobal.codigo + "@merkamex.com";
-            await auth.signInWithEmailAndPassword(email, passIngresada);
             
-            btn.classList.remove('loading');
-            localStorage.setItem("operadorActivo", infoSesionGlobal.nombre);
-            localStorage.setItem("codigoActivo", infoSesionGlobal.codigo); 
-            window.location.href = "../SISTEMA/sistema.html";
+            let authExitoso = false;
+            try {
+                await auth.signInWithEmailAndPassword(email, passIngresada);
+                authExitoso = true;
+            } catch (authError) {
+                // Fallback de migración: Si Firebase Auth falla (ej. usuario no existe aún), verificamos contra Firestore
+                const userDoc = await db.collection("usuarios").doc(infoSesionGlobal.codigo).get();
+                if (userDoc.exists && userDoc.data().password === passIngresada) {
+                    console.warn("Bypass temporal: Autenticado contra Firestore (Firebase Auth no configurado).");
+                    authExitoso = true;
+                } else {
+                    throw authError;
+                }
+            }
+            
+            if (authExitoso) {
+                btn.classList.remove('loading');
+                localStorage.setItem("operadorActivo", infoSesionGlobal.nombre);
+                localStorage.setItem("codigoActivo", infoSesionGlobal.codigo); 
+                window.location.href = "../SISTEMA/sistema.html";
+            }
         } catch (error) {
             btn.classList.remove('loading');
-            console.error(error);
-            alert("Contraseña de acceso incorrecta. Intenta de nuevo.");
+            console.error("Error de acceso:", error);
+            alert("Contraseña de acceso incorrecta o servicio no disponible.");
             document.getElementById('passUsuario').value = "";
             document.getElementById('passUsuario').focus();
         }
