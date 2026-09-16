@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Migración de Operadores</title>
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="../firebase-config.js"></script>
+    <script src="../OPERADORES/db_operadores.js"></script> <!-- Aún lo necesitamos aquí para leer los datos por última vez -->
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #111; color: #fff; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+        #log { margin-top: 20px; font-family: monospace; white-space: pre-wrap; background: #222; padding: 10px; border-radius: 5px; height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <h2>Migración de Operadores a Firestore</h2>
+    <p>Este script tomará la lista estática y la subirá a la colección 'usuarios' en Firestore.</p>
+    <button onclick="iniciarMigracion()">Iniciar Migración</button>
+    <div id="log"></div>
+
+    <script>
+        const logDiv = document.getElementById('log');
+        function log(msg) {
+            logDiv.innerHTML += msg + "\n";
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        async function iniciarMigracion() {
+            log("Iniciando migración...");
+            
+            for (const codigo in baseOperadores) {
+                const nombre = baseOperadores[codigo];
+                let puesto = "OPERADOR";
+                let tipo = "OPERADOR";
+                let password = "";
+                
+                if (codigo === "1799") {
+                    puesto = "ADMINISTRADOR";
+                    tipo = "ADMINISTRADOR";
+                    password = "2684";
+                }
+                
+                const iniciales = nombre.split(" ").map(n => n[0]).join("").substring(0,2);
+                
+                const docData = {
+                    codigo: codigo,
+                    nombre: nombre,
+                    puesto: puesto,
+                    tipo: tipo,
+                    password: password,
+                    vacaciones: 0,
+                    estado: "ACTIVO",
+                    foto: `https://ui-avatars.com/api/?name=${iniciales}&background=D4AF37&color=050505&size=150`
+                };
+                
+                try {
+                    await db.collection('usuarios').doc(codigo).set(docData, { merge: true });
+                    log(`✅ Migrado: [${codigo}] ${nombre}`);
+                    
+                    // Nota: Idealmente aquí también registraríamos el usuario en Firebase Auth con auth.createUserWithEmailAndPassword()
+                    // pero para simplificar, se recomienda hacerlo desde un backend o Cloud Function, o que el admin lo haga
+                    // por el momento el script solo migra a firestore.
+                } catch (error) {
+                    log(`❌ Error con [${codigo}]: ` + error.message);
+                }
+            }
+            
+            log("¡Migración completada!");
+        }
+    </script>
+</body>
+</html>

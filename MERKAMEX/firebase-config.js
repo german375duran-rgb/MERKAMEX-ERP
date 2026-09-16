@@ -12,5 +12,6 @@ const firebaseConfig = {
 // Inicializar Firebase (usando la versión compat para mayor facilidad con el código actual)
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+const auth = firebase.auth(); // Added auth
 
 console.log("🔥 Firebase conectado exitosamente a MERKAMEX ERP");
