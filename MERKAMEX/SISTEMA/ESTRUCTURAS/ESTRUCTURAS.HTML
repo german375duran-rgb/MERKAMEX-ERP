@@ -565,8 +565,7 @@
             </div>
             <ul class="nav-menu">
                 <li class="nav-item active" onclick="showView('piso', this)">Piso / Avance</li>
-                <li class="nav-item" onclick="showView('generico', this)">Nueva OT</li>
-                <li class="nav-item" onclick="showView('generico', this)">Nuevo Proyecto</li>
+                <li class="nav-item" onclick="showView('nuevo-proyecto', this)">Nuevo Proyecto</li>
                 <li class="nav-item" onclick="showView('centros-trabajo', this)">Centros Trabajo y Recursos</li>
                 <li class="nav-item" onclick="showView('historial', this)">Historial</li>
                 <li class="nav-item" onclick="showView('generico', this)">Códigos Artículo</li>
@@ -622,6 +621,62 @@
                         </div>
                 </section>
 
+                <section id="view-nuevo-proyecto" class="view-section">
+                    <div class="section-header">
+                        <h2 class="section-title">NUEVO PROYECTO Y ÓRDENES DE TRABAJO</h2>
+                    </div>
+                    
+                    <div class="form-grid-gen" style="max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; background: transparent; border: none; padding: 0;">
+                        
+                        <!-- Proyecto -->
+                        <div style="background: rgba(0, 243, 255, 0.05); border: 1px solid var(--neon-blue); padding: 25px; border-radius: 8px; box-shadow: 0 0 15px rgba(0, 243, 255, 0.1);">
+                            <h3 style="color: var(--neon-blue); margin-bottom: 20px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">1. Definir Proyecto</h3>
+                            <div class="form-group-custom" style="margin-bottom: 0;">
+                                <label>Código del Nuevo Proyecto</label>
+                                <input type="text" id="np-proyecto-cod" placeholder="Ej. PRO2030 ACEROS" required>
+                            </div>
+                        </div>
+
+                        <!-- OT -->
+                        <div style="background: rgba(10, 10, 12, 0.8); border: 1px solid var(--border-glass); padding: 25px; border-radius: 8px;">
+                            <h3 style="color: var(--gold-primary); margin-bottom: 20px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">2. Agregar Orden de Trabajo al Proyecto</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                                <div class="form-group-custom">
+                                    <label>Código de OT</label>
+                                    <input type="text" id="np-ot-cod" placeholder="Ej. OT62000" required>
+                                </div>
+                                <div class="form-group-custom">
+                                    <label>Piezas a Fabricar</label>
+                                    <input type="number" id="np-piezas" min="1" value="1" required>
+                                </div>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+                                <div class="form-group-custom" style="position: relative;">
+                                    <label>Código de Artículo</label>
+                                    <input type="text" id="np-art-cod" placeholder="Ej. ART-01" required autocomplete="off" oninput="handleAutocomplete('cod')">
+                                    <div id="np-autocomplete-cod" style="position: absolute; background: var(--bg-card); border: 1px solid var(--neon-blue); width: 100%; max-height: 180px; overflow-y: auto; z-index: 1000; display: none; border-radius: 4px; top: 100%; left: 0;"></div>
+                                </div>
+                                <div class="form-group-custom" style="position: relative;">
+                                    <label>Nombre / Descripción de Artículo</label>
+                                    <input type="text" id="np-art-nom" placeholder="Ej. Armadura Viga IPR" required autocomplete="off" oninput="handleAutocomplete('nom')">
+                                    <div id="np-autocomplete-nom" style="position: absolute; background: var(--bg-card); border: 1px solid var(--neon-blue); width: 100%; max-height: 180px; overflow-y: auto; z-index: 1000; display: none; border-radius: 4px; top: 100%; left: 0;"></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-custom">
+                                <label>Datos Adicionales / Observaciones (Opcional)</label>
+                                <textarea id="np-obs" rows="3" placeholder="Escribe notas adicionales..."></textarea>
+                            </div>
+                            
+                            <div style="text-align: right; margin-top: 25px;">
+                                <button class="btn-solid-cyan" onclick="agregarOTProduccion()">Agregar OT a Producción</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
                 <section id="view-generico" class="view-section">
                     <div class="section-header">
                         <h2 class="section-title">MÓDULO EN DESARROLLO</h2>
@@ -952,6 +1007,148 @@
                 verRecursos(selectedCT);
             }
         }
+
+        window.updateSliderUI = function(el) {
+            document.getElementById('ma-slider-val').textContent = el.value + '%';
+            let pct = el.value;
+            el.style.background = `linear-gradient(to right, var(--neon-blue) ${pct}%, rgba(255,255,255,0.1) ${pct}%)`;
+        };
+
+        function enviarAvanceManual() {
+            // Lógica para enviar avance
+            closeAvanceModal();
+        }
+
+        // --- LÓGICA PARA NUEVO PROYECTO Y AUTOCOMPLETADO ---
+        const dbArticulos = [
+            { codigo: 'ART-01', nombre: 'ARMADURA VIGA IPR 12', ruta: [{ seq:1, operacion:'CORTE', recurso:'CR0100', descCT:'CENTRO DE CORTE', descCR:'SIERRA CINTA', operador:'PENDIENTE', tiempoPz:'15 MIN' }, { seq:2, operacion:'ARMADO', recurso:'CR0119', descCT:'CENTRO DE ARMADO EST', descCR:'CENTRO ARMADO', operador:'PENDIENTE', tiempoPz:'60 MIN' }] },
+            { codigo: 'ART-02', nombre: 'COLUMNA PRINCIPAL', ruta: [{ seq:1, operacion:'CORTE', recurso:'CR0100', descCT:'CENTRO DE CORTE', descCR:'SIERRA CINTA', operador:'PENDIENTE', tiempoPz:'20 MIN' }] },
+            { codigo: 'ART-03', nombre: 'PLACA BASE 3/4', ruta: [{ seq:1, operacion:'PLASMA CNC', recurso:'CR0105', descCT:'CENTRO DE CORTE', descCR:'PLASMA', operador:'PENDIENTE', tiempoPz:'10 MIN' }] },
+            { codigo: 'ART-04', nombre: 'CONEXIÓN ATORNILLADA', ruta: [{ seq:1, operacion:'BARRENADO', recurso:'CR0110', descCT:'CENTRO DE HABILITADO', descCR:'TALADRO', operador:'PENDIENTE', tiempoPz:'5 MIN' }] },
+            { codigo: 'ART-05', nombre: 'VIGA TIPO JOIST', ruta: [{ seq:1, operacion:'ARMADO', recurso:'CR0119', descCT:'CENTRO DE ARMADO EST', descCR:'CENTRO ARMADO', operador:'PENDIENTE', tiempoPz:'90 MIN' }] },
+            { codigo: 'ART-06', nombre: 'PERFIL TUBULAR', ruta: [{ seq:1, operacion:'CORTE', recurso:'CR0100', descCT:'CENTRO DE CORTE', descCR:'SIERRA CINTA', operador:'PENDIENTE', tiempoPz:'12 MIN' }] },
+            { codigo: 'ART-07', nombre: 'ÁNGULO DE CONEXIÓN', ruta: [{ seq:1, operacion:'CORTE', recurso:'CR0100', descCT:'CENTRO DE CORTE', descCR:'SIERRA CINTA', operador:'PENDIENTE', tiempoPz:'8 MIN' }] }
+        ];
+
+        let selectedRuta = [];
+
+        window.handleAutocomplete = function(type) {
+            const inputVal = type === 'cod' ? document.getElementById('np-art-cod').value.toLowerCase() : document.getElementById('np-art-nom').value.toLowerCase();
+            const container = type === 'cod' ? document.getElementById('np-autocomplete-cod') : document.getElementById('np-autocomplete-nom');
+            
+            container.innerHTML = '';
+            if (!inputVal) {
+                container.style.display = 'none';
+                return;
+            }
+
+            const matches = dbArticulos.filter(art => 
+                (type === 'cod' && art.codigo.toLowerCase().includes(inputVal)) || 
+                (type === 'nom' && art.nombre.toLowerCase().includes(inputVal))
+            ).slice(0, 10);
+
+            if (matches.length > 0) {
+                container.style.display = 'block';
+                matches.forEach(art => {
+                    const div = document.createElement('div');
+                    div.style.padding = '10px';
+                    div.style.cursor = 'pointer';
+                    div.style.borderBottom = '1px solid rgba(255,255,255,0.05)';
+                    div.style.fontSize = '0.8rem';
+                    div.textContent = `${art.codigo} - ${art.nombre}`;
+                    div.onmouseover = () => { div.style.background = 'rgba(0, 243, 255, 0.1)'; div.style.color = 'var(--neon-blue)'; };
+                    div.onmouseout = () => { div.style.background = 'transparent'; div.style.color = '#fff'; };
+                    div.onclick = () => selectArticle(art);
+                    container.appendChild(div);
+                });
+            } else {
+                container.style.display = 'none';
+            }
+        };
+
+        function selectArticle(art) {
+            document.getElementById('np-art-cod').value = art.codigo;
+            document.getElementById('np-art-nom').value = art.nombre;
+            selectedRuta = art.ruta;
+            document.getElementById('np-autocomplete-cod').style.display = 'none';
+            document.getElementById('np-autocomplete-nom').style.display = 'none';
+        }
+
+        document.addEventListener('click', function(e) {
+            if(e.target.id !== 'np-art-cod' && e.target.id !== 'np-art-nom') {
+                const c1 = document.getElementById('np-autocomplete-cod');
+                const c2 = document.getElementById('np-autocomplete-nom');
+                if(c1) c1.style.display = 'none';
+                if(c2) c2.style.display = 'none';
+            }
+        });
+
+        window.agregarOTProduccion = function() {
+            const proyId = document.getElementById('np-proyecto-cod').value.trim();
+            const otId = document.getElementById('np-ot-cod').value.trim();
+            const artCod = document.getElementById('np-art-cod').value.trim();
+            const artNom = document.getElementById('np-art-nom').value.trim();
+            const pzTotales = parseInt(document.getElementById('np-piezas').value);
+            const obs = document.getElementById('np-obs').value.trim();
+
+            if(!proyId || !otId || !artCod || !artNom || !pzTotales) {
+                alert('Por favor, completa todos los campos obligatorios.');
+                return;
+            }
+
+            let rutaToUse = selectedRuta.length > 0 ? selectedRuta : [
+                { seq:1, operacion:'OPERACIÓN 1', recurso:'CR000', descCT:'CENTRO GRAL', descCR:'RECURSO GRAL', operador:'PENDIENTE', tiempoPz:'10 MIN' }
+            ];
+
+            const newRuta = rutaToUse.map(r => ({
+                seq: r.seq,
+                operacion: r.operacion,
+                recurso: r.recurso,
+                descCT: r.descCT,
+                descCR: r.descCR,
+                operador: r.operador,
+                tiempoPz: r.tiempoPz,
+                pzTotales: pzTotales,
+                pzTerminadas: 0,
+                estado: "NO INICIADA",
+                timeSegundos: 0,
+                pausaSegundos: 0
+            }));
+
+            const newOT = {
+                ot: otId,
+                proyectoId: proyId,
+                articulo: artCod,
+                descArticulo: artNom,
+                pzTotales: pzTotales,
+                ruta: newRuta,
+                observaciones: obs
+            };
+
+            const proyKey = newOT.proyectoId;
+            if(!appDb.proyectos.find(p => p.id === proyKey)) {
+                appDb.proyectos.push({ id: proyKey, cliente: "NUEVO CLIENTE", nombre: proyId });
+            }
+
+            appDb.ots.push(newOT);
+
+            // Clean OT fields, keep project
+            document.getElementById('np-ot-cod').value = '';
+            document.getElementById('np-art-cod').value = '';
+            document.getElementById('np-art-nom').value = '';
+            document.getElementById('np-piezas').value = '1';
+            document.getElementById('np-obs').value = '';
+            selectedRuta = [];
+
+            if(typeof showToast === 'function') {
+                showToast('OT agregada a producción: ' + otId);
+            } else {
+                alert('OT agregada a producción: ' + otId);
+            }
+            
+            // Re-render piso so it's updated when user goes there
+            if(typeof renderPiso === 'function') renderPiso();
+        };
 
         function verRecursos(ctCode) {
             document.getElementById('cr-ct-seleccionado').value = ctCode;
