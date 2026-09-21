@@ -23,6 +23,31 @@
             --text-main: #FFFFFF;
             --text-muted: #A0A0A0;
             --border-glass: rgba(212, 175, 55, 0.2);
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MERKAMEX - Estructuras | Avance a Piso</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-black: #050505;
+            --bg-card: rgba(15, 15, 18, 0.7);
+            --bg-glass: rgba(10, 10, 12, 0.85);
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #997A00;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --neon-blue: #00f3ff;
+            --neon-blue-glow: rgba(0, 243, 255, 0.3);
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --border-glass: rgba(212, 175, 55, 0.2);
             --success-color: #2ecc71;
             --danger-color: #e74c3c;
             --warning-color: #f1c40f;
@@ -30,7 +55,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-        body, html { width: 100%; min-height: 100vh; background-color: var(--bg-black); color: var(--text-main); overflow-x: hidden; }
+        body, html { width: 100%; min-height: 100vh; background-color: var(--bg-black); color: var(--text-main); overflow-x: hidden; text-transform: uppercase; }
 
         /* CANVAS FONDO ANIMADO */
         #gold-network { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.4; }
@@ -109,6 +134,18 @@
         .filters-group { display: flex; gap: 10px; flex-wrap: wrap; }
         .btn-filter { background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); color: var(--text-muted); padding: 8px 18px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.3s; letter-spacing: 0.5px; }
         .btn-filter.active, .btn-filter:hover { background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary)); border-color: var(--gold-primary); color: #000; box-shadow: 0 0 10px var(--gold-glow); }
+
+        /* FORMULARIO NUEVO PROYECTO */
+        .form-group-custom { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .form-group-custom label { font-size: 0.75rem; font-weight: 700; color: var(--gold-light); text-transform: uppercase; }
+        .form-group-custom input, .form-group-custom textarea {
+            background: rgba(0,0,0,0.5); border: 1px solid #444; color: var(--text-main); 
+            padding: 12px 15px; border-radius: 4px; outline: none; font-size: 0.85rem; width: 100%; transition: all 0.3s;
+        }
+        .form-group-custom input:focus, .form-group-custom textarea:focus { border-color: var(--neon-blue); box-shadow: 0 0 8px var(--neon-blue); }
+        .btn-solid-cyan { background: var(--neon-blue); color: var(--bg-black); padding: 12px 25px; border-radius: 4px; font-weight: 800; text-transform: uppercase; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 0 10px var(--neon-blue-glow); }
+        .btn-solid-cyan:hover { box-shadow: 0 0 20px var(--neon-blue); transform: translateY(-2px); }
+
 
         /* ENCABEZADOS DE PROYECTO (AZUL FLUORESCENTE) */
         .project-group { margin-bottom: 50px; }
@@ -1020,7 +1057,7 @@
         }
 
         // --- LÓGICA PARA NUEVO PROYECTO Y AUTOCOMPLETADO ---
-        const dbArticulos = [
+        let dbArticulos = [
             { codigo: 'ART-01', nombre: 'ARMADURA VIGA IPR 12', ruta: [{ seq:1, operacion:'CORTE', recurso:'CR0100', descCT:'CENTRO DE CORTE', descCR:'SIERRA CINTA', operador:'PENDIENTE', tiempoPz:'15 MIN' }, { seq:2, operacion:'ARMADO', recurso:'CR0119', descCT:'CENTRO DE ARMADO EST', descCR:'CENTRO ARMADO', operador:'PENDIENTE', tiempoPz:'60 MIN' }] },
             { codigo: 'ART-02', nombre: 'COLUMNA PRINCIPAL', ruta: [{ seq:1, operacion:'CORTE', recurso:'CR0100', descCT:'CENTRO DE CORTE', descCR:'SIERRA CINTA', operador:'PENDIENTE', tiempoPz:'20 MIN' }] },
             { codigo: 'ART-03', nombre: 'PLACA BASE 3/4', ruta: [{ seq:1, operacion:'PLASMA CNC', recurso:'CR0105', descCT:'CENTRO DE CORTE', descCR:'PLASMA', operador:'PENDIENTE', tiempoPz:'10 MIN' }] },
@@ -1033,6 +1070,20 @@
         let selectedRuta = [];
 
         window.handleAutocomplete = function(type) {
+            const storedDB = localStorage.getItem('merkamex_master_db');
+            if (storedDB) {
+                try {
+                    const parsed = JSON.parse(storedDB);
+                    if (parsed.articulos && parsed.articulos.length > 0) {
+                        dbArticulos = parsed.articulos.map(a => ({
+                            codigo: a.id,
+                            nombre: a.nombre,
+                            ruta: parsed.rutas.find(r => r.id_articulo === a.id)?.operaciones || []
+                        }));
+                    }
+                } catch(e) { console.error("Error leyendo merkamex_master_db", e); }
+            }
+
             const inputVal = type === 'cod' ? document.getElementById('np-art-cod').value.toLowerCase() : document.getElementById('np-art-nom').value.toLowerCase();
             const container = type === 'cod' ? document.getElementById('np-autocomplete-cod') : document.getElementById('np-autocomplete-nom');
             

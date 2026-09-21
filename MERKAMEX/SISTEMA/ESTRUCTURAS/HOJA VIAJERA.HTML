@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -25,138 +25,6 @@
             --neon-blue: #00f3ff;
             --text-main: #FFFFFF;
             --text-muted: #A0A0A0;
-            --border-glass: rgba(212, 175, 55, 0.2);
-            --success-color: #2ecc71;
-            --danger-color: #e74c3c;
-            --menu-width: 280px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-        body { background-color: var(--bg-black); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; position: relative; z-index: 1;}
-
-        /* CANVAS FONDO ANIMADO */
-        #gold-network { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.4; }
-
-        /* ========================================================
-           2. UI DEL SISTEMA (MODO OSCURO Y MENÚ)
-           ======================================================== */
-        
-        /* MENÚ VERTICAL LATERAL (OCULTO) */
-        .side-nav { position: fixed; top: 0; left: calc(-1 * var(--menu-width)); width: var(--menu-width); height: 100%; background: var(--bg-glass); border-right: 1px solid var(--gold-primary); backdrop-filter: blur(15px); z-index: 1000; transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
-        .side-nav.open { left: 0; }
-        .side-nav-header { padding: 25px 20px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
-        .side-nav-title { font-weight: 800; color: var(--gold-primary); letter-spacing: 2px; font-size: 1.1rem; }
-        .btn-close-nav { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.3s; padding: 5px; }
-        .btn-close-nav:hover { color: var(--danger-color); }
-        .nav-menu { display: flex; flex-direction: column; list-style: none; padding: 15px 0; overflow-y: auto; flex: 1; }
-        .nav-item { padding: 15px 25px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; border-left: 3px solid transparent; display: flex; align-items: center; }
-        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
-        .nav-item.active { color: var(--gold-primary); border-left-color: var(--gold-primary); background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); text-shadow: 0 0 10px var(--gold-glow); }
-
-        /* PESTAÑA PARA ABRIR MENÚ */
-        .nav-toggle-tab { position: fixed; top: 50%; left: 0; transform: translateY(-50%); background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary)); width: 35px; height: 90px; display: flex; justify-content: center; align-items: center; border-radius: 0 8px 8px 0; cursor: pointer; z-index: 900; box-shadow: 2px 0 15px var(--gold-glow); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.8; }
-        .nav-toggle-tab:hover { opacity: 1; width: 45px; }
-        .nav-toggle-tab.open { left: var(--menu-width); border-radius: 0 8px 8px 0; background: var(--bg-card); border: 1px solid var(--gold-primary); border-left: none; width: 40px; }
-        .nav-toggle-tab svg { width: 20px; height: 20px; stroke: #000; transition: transform 0.4s; }
-        .nav-toggle-tab.open svg { stroke: var(--gold-primary); transform: rotate(180deg); }
-
-        /* OVERLAY PARA CERRAR MENÚ */
-        .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 990; opacity: 0; visibility: hidden; transition: all 0.3s; }
-        .nav-overlay.open { opacity: 1; visibility: visible; }
-
-        .app-header {
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 15px 40px; border-bottom: 1px solid var(--border-glass); 
-            background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%); 
-            backdrop-filter: blur(10px); padding-left: 70px;
-        }
-        .header-title h1 { font-size: 1.4rem; font-weight: 800; color: var(--gold-primary); letter-spacing: 2px; }
-        .header-title p { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 3px; font-weight: 600; }
-        
-        .btn-volver { 
-            background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); 
-            padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; 
-            cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-volver:hover { background: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); color: #fff; }
-
-        .controls-bar {
-            margin: 20px 40px 20px 70px; padding: 20px; background: rgba(10,10,12,0.6); 
-            border: 1px solid var(--border-glass); border-radius: 8px;
-            display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 15px;
-        }
-        .form-group { display: flex; flex-direction: column; gap: 8px; }
-        .form-label { font-size: 0.75rem; font-weight: 700; color: var(--gold-light); text-transform: uppercase; }
-        .form-control {
-            background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); 
-            color: var(--text-main); padding: 10px 15px; border-radius: 4px; outline: none;
-            font-size: 0.85rem; min-width: 250px;
-        }
-        .form-control:focus { border-color: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); }
-
-        .btn-group { display: flex; gap: 10px; }
-        .btn {
-            padding: 10px 20px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; 
-            text-transform: uppercase; cursor: pointer; transition: all 0.3s; border: none; letter-spacing: 1px;
-            display: inline-flex; align-items: center; gap: 8px;
-        }
-        .btn-primary { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: var(--bg-black); }
-        .btn-primary:hover { box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
-        .btn-secondary { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); }
-        .btn-secondary:hover { border-color: var(--gold-primary); color: var(--gold-primary); }
-
-        /* ========================================================
-           3. DOCUMENTO HOJA VIAJERA (MODO BLANCO / IMPRESIÓN)
-           ======================================================== */
-        .document-wrapper { flex: 1; padding: 0 40px 40px 70px; overflow-x: auto; }
-        
-        .paper {
-            background-color: #ffffff; color: #000000;
-            width: 100%; min-width: 1000px; max-width: 1400px; margin: 0 auto;
-            padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 4px;
-            font-family: Arial, sans-serif; /* Fuente estándar para documentos impresos */
-        }
-
-        .paper-header {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            margin-bottom: 20px; font-size: 14px; font-weight: bold;
-        }
-        
-        .data-grid {
-            width: 100%; border-collapse: collapse; border: 1px solid #000;
-            margin-bottom: 15px; font-size: 12px; font-weight: bold;
-        }
-        .data-grid td { border: 1px solid #000; padding: 4px 8px; }
-        .bg-beige { background-color: #f5eedc; } /* Color crema del encabezado */
-
-        .route-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        .route-table th { 
-            border: 1px solid #000; padding: 6px; text-align: center;
-            background-color: #f5eedc; font-weight: bold;
-        }
-        .route-table td { border: 1px solid #000; padding: 2px; text-align: center; height: 28px; }
-        
-        /* Inputs dentro del papel transparente para que parezcan texto */
-        .paper input, .paper select {
-            width: 100%; border: none; background: transparent; padding: 6px;
-            font-size: 11px; outline: none; font-family: Arial, sans-serif;
-            text-align: center; color: #000;
-        }
-        .paper input[type="text"].text-left { text-align: left; }
-        .paper input:focus, .paper select:focus { background-color: rgba(212, 175, 55, 0.1); }
-        
-        .btn-delete-row { 
-            background: var(--danger-color); color: white; border: none; 
-            padding: 4px 8px; cursor: pointer; border-radius: 3px; font-size: 10px;
-        }
-
-        /* ========================================================
-           4. CONFIGURACIÓN ESTRICTA DE IMPRESIÓN (CARTA HORIZONTAL)
-           ======================================================== */
-        @media print {
-            @page { size: letter landscape; margin: 5mm; }
-            body { background: white; -webkit-print-color-adjust: exact; padding: 0; margin: 0; width: 100%; }
-            #gold-network { display: none !important; }
             .app-header, .controls-bar, .no-print, .btn-delete-row, .side-nav, .nav-toggle-tab, .nav-overlay { display: none !important; }
             
             .document-wrapper { padding: 0; overflow: visible; width: 100%; }
@@ -207,7 +75,7 @@
         </div>
         <ul class="nav-menu">
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Piso / Avance</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nueva OT</li>
+
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nuevo Proyecto</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Centros Trabajo</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Recursos</li>

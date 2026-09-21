@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -35,7 +35,7 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-        body { background-color: var(--bg-black); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; }
+        body { background-color: var(--bg-black); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; text-transform: uppercase; }
 
         /* ========================================================
            Fondo Animado (PartÃ­culas)
@@ -43,7 +43,7 @@
         #gold-network { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.4; }
 
         /* ========================================================
-           2. LAYOUT PRINCIPAL Y MENÃš LATERAL
+           2. LAYOUT PRINCIPAL Y MENÚ LATERAL
            ======================================================== */
         .main-wrapper { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; width: 100%; }
         
@@ -57,7 +57,7 @@
         .btn-volver { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: flex; align-items: center; gap: 8px; }
         .btn-volver:hover { background: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); color: #fff; }
 
-        /* MENÃš VERTICAL LATERAL (OCULTO) */
+        /* MENÚ VERTICAL LATERAL (OCULTO) */
         .side-nav { position: fixed; top: 0; left: calc(-1 * var(--menu-width)); width: var(--menu-width); height: 100%; background: var(--bg-glass); border-right: 1px solid var(--gold-primary); backdrop-filter: blur(15px); z-index: 1000; transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
         .side-nav.open { left: 0; }
         .side-nav-header { padding: 25px 20px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
@@ -69,14 +69,14 @@
         .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
         .nav-item.active { color: var(--gold-primary); border-left-color: var(--gold-primary); background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); text-shadow: 0 0 10px var(--gold-glow); }
 
-        /* PESTAÃ‘A PARA ABRIR MENÃš */
+        /* PESTAÑA PARA ABRIR MENÚ */
         .nav-toggle-tab { position: fixed; top: 50%; left: 0; transform: translateY(-50%); background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary)); width: 35px; height: 90px; display: flex; justify-content: center; align-items: center; border-radius: 0 8px 8px 0; cursor: pointer; z-index: 900; box-shadow: 2px 0 15px var(--gold-glow); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.8; }
         .nav-toggle-tab:hover { opacity: 1; width: 45px; }
         .nav-toggle-tab.open { left: var(--menu-width); border-radius: 0 8px 8px 0; background: var(--bg-card); border: 1px solid var(--gold-primary); border-left: none; width: 40px; }
         .nav-toggle-tab svg { width: 20px; height: 20px; stroke: #000; transition: transform 0.4s; }
         .nav-toggle-tab.open svg { stroke: var(--gold-primary); transform: rotate(180deg); }
 
-        /* OVERLAY PARA CERRAR MENÃš */
+        /* OVERLAY PARA CERRAR MENÚ */
         .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 990; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .nav-overlay.open { opacity: 1; visibility: visible; }
 
@@ -112,7 +112,7 @@
         td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
         tr:hover td { background: rgba(255,255,255,0.02); }
         
-        /* Inputs dentro de la tabla de ediciÃ³n */
+        /* Inputs dentro de la tabla de edición */
         .table-input { background: transparent; border: none; border-bottom: 1px solid var(--text-muted); color: var(--text-main); padding: 5px; width: 100%; font-size: 0.8rem; outline: none; }
         .table-input:focus { border-color: var(--neon-blue); }
         .table-select { background: var(--bg-black); border: 1px solid var(--text-muted); color: var(--text-main); padding: 5px; width: 100%; font-size: 0.8rem; outline: none; }
@@ -134,13 +134,13 @@
         .toast.show { bottom: 40px; }
 
         /* ========================================================
-           6. IMPRESIÃ“N (A4 LANDSCAPE)
+           6. IMPRESIÓN (A4 LANDSCAPE)
            ======================================================== */
         @media print {
             @page { size: A4 landscape; margin: 10mm; }
             body { background: #fff !important; color: #000 !important; display: block; }
             .header, .search-section, .no-print, .side-nav, .nav-toggle-tab, .nav-overlay { display: none !important; }
-            #gold-network { display: none !important; } /* Ocultar partÃ­culas al IMPRIMIR */
+            #gold-network { display: none !important; } /* Ocultar partículas al IMPRIMIR */
             .main-wrapper { margin: 0; }
             .content { padding: 0; gap: 15px; }
             
@@ -171,7 +171,7 @@
 
     <canvas id="gold-network"></canvas>
 
-    <!-- PESTAÃ‘A LATERAL PARA ABRIR MENÃš -->
+    <!-- PESTAÑA LATERAL PARA ABRIR MENÚ -->
     <div class="nav-toggle-tab no-print" id="nav-toggle" onclick="toggleNav()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -180,18 +180,213 @@
         </svg>
     </div>
 
-    <!-- OVERLAY PARA CERRAR MENÃš AL HACER CLIC FUERA -->
+    <!-- OVERLAY PARA CERRAR MENÚ AL HACER CLIC FUERA -->
     <div class="nav-overlay no-print" id="nav-overlay" onclick="toggleNav()"></div>
 
-    <!-- MENÃš LATERAL DESPLEGABLE -->
+    <!-- MENÚ LATERAL DESPLEGABLE -->
     <nav class="side-nav no-print" id="side-nav">
         <div class="side-nav-header">
-            <span class="side-nav-title">MENÃš MÃ“DULO</span>
+            <span class="side-nav-title">MENÚ MÓDULO</span>
             <button class="btn-close-nav" onclick="toggleNav()">âœ•</button>
         </div>
         <ul class="nav-menu">
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Piso / Avance</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nueva OT</li>
+
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nuevo Proyecto</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Centros Trabajo</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Recursos</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Historial</li>
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">códigos artículo</li>
+            <li class="nav-item active" onclick="toggleNav()">Rutas Operación</li>
+            <li class="nav-item" onclick="window.location.href='HOJA VIAJERA.HTML'">Hoja Viajera</li>
+        </ul>
+    </nav>
+
+    <div class="main-wrapper">
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <style>
+        /* ========================================================
+           1. VARIABLES TEMA MERKAMEX
+           ======================================================== */
+        :root {
+            --bg-black: #050505;
+            --bg-card: rgba(15, 15, 18, 0.7);
+            --bg-glass: rgba(10, 10, 12, 0.85);
+            --gold-primary: #D4AF37;
+            --gold-light: #F3E5AB;
+            --gold-dark: #997A00;
+            --gold-glow: rgba(212, 175, 55, 0.3);
+            --neon-blue: #00f3ff;
+            --neon-blue-glow: rgba(0, 243, 255, 0.3);
+            --text-main: #FFFFFF;
+            --text-muted: #A0A0A0;
+            --border-glass: rgba(212, 175, 55, 0.2);
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
+            --warning-color: #f1c40f;
+            --menu-width: 280px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: var(--bg-black); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; position: relative; text-transform: uppercase; }
+
+        /* ========================================================
+           Fondo Animado (PartÃ­culas)
+           ======================================================== */
+        #gold-network { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0.4; }
+
+        /* ========================================================
+           2. LAYOUT PRINCIPAL Y MENÚ LATERAL
+           ======================================================== */
+        .main-wrapper { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 1; width: 100%; }
+        
+        /* Encabezado Principal */
+        .header { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; border-bottom: 1px solid var(--border-glass); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding-left: 70px; }
+        .header h1 { font-size: 1.5rem; font-weight: 800; color: var(--gold-primary); letter-spacing: 1px; }
+        
+        .content { padding: 30px 40px; flex: 1; display: flex; flex-direction: column; gap: 30px; padding-left: 70px;}
+
+        /* BotÃ³n Volver */
+        .btn-volver { background: transparent; border: 1px solid var(--gold-primary); color: var(--gold-primary); padding: 8px 20px; border-radius: 50px; font-weight: 600; font-size: 0.75rem; cursor: pointer; transition: all 0.3s ease; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+        .btn-volver:hover { background: var(--gold-glow); box-shadow: 0 0 15px var(--gold-glow); color: #fff; }
+
+        /* MENÚ VERTICAL LATERAL (OCULTO) */
+        .side-nav { position: fixed; top: 0; left: calc(-1 * var(--menu-width)); width: var(--menu-width); height: 100%; background: var(--bg-glass); border-right: 1px solid var(--gold-primary); backdrop-filter: blur(15px); z-index: 1000; transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
+        .side-nav.open { left: 0; }
+        .side-nav-header { padding: 25px 20px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; }
+        .side-nav-title { font-weight: 800; color: var(--gold-primary); letter-spacing: 2px; font-size: 1.1rem; }
+        .btn-close-nav { background: transparent; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.3s; padding: 5px; }
+        .btn-close-nav:hover { color: var(--danger-color); }
+        .nav-menu { display: flex; flex-direction: column; list-style: none; padding: 15px 0; overflow-y: auto; flex: 1; }
+        .nav-item { padding: 15px 25px; font-size: 0.8rem; font-weight: 700; color: var(--text-muted); cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; border-left: 3px solid transparent; display: flex; align-items: center; }
+        .nav-item:hover { color: var(--text-main); background: rgba(255,255,255,0.03); }
+        .nav-item.active { color: var(--gold-primary); border-left-color: var(--gold-primary); background: linear-gradient(90deg, rgba(212, 175, 55, 0.15), transparent); text-shadow: 0 0 10px var(--gold-glow); }
+
+        /* PESTAÑA PARA ABRIR MENÚ */
+        .nav-toggle-tab { position: fixed; top: 50%; left: 0; transform: translateY(-50%); background: linear-gradient(135deg, var(--gold-dark), var(--gold-primary)); width: 35px; height: 90px; display: flex; justify-content: center; align-items: center; border-radius: 0 8px 8px 0; cursor: pointer; z-index: 900; box-shadow: 2px 0 15px var(--gold-glow); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0.8; }
+        .nav-toggle-tab:hover { opacity: 1; width: 45px; }
+        .nav-toggle-tab.open { left: var(--menu-width); border-radius: 0 8px 8px 0; background: var(--bg-card); border: 1px solid var(--gold-primary); border-left: none; width: 40px; }
+        .nav-toggle-tab svg { width: 20px; height: 20px; stroke: #000; transition: transform 0.4s; }
+        .nav-toggle-tab.open svg { stroke: var(--gold-primary); transform: rotate(180deg); }
+
+        /* OVERLAY PARA CERRAR MENÚ */
+        .nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 990; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .nav-overlay.open { opacity: 1; visibility: visible; }
+
+        /* ========================================================
+           3. COMPONENTES UI (Botones, Inputs, Cards)
+           ======================================================== */
+        .btn { padding: 10px 20px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: all 0.3s; border: none; display: inline-flex; align-items: center; gap: 8px; letter-spacing: 1px; }
+        .btn-primary { background: linear-gradient(135deg, var(--gold-primary), var(--gold-dark)); color: var(--bg-black); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px var(--gold-glow); }
+        .btn-secondary { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); }
+        .btn-secondary:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+        .btn-success { background: rgba(46, 204, 113, 0.2); border: 1px solid var(--success-color); color: var(--success-color); }
+        .btn-success:hover { background: var(--success-color); color: #000; box-shadow: 0 0 10px var(--success-color); }
+        .btn-danger { background: rgba(231, 76, 60, 0.2); border: 1px solid var(--danger-color); color: var(--danger-color); padding: 6px 12px; }
+        .btn-danger:hover { background: var(--danger-color); color: #fff; }
+
+        .card { background: var(--bg-card); border: 1px solid var(--border-glass); border-radius: 8px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
+        .card-header { font-size: 1rem; font-weight: 800; color: var(--neon-blue); margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; display: flex; justify-content: space-between; }
+
+        .form-control { background: rgba(0,0,0,0.6); border: 1px solid var(--border-glass); color: var(--text-main); padding: 12px 15px; border-radius: 4px; outline: none; font-size: 0.85rem; width: 100%; transition: all 0.3s; }
+        .form-control:focus { border-color: var(--gold-primary); box-shadow: 0 0 10px var(--gold-glow); }
+        
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 0.65rem; font-weight: 800; letter-spacing: 1px; }
+        .bg-success { background: rgba(46, 204, 113, 0.2); color: var(--success-color); border: 1px solid var(--success-color); }
+        .bg-warning { background: rgba(241, 196, 15, 0.2); color: var(--warning-color); border: 1px solid var(--warning-color); }
+
+        /* ========================================================
+           4. TABLAS
+           ======================================================== */
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { background: rgba(212, 175, 55, 0.1); color: var(--gold-light); font-size: 0.75rem; padding: 12px; text-align: left; border-bottom: 1px solid var(--gold-primary); white-space: nowrap; }
+        td { padding: 12px; font-size: 0.85rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        
+        /* Inputs dentro de la tabla de edición */
+        .table-input { background: transparent; border: none; border-bottom: 1px solid var(--text-muted); color: var(--text-main); padding: 5px; width: 100%; font-size: 0.8rem; outline: none; }
+        .table-input:focus { border-color: var(--neon-blue); }
+        .table-select { background: var(--bg-black); border: 1px solid var(--text-muted); color: var(--text-main); padding: 5px; width: 100%; font-size: 0.8rem; outline: none; }
+
+        /* ========================================================
+           5. RESUMEN Y MODALES
+           ======================================================== */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-top: 15px; }
+        .summary-item { background: rgba(0,0,0,0.5); border: 1px solid var(--border-glass); padding: 15px; border-radius: 6px; text-align: center; }
+        .summary-item span { display: block; font-size: 0.7rem; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; }
+        .summary-item strong { font-size: 1.5rem; color: var(--gold-light); font-weight: 800; }
+
+        .modal-overlay-custom { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; display: flex; justify-content: center; align-items: center; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal-overlay-custom.active { opacity: 1; visibility: visible; }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--gold-primary); width: 90%; max-width: 800px; border-radius: 8px; padding: 30px; max-height: 90vh; overflow-y: auto; }
+
+        /* Toast Notificaciones */
+        .toast { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: var(--bg-glass); border: 1px solid var(--neon-blue); color: #fff; padding: 15px 30px; border-radius: 50px; font-weight: 700; z-index: 3000; transition: bottom 0.4s; box-shadow: 0 0 20px var(--neon-blue-glow); }
+        .toast.show { bottom: 40px; }
+
+        /* ========================================================
+           6. IMPRESIÓN (A4 LANDSCAPE)
+           ======================================================== */
+        @media print {
+            @page { size: A4 landscape; margin: 10mm; }
+            body { background: #fff !important; color: #000 !important; display: block; }
+            .header, .search-section, .no-print, .side-nav, .nav-toggle-tab, .nav-overlay { display: none !important; }
+            #gold-network { display: none !important; } /* Ocultar partículas al IMPRIMIR */
+            .main-wrapper { margin: 0; }
+            .content { padding: 0; gap: 15px; }
+            
+            .card { box-shadow: none; border: none; padding: 0; }
+            .card-header { color: #000; border-bottom: 2px solid #000; }
+            
+            th { background: #f0f0f0 !important; color: #000 !important; border-bottom: 2px solid #000; }
+            td { border-bottom: 1px solid #ccc; color: #000; }
+            
+            /* Convertir inputs a texto plano visualmente */
+            .table-input, .table-select { border: none !important; color: #000 !important; background: transparent !important; appearance: none; }
+            .summary-item { border: 1px solid #000; background: transparent; }
+            .summary-item strong { color: #000; }
+            .summary-item span { color: #555; }
+            
+            #print-header { display: block !important; text-align: center; margin-bottom: 20px; }
+            #print-header h1 { font-size: 24px; font-weight: bold; margin: 0; }
+        }
+        #print-header { display: none; }
+    </style>
+
+    <!-- FIREBASE SDKS -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="../../firebase-config.js"></script>
+</head>
+<body>
+
+    <canvas id="gold-network"></canvas>
+
+    <!-- PESTAÑA LATERAL PARA ABRIR MENÚ -->
+    <div class="nav-toggle-tab no-print" id="nav-toggle" onclick="toggleNav()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </div>
+
+    <!-- OVERLAY PARA CERRAR MENÚ AL HACER CLIC FUERA -->
+    <div class="nav-overlay no-print" id="nav-overlay" onclick="toggleNav()"></div>
+
+    <!-- MENÚ LATERAL DESPLEGABLE -->
+    <nav class="side-nav no-print" id="side-nav">
+        <div class="side-nav-header">
+            <span class="side-nav-title">MENÚ MÓDULO</span>
+            <button class="btn-close-nav" onclick="toggleNav()">âœ•</button>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Piso / Avance</li>
+
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nuevo Proyecto</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Centros Trabajo</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Recursos</li>
@@ -211,7 +406,8 @@
             </div>
             <div style="display: flex; gap: 15px;">
                 <button class="btn btn-secondary" onclick="abrirModalImportacion()"><i class="fa-solid fa-upload"></i> Carga Masiva</button>
-                
+                <button class="btn btn-primary" onclick="verTodosArticulos()"><i class="fa-solid fa-list"></i> VER TODOS LOS ARTÍCULOS</button>
+                <button class="btn btn-danger" onclick="eliminarTodasRutas()"><i class="fa-solid fa-trash"></i> ELIMINAR TODAS LAS RUTAS</button>
             </div>
         </header>
 
@@ -544,6 +740,54 @@
             }
             
             tableDiv.style.display = 'block';
+        }
+
+        function verTodosArticulos() {
+            document.getElementById('input-busqueda').value = '';
+            document.getElementById('seccion-info-articulo').style.display = 'none';
+            document.getElementById('seccion-ruta').style.display = 'none';
+
+            let resultadosHtml = '';
+            const tbody = document.getElementById('tbody-resultados');
+            const tableDiv = document.getElementById('resultados-busqueda');
+            
+            for (let i = 0; i < appDb.articulos.length; i++) {
+                const a = appDb.articulos[i];
+                const rutaInfo = appDb.rutas.find(r => r.id_articulo === a.id);
+                const tieneRuta = !!rutaInfo;
+                
+                const badgeStr = tieneRuta ? `<span class="badge bg-success">ACTIVA</span>` : `<span class="badge bg-warning">SIN RUTA</span>`;
+                const btnAccion = tieneRuta 
+                    ? `<button class="btn btn-secondary" onclick="seleccionarArticulo('${a.id}')"><i class="fa-solid fa-eye"></i> VER RUTA</button>`
+                    : `<button class="btn btn-primary" onclick="seleccionarArticulo('${a.id}')"><i class="fa-solid fa-plus"></i> CREAR RUTA</button>`;
+
+                resultadosHtml += `
+                    <tr>
+                        <td><strong style="color:var(--gold-light)">${a.id}</strong></td>
+                        <td><strong>${a.nombre}</strong><br><span style="font-size:0.7rem; color:var(--text-muted)">${a.desc}</span></td>
+                        <td>${tieneRuta ? rutaInfo.id_ruta : '--'}</td>
+                        <td>${badgeStr}</td>
+                        <td>${btnAccion}</td>
+                    </tr>
+                `;
+            }
+
+            if (appDb.articulos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger-color);">⚠️ NO HAY ARTÍCULOS REGISTRADOS.</td></tr>`;
+            } else {
+                tbody.innerHTML = resultadosHtml;
+            }
+            
+            tableDiv.style.display = 'block';
+        }
+
+        async function eliminarTodasRutas() {
+            if (confirm("¿Estás seguro de que deseas ELIMINAR TODAS LAS RUTAS de la base de datos? Esta acción no se puede deshacer.")) {
+                appDb.rutas = [];
+                await guardarDB();
+                showToast("Todas las rutas han sido eliminadas.");
+                verTodosArticulos();
+            }
         }
 
         /* --------------------------------------------------------
