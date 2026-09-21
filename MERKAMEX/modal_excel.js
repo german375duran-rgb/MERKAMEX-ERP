@@ -1,61 +1,38 @@
-function iniciarGrid() {
+﻿function iniciarGrid() {
+    const tbody = document.getElementById('excel-grid-body');
+    if(!tbody) return;
     limpiarGrid();
+    
+    tbody.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const text = (e.originalEvent || e).clipboardData.getData('text/plain');
+        const rows = text.split(/\r?\n/);
+        
+        tbody.innerHTML = '';
+        
+        rows.forEach(row => {
+            if(!row.trim()) return;
+            const cols = row.split('\t');
+            const tr = document.createElement('tr');
+            for(let i=0; i<9; i++) {
+                const td = document.createElement('td');
+                td.contentEditable = "true";
+                td.innerText = cols[i] !== undefined ? cols[i] : '';
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        });
+    });
 }
 
 function limpiarGrid() {
     const tbody = document.getElementById('excel-grid-body');
-    if(!tbody) return;
     tbody.innerHTML = '';
-    // Agregamos filas vacías para diseño inicial
-    for(let r=0; r<10; r++) {
+    for(let r=0; r<15; r++) {
         const tr = document.createElement('tr');
         for(let i=0; i<9; i++) {
             const td = document.createElement('td');
-            tr.appendChild(td);
-        }
-        tbody.appendChild(tr);
-    }
-}
-
-function manejarCargaExcel(event) {
-    const file = event.target.files[0];
-    if(!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, {type: 'array'});
-        
-        // Asume que los datos están en la primera hoja
-        const firstSheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[firstSheetName];
-        
-        // Convierte a array de arrays
-        const json = XLSX.utils.sheet_to_json(worksheet, {header: 1});
-        
-        llenarGridDesdeJson(json);
-    };
-    reader.readAsArrayBuffer(file);
-}
-
-function llenarGridDesdeJson(rows) {
-    const tbody = document.getElementById('excel-grid-body');
-    tbody.innerHTML = '';
-    
-    // Saltarse la primera fila si es encabezado (asumiendo que tiene la palabra ARTICULO o similar)
-    let startIndex = 0;
-    if(rows[0] && rows[0][0] && typeof rows[0][0] === 'string' && rows[0][0].toUpperCase().includes('ART')) {
-        startIndex = 1;
-    }
-
-    for (let r = startIndex; r < rows.length; r++) {
-        const row = rows[r];
-        if(!row || row.length === 0) continue;
-        
-        const tr = document.createElement('tr');
-        for(let i=0; i<9; i++) {
-            const td = document.createElement('td');
-            td.innerText = row[i] !== undefined ? row[i] : '';
+            td.contentEditable = "true";
             tr.appendChild(td);
         }
         tbody.appendChild(tr);
@@ -105,24 +82,21 @@ async function procesarExcelGrid() {
     });
     
     if(procesadas === 0) {
-        alert("No se detectaron datos válidos. Asegúrese de que el archivo tenga las columnas correctas.");
+        alert("No se detectaron datos válidos. Asegúrese de pegar las columnas correctamente.");
         return;
     }
     
-    // asumiendo que appDb.rutas existe en el contexto global de la aplicación
     for(let art in nuevasRutas) {
-        if(typeof appDb !== 'undefined') {
-            appDb.rutas = appDb.rutas.filter(r => r.id_articulo !== art);
-            appDb.rutas.push(nuevasRutas[art]);
-            
-            if(!appDb.articulos.find(a => a.id === art)) {
-                appDb.articulos.push({ id: art, nombre: "Art. " + art, desc: "Importado automáticamente", unidad: "PZA", familia: "General" });
-            }
+        appDb.rutas = appDb.rutas.filter(r => r.id_articulo !== art);
+        appDb.rutas.push(nuevasRutas[art]);
+        
+        if(!appDb.articulos.find(a => a.id === art)) {
+            appDb.articulos.push({ id: art, nombre: "Art. " + art, desc: "Importado automáticamente", unidad: "PZA", familia: "General" });
         }
     }
     
-    if(typeof guardarDB === 'function') await guardarDB();
-    if(typeof renderRutas === 'function') renderRutas();
-    if(typeof cerrarModal === 'function') cerrarModal('modal-importacion');
-    if(typeof showToast === 'function') showToast("Se cargaron " + Object.keys(nuevasRutas).length + " rutas con éxito.");
+    await guardarDB();
+    renderRutas();
+    cerrarModal('modal-importacion');
+    showToast("Se cargaron " + Object.keys(nuevasRutas).length + " rutas con éxito.");
 }

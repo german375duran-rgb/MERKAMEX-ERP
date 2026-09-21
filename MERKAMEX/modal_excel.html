@@ -1,4 +1,4 @@
-<style>
+﻿<style>
 .excel-grid {
     width: 100%;
     border-collapse: collapse;
@@ -24,6 +24,10 @@
     outline: none;
     background: #fff;
 }
+.excel-grid td:focus {
+    background: #e6f2ff;
+    border: 2px solid #0066cc;
+}
 .excel-wrapper {
     max-height: 500px;
     overflow-y: auto;
@@ -31,18 +35,7 @@
     background: #fff;
     border-radius: 4px;
 }
-.file-upload-wrapper {
-    margin-bottom: 15px;
-    padding: 15px;
-    background: rgba(0, 150, 94, 0.1);
-    border: 1px dashed var(--emerald-green);
-    border-radius: 8px;
-    text-align: center;
-}
 </style>
-
-<!-- SheetJS para parseo de Excel -->
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
 <div class="modal-overlay-custom" id="modal-importacion">
     <div class="modal-content" style="max-width: 95vw; width: 1200px;">
@@ -51,12 +44,9 @@
             <button style="background:none; border:none; color:var(--text-main); font-size:1.2rem; cursor:pointer;" onclick="cerrarModal('modal-importacion')">X</button>
         </div>
         
-        <div class="file-upload-wrapper">
-            <p style="font-size: 0.85rem; color: var(--text-main); margin-bottom: 10px;">
-                <strong>Seleccione un archivo de Excel (.xlsx, .csv)</strong> o arrástrelo aquí para cargar las rutas.
-            </p>
-            <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" style="margin: 0 auto; display: block;" onchange="manejarCargaExcel(event)">
-        </div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 10px;">
+            Haga clic en la primera celda y <strong>presione Ctrl+V</strong> para pegar directamente desde su archivo de Excel.
+        </p>
 
         <div style="display: flex; gap: 10px; margin-bottom: 10px;">
             <button class="btn btn-primary" onclick="procesarExcelGrid()"><i class="fa-solid fa-save"></i> PROCESAR Y GUARDAR RUTAS</button>
