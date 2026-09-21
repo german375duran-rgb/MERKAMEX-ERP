@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -206,14 +206,13 @@
             <button class="btn-close-nav" onclick="toggleNav()">✕</button>
         </div>
         <ul class="nav-menu">
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Piso / Avance</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nueva OT</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Nuevo Proyecto</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Centros Trabajo</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Recursos</li>
-            <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Historial</li>
-            <li Códigos Artículo</li>
-            <li class="nav-item" onclick="window.location.href='CONTROL DE RUTAS DE PRODUCCION.HTML'">Rutas Operación</li>
+            <li class="nav-item" onclick="navigateTo('ESTRUCTURAS.HTML#piso')">Piso / Avance</li>
+            <li class="nav-item" onclick="navigateTo('ESTRUCTURAS.HTML#generico')">Nueva OT</li>
+            <li class="nav-item" onclick="navigateTo('ESTRUCTURAS.HTML#generico')">Nuevo Proyecto</li>
+            <li class="nav-item" onclick="navigateTo('ESTRUCTURAS.HTML#centros-trabajo')">Centros Trabajo y Recursos</li>
+            <li class="nav-item" onclick="navigateTo('ESTRUCTURAS.HTML#historial')">Historial</li>
+            <li class="nav-item" onclick="navigateTo('ESTRUCTURAS.HTML#generico')">Códigos Artículo</li>
+            <li class="nav-item" onclick="navigateTo('CONTROL DE RUTAS DE PRODUCCION.HTML')">Rutas Operación</li>
             <li class="nav-item active" onclick="toggleNav()">Hoja Viajera</li>
         </ul>
     </nav>
@@ -316,6 +315,17 @@
                 toggleTab.classList.remove('open');
                 overlay.classList.remove('open');
                 toggleTab.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+            }
+        }
+
+        /* Navegación suave entre archivos HTML: cierra el menú con animación antes de redirigir */
+        function navigateTo(url) {
+            const sideNav = document.getElementById('side-nav');
+            if (sideNav.classList.contains('open')) {
+                toggleNav();
+                setTimeout(function() { window.location.href = url; }, 450);
+            } else {
+                window.location.href = url;
             }
         }
 

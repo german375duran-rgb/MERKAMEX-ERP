@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -322,8 +322,8 @@
                 <li class="nav-item" onclick="showView('centros-trabajo', this)">Centros Trabajo y Recursos</li>
                 <li class="nav-item" onclick="showView('historial', this)">Historial</li>
                 <li class="nav-item" onclick="showView('generico', this)">Códigos Artículo</li>
-                <li class="nav-item" onclick="window.location.href='CONTROL DE RUTAS DE PRODUCCION.HTML'">Rutas Operación</li>
-                <li class="nav-item" onclick="window.location.href='HOJA VIAJERA.HTML'">Hoja Viajera</li>
+                <li class="nav-item" onclick="navigateTo('CONTROL DE RUTAS DE PRODUCCION.HTML')">Rutas Operación</li>
+                <li class="nav-item" onclick="navigateTo('HOJA VIAJERA.HTML')">Hoja Viajera</li>
             </ul>
         </nav>
 
@@ -853,6 +853,17 @@
             }
         }
 
+        /* Navegación suave entre archivos HTML: cierra el menú con animación antes de redirigir */
+        function navigateTo(url) {
+            const sideNav = document.getElementById('side-nav');
+            if (sideNav.classList.contains('open')) {
+                toggleNav();
+                setTimeout(function() { window.location.href = url; }, 450);
+            } else {
+                window.location.href = url;
+            }
+        }
+
         function showView(viewId, navItemElement = null) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
@@ -871,6 +882,33 @@
                 if(appDb && appDb.catalogos) renderCatalogos();
             }
         }
+
+        /* Deep-link: activar vista según el hash de la URL (ej. ESTRUCTURAS.HTML#centros-trabajo) */
+        (function processHashRoute() {
+            const hash = window.location.hash.replace('#', '');
+            if (hash) {
+                const validViews = ['piso', 'generico', 'centros-trabajo', 'historial', 'hoja-viajera'];
+                if (validViews.includes(hash)) {
+                    // Esperar un tick para que el DOM y la lógica de renderPiso() estén listos
+                    setTimeout(function() {
+                        showView(hash);
+                        // Marcar el nav-item correcto como activo
+                        const navItems = document.querySelectorAll('.nav-item');
+                        const viewMap = {
+                            'piso': 0,
+                            'generico': 1,
+                            'centros-trabajo': 3,
+                            'historial': 4,
+                            'hoja-viajera': 7
+                        };
+                        if (viewMap[hash] !== undefined && navItems[viewMap[hash]]) {
+                            navItems.forEach(function(el) { el.classList.remove('active'); });
+                            navItems[viewMap[hash]].classList.add('active');
+                        }
+                    }, 100);
+                }
+            }
+        })();
 
         /* ========================================================
            BASE DE DATOS MOCK RELACIONAL
