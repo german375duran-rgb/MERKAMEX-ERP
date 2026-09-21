@@ -871,7 +871,8 @@
             if(navItemElement) {
                 document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
                 navItemElement.classList.add('active');
-                if(window.innerWidth <= 1024) toggleNav();
+                const sideNav = document.getElementById('side-nav');
+                if (sideNav.classList.contains('open')) toggleNav();
             }
 
             if(viewId === 'piso') renderPiso();
