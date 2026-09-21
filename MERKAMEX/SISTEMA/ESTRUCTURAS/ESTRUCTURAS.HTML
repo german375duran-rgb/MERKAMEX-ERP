@@ -573,6 +573,8 @@
         .btn-outline-cyan:hover { background: rgba(0, 243, 255, 0.1); }
         .btn-solid-cyan { background: var(--neon-blue); border: 1px solid var(--neon-blue); color: #000; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: 0.3s; text-transform: uppercase; font-size: 0.8rem; }
         .btn-solid-cyan:hover { box-shadow: 0 0 15px var(--neon-blue-glow); }
+
+        @keyframes fadeIn { from { opacity: 0; filter: blur(10px); } to { opacity: 1; filter: blur(0); } }
     </style>
     <!-- FIREBASE SDKS -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -606,8 +608,8 @@
                 <li class="nav-item" onclick="showView('centros-trabajo', this)">Centros Trabajo y Recursos</li>
                 <li class="nav-item" onclick="showView('historial', this)">Historial</li>
                 <li class="nav-item" onclick="showView('generico', this)">Códigos Artículo</li>
-                <li class="nav-item" onclick="window.location.href='CONTROL DE RUTAS DE PRODUCCION.HTML'">Rutas Operación</li>
-                <li class="nav-item" onclick="window.location.href='HOJA VIAJERA.HTML'">Hoja Viajera</li>
+                <li class="nav-item" onclick="showView('rutas-operacion', this)">Rutas Operación</li>
+                <li class="nav-item" onclick="showView('hoja-viajera', this)">Hoja Viajera</li>
             </ul>
         </nav>
 
@@ -825,45 +827,13 @@
                     </div>
                 </section>
 
-                <section id="view-hoja-viajera" class="view-section">
-                    <div class="section-header no-print">
-                        <h2 class="section-title">GENERAR HOJA VIAJERA</h2>
-                        <button class="btn btn-primary" onclick="window.print()">🖨️ IMPRIMIR</button>
-                    </div>
-                    <div class="form-grid-gen no-print" style="max-width: 600px;">
-                        <div class="form-group full">
-                            <label class="form-label">SELECCIONAR OT</label>
-                            <select class="form-control" id="sel-hoja-ot" onchange="generarHojaViajera()"></select>
-                        </div>
-                    </div>
-                    <div id="hoja-viajera-doc" style="background:#fff; color:#000; padding:40px; border-radius:4px; display:none; max-width:900px; margin:0 auto;">
-                        <div style="display:flex; justify-content:space-between; border-bottom:3px solid #000; padding-bottom:15px; margin-bottom:20px;">
-                            <div><h2 style="margin:0;font-weight:800;">FIMMA</h2><p style="margin:0;font-size:0.7rem;color:#555;">INGENIERÍA EN MOVIMIENTO</p></div>
-                            <h1 style="margin:0;font-weight:800;">HOJA VIAJERA</h1>
-                        </div>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px; font-size:0.85rem; border:1px solid #000; padding:15px;">
-                            <div><strong>OT:</strong> <span id="hv-ot"></span></div>
-                            <div><strong>PROYECTO:</strong> <span id="hv-proy"></span></div>
-                            <div><strong>ARTÍCULO:</strong> <span id="hv-art"></span></div>
-                            <div><strong>CANTIDAD:</strong> <span id="hv-cant"></span></div>
-                            <div style="grid-column:1/-1;"><strong>DESCRIPCIÓN:</strong> <span id="hv-desc"></span></div>
-                        </div>
-                        <table style="width:100%; border-collapse:collapse; font-size:0.75rem; text-align:center;">
-                            <thead>
-                                <tr style="background:#eee;">
-                                    <th style="border:1px solid #000; padding:8px;">SEQ</th>
-                                    <th style="border:1px solid #000; padding:8px; text-align:left;">OPERACIÓN</th>
-                                    <th style="border:1px solid #000; padding:8px;">CENTRO</th>
-                                    <th style="border:1px solid #000; padding:8px;">RECURSO</th>
-                                    <th style="border:1px solid #000; padding:8px;">OPERADOR (FIRMA)</th>
-                                    <th style="border:1px solid #000; padding:8px;">CANT</th>
-                                </tr>
-                            </thead>
-                            <tbody id="hv-tbody"></tbody>
-                        </table>
-                    </div>
+                <section id="view-hoja-viajera" class="view-section" style="height: calc(100vh - 100px); padding: 0;">
+                    <iframe src="HOJA VIAJERA.HTML" style="width: 100%; height: 100%; border: none; background: transparent;"></iframe>
                 </section>
 
+                <section id="view-rutas-operacion" class="view-section" style="height: calc(100vh - 100px); padding: 0;">
+                    <iframe src="CONTROL DE RUTAS DE PRODUCCION.HTML?embed=1" style="width: 100%; height: 100%; border: none; background: transparent;"></iframe>
+                </section>
             </main>
         </div>
     </div>

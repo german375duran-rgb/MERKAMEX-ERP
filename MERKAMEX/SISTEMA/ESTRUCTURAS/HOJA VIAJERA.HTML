@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -55,7 +55,7 @@
     <!-- FONDO ANIMADO CANVAS -->
     <canvas id="gold-network"></canvas>
 
-    <!-- PESTAÑA LATERAL PARA ABRIR MENÚ -->
+    <!-- PESTAÃ‘A LATERAL PARA ABRIR MENÃš -->
     <div class="nav-toggle-tab no-print" id="nav-toggle" onclick="toggleNav()">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -64,13 +64,13 @@
         </svg>
     </div>
 
-    <!-- OVERLAY PARA CERRAR MENÚ AL HACER CLIC FUERA -->
+    <!-- OVERLAY PARA CERRAR MENÃš AL HACER CLIC FUERA -->
     <div class="nav-overlay no-print" id="nav-overlay" onclick="toggleNav()"></div>
 
-    <!-- MENÚ LATERAL DESPLEGABLE -->
+    <!-- MENÃš LATERAL DESPLEGABLE -->
     <nav class="side-nav no-print" id="side-nav">
         <div class="side-nav-header">
-            <span class="side-nav-title">MENÚ MÓDULO</span>
+            <span class="side-nav-title">MENÃš MÃ“DULO</span>
             <button class="btn-close-nav" onclick="toggleNav()">✕</button>
         </div>
         <ul class="nav-menu">
@@ -80,8 +80,8 @@
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Centros Trabajo</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Recursos</li>
             <li class="nav-item" onclick="window.location.href='ESTRUCTURAS.HTML'">Historial</li>
-            <li Códigos Artículo</li>
-            <li class="nav-item" onclick="window.location.href='CONTROL DE RUTAS DE PRODUCCION.HTML'">Rutas Operación</li>
+            <li CÃ³digos ArtÃ­culo</li>
+            <li class="nav-item" onclick="window.location.href='CONTROL DE RUTAS DE PRODUCCION.HTML'">Rutas OperaciÃ³n</li>
             <li class="nav-item active" onclick="toggleNav()">Hoja Viajera</li>
         </ul>
     </nav>
@@ -89,7 +89,7 @@
     <header class="app-header no-print">
         <div class="header-title">
             <h1>MERKAMEX / HOJA VIAJERA</h1>
-            <p>MÓDULO DE CONTROL DE PRODUCCIÓN</p>
+            <p>MÃ“DULO DE CONTROL DE PRODUCCIÃ“N</p>
         </div>
         <div>
             <a href="ESTRUCTURAS.HTML" class="btn-volver"><i class="fa-solid fa-arrow-left"></i> VOLVER AL SISTEMA</a>
@@ -98,10 +98,10 @@
 
         <div class="controls-bar no-print">
         <div class="form-group" style="width: 100%; max-width: 600px;">
-            <label class="form-label">BUSCAR POR OT O CÓDIGO DE ARTÍCULO</label>
+            <label class="form-label">BUSCAR POR OT O CÃ“DIGO DE ARTÃCULO</label>
                         <div style="display: flex; gap: 10px; width: 100%;">
                 <div style="position: relative; flex: 1;">
-                    <input type="text" class="form-control" id="input-busqueda-hoja" placeholder="Ingrese OT (ej. OT61943) o Artículo (ej. E2501020)..." autocomplete="off" onkeyup="sugerirHojaViajera(event)" onkeydown="if(event.key === 'Enter') procesarBusquedaHoja()">
+                    <input type="text" class="form-control" id="input-busqueda-hoja" placeholder="Ingrese OT (ej. OT61943) o ArtÃ­culo (ej. E2501020)..." autocomplete="off" onkeyup="sugerirHojaViajera(event)" onkeydown="if(event.key === 'Enter') procesarBusquedaHoja()">
                     <div id="dropdown-sugerencias-hoja" style="display:none; position:absolute; top:100%; left:0; right:0; background:var(--bg-glass); border:1px solid var(--border-glass); max-height:250px; overflow-y:auto; z-index:1000; box-shadow:0 5px 15px rgba(0,0,0,0.5);"></div>
                 </div>
                 <button class="btn btn-primary" onclick="procesarBusquedaHoja()"><i class="fa-solid fa-search"></i> BUSCAR</button>
@@ -112,7 +112,7 @@
         </div>
         
         <div class="btn-group">
-            <button class="btn btn-secondary" onclick="agregarFilaVacia()"><i class="fa-solid fa-plus"></i> Fila Vacía</button>
+            <button class="btn btn-secondary" onclick="agregarFilaVacia()"><i class="fa-solid fa-plus"></i> Fila VacÃ­a</button>
             <button class="btn btn-secondary" onclick="LIMPIARPantalla()"><i class="fa-solid fa-eraser"></i> LIMPIAR</button>
             <button class="btn btn-primary" onclick="window.print()" style="background: var(--neon-blue); color: #000;"><i class="fa-solid fa-print"></i> IMPRIMIR</button>
         </div>
@@ -130,7 +130,7 @@
             <table class="data-grid">
                 <tr>
                     <td style="width: 10%;">CODIGO</td>
-                    <td colspan="2" style="text-align: center;" class="bg-beige" id="doc-proy">PROYECTO DESCRIPCIÓN</td>
+                    <td colspan="2" style="text-align: center;" class="bg-beige" id="doc-proy">PROYECTO DESCRIPCIÃ“N</td>
                     <td style="width: 15%; text-align: center;">CANTIDAD</td>
                     <td style="width: 15%; text-align: center;">OT</td>
                 </tr>
@@ -167,7 +167,7 @@
 
     <script>
         /* ========================================================
-           Lógica del Menú
+           LÃ³gica del MenÃº
            ======================================================== */
         function toggleNav() {
             const sideNav = document.getElementById('side-nav');
@@ -188,7 +188,7 @@
         }
 
         /* ========================================================
-           BASE DE DATOS SIMULADA (Extracción de tu sistema)
+           BASE DE DATOS SIMULADA (ExtracciÃ³n de tu sistema)
            ======================================================== */
         const DB = {
             proyectos: [
@@ -214,7 +214,7 @@
             ]
         };
 
-        // Al cargar la página
+        // Al cargar la pÃ¡gina
                 window.onload = () => {
             const hoy = new Date();
             const dia = String(hoy.getDate()).padStart(2, '0');
@@ -225,7 +225,7 @@
             cargarSelectores();
             LIMPIARTabla(true); 
 
-            // Iniciar partículas
+            // Iniciar partÃ­culas
             initCanvas(); 
             drawCanvas();
 
@@ -245,8 +245,8 @@
 
                                 const diccCR = {
       "CR0101": "Centro Corte Sierra Cinta", "CR0102": "Centro Corte Metalera Bufalo", "CR0103": "Centro Corte Plasma Est.", "CR0104": "Centro Cortadora de Disco Est.", "CR0105": "Centro Corte Soplete Est.", "CR0106": "Centro Rolado RN100", "CR0107": "Centro Taladro Fundoya-Barrenado", "CR0108": "Centro Troqueladora Comamet", "CR0109": "Centro Troqueladora Bufalo", "CR0110": "Centro Troqueladora de Monten", "CR0111": "Centro Troqueladora MEISTER 90", "CR0112": "Centro Troqueladora MEISTER 120", "CR0113": "Centro Roscado", "CR0114": "Centro Doblez Icaro", "CR0115": "Centro Soldadura Polin", "CR0116": "Centro Soldadura 1Per", "CR0117": "Centro Soldadura (2 Personas)", "CR0118": "Centro de Montacargas", "CR0119": "Centro Armado (2 Personas)",
-      "CR0201": "Centro Estirado Automático", "CR0202": "Corte de Alambre", "CR0203": "Centro Estirado Manual", "CR0204": "Centro Birlo", "CR0205": "Centro Wafios 1", "CR0206": "Centro Wafios 2", "CR0207": "Centro Schlatter 1", "CR0208": "Centro Schlatter 2", "CR0209": "Centro Schlatter 3", "CR0210": "Centro Schlatter 4", "CR0211": "Centro Posiweld 1", "CR0212": "Centro Posiweld 2", "CR0213": "Centro Punteado 1", "CR0214": "Centro Punteado 2", "CR0215": "Centro Punteado 3", "CR0216": "Centro Punteado 4", "CR0217": "Centro Punteado 5", "CR0218": "Centro Punteado 6", "CR0219": "Centro Punteado 7", "CR0220": "Centro Punteado 8", "CR0221": "Centro Terminación Recorte 1", "CR0222": "Centro Terminación Recorte 2", "CR0223": "Centro Terminación Recorte 3", "CR0224": "Centro Terminación Recorte 4", "CR0225": "Centro Terminación Recorte 5", "CR0226": "Centro Terminación Recorte 6", "CR0227": "Centro Terminación Recorte 7", "CR0228": "Centro Terminación Recorte 8", "CR0229": "Centro Terminación Recorte 9", "CR0230": "Centro Terminación Recorte 10", "CR0231": "Centro Terminación Doblez 1", "CR0232": "Centro Terminación Ventana", "CR0233": "Centro Empaque Alambre", "CR0236": "Centro Galvanizado",
-      "CR0301": "Centro Inyección Engel", "CR0302": "Centro Inyección Haitian", "CR0303": "Centro Inyección Negri Bossi", "CR0304": "Centro Extrusión SJSZ 1", "CR0305": "Centro Extrusión SJSZ 2", "CR0306": "Centro Extrusión Baussano", "CR0307": "Centro Curvado y Acampanado", "CR0308": "Centro Pegado Silleta", "CR0309": "Centro Mezclado", "CR0310": "Centro de Empaque Plásticos", "CR0311": "vacio",
+      "CR0201": "Centro Estirado AutomÃ¡tico", "CR0202": "Corte de Alambre", "CR0203": "Centro Estirado Manual", "CR0204": "Centro Birlo", "CR0205": "Centro Wafios 1", "CR0206": "Centro Wafios 2", "CR0207": "Centro Schlatter 1", "CR0208": "Centro Schlatter 2", "CR0209": "Centro Schlatter 3", "CR0210": "Centro Schlatter 4", "CR0211": "Centro Posiweld 1", "CR0212": "Centro Posiweld 2", "CR0213": "Centro Punteado 1", "CR0214": "Centro Punteado 2", "CR0215": "Centro Punteado 3", "CR0216": "Centro Punteado 4", "CR0217": "Centro Punteado 5", "CR0218": "Centro Punteado 6", "CR0219": "Centro Punteado 7", "CR0220": "Centro Punteado 8", "CR0221": "Centro TerminaciÃ³n Recorte 1", "CR0222": "Centro TerminaciÃ³n Recorte 2", "CR0223": "Centro TerminaciÃ³n Recorte 3", "CR0224": "Centro TerminaciÃ³n Recorte 4", "CR0225": "Centro TerminaciÃ³n Recorte 5", "CR0226": "Centro TerminaciÃ³n Recorte 6", "CR0227": "Centro TerminaciÃ³n Recorte 7", "CR0228": "Centro TerminaciÃ³n Recorte 8", "CR0229": "Centro TerminaciÃ³n Recorte 9", "CR0230": "Centro TerminaciÃ³n Recorte 10", "CR0231": "Centro TerminaciÃ³n Doblez 1", "CR0232": "Centro TerminaciÃ³n Ventana", "CR0233": "Centro Empaque Alambre", "CR0236": "Centro Galvanizado",
+      "CR0301": "Centro InyecciÃ³n Engel", "CR0302": "Centro InyecciÃ³n Haitian", "CR0303": "Centro InyecciÃ³n Negri Bossi", "CR0304": "Centro ExtrusiÃ³n SJSZ 1", "CR0305": "Centro ExtrusiÃ³n SJSZ 2", "CR0306": "Centro ExtrusiÃ³n Baussano", "CR0307": "Centro Curvado y Acampanado", "CR0308": "Centro Pegado Silleta", "CR0309": "Centro Mezclado", "CR0310": "Centro de Empaque PlÃ¡sticos", "CR0311": "vacio",
       "CR0401": "Centro Torneado", "CR0402": "Maquinado externo", "CR0403": "Centro Ajuste Tornos", "CR0404": "Centro de Trabajo Desbaste Tornos", "CR0405": "Centro Fresado", "CR0406": "Centro Cepillado", "CR0407": "Centro Barrenado Tornos", "CR0408": "Centro Machueleado", "CR0409": "Centro Prensado Tornos", "CR0410": "Centro Perfilado", "CR0411": "Centro Rectificado", "CR0412": "Centro Erosionado", "CR0413": "Centro Corte Sierra Cinta #1", "CR0414": "Centro Corte Sierra Cinta #2", "CR0415": "Centro Torno CNC", "CR0416": "Centro CNC Vertical", "CR0417": "Centro Revolver", "CR0418": "Centro Ensamblado Tornos", "CR0419": "Avellanado Tornos", "CR0420": "Empaque Tornos",
       "CR0501": "Centro Cortado Mec.", "CR0502": "Centro Corte Disco Mec.", "CR0503": "Centro Rolado Comedero (4Per)", "CR0504": "Centro Rolado Bipie-Riel", "CR0505": "Centro Rolado Columna", "CR0506": "Centro Punzonado Unipunch", "CR0507": "Centro Troquelado Mec.", "CR0508": "Centro Doblado Mec.", "CR0509": "Centro Prensa Mec.", "CR0510": "Centro Machucado Mec.", "CR0511": "Centro de Engargolado", "CR0512": "Centro Prensado Accurpress", "CR0513": "Centro de Klinchado", "CR0514": "Centro Soldado Mec.", "CR0515": "Punteado Mec.", "CR0516": "Centro Armado Mec.", "CR0517": "Centro Ensamblado Mec.", "CR0518": "Centro Barrenado Mec.", "CR0519": "Empaque y Emplayado", "CR0520": "Centro Pulido Mec.",
       "CR0601": "Empaque Paileria", "CR0602": "Paileria-Inst. Foranea", "CR0603": "Paileria-Inst. Torres y Tambos", "CR0604": "Centro Corte Disco Paileria", "CR0605": "Centro Corte Cizalla Paileria", "CR0606": "Centro de Rolado Paileria", "CR0607": "Centro de Doblado Paileria", "CR0608": "Centro de Armado Paileria", "CR0609": "Centro de Soldado Paileria", "CR0610": "Vuelta de Camioneta", "CR0611": "Centro de Barrenado Paileria", "CR0612": "vacio",
@@ -299,10 +299,10 @@
                 appDbCache.articulos.forEach(a => {
                     if(resultados.length >= 10) return;
                     if(a.id.toLowerCase().includes(val) || a.nombre.toLowerCase().includes(val)) {
-                        const yaExiste = resultados.find(r => r.tipo === 'ARTÍCULO' && r.codigo === a.id);
+                        const yaExiste = resultados.find(r => r.tipo === 'ARTÃCULO' && r.codigo === a.id);
                         if(!yaExiste) {
                             resultados.push({
-                                tipo: 'ARTÍCULO',
+                                tipo: 'ARTÃCULO',
                                 codigo: a.id,
                                 desc: a.nombre,
                                 valorBusqueda: a.id
@@ -384,7 +384,7 @@
                     select.appendChild(opt);
                 });
                 select.style.display = 'block';
-                alert("Este artículo está en varios proyectos. Por favor, seleccione la OT en el menú desplegable que acaba de aparecer.");
+                alert("Este artÃ­culo estÃ¡ en varios proyectos. Por favor, seleccione la OT en el menÃº desplegable que acaba de aparecer.");
             } 
                         else {
                 try {
@@ -401,7 +401,7 @@
                         if(art && ruta) {
                             cargarRutaMaster(art, ruta);
                         } else {
-                            alert("No se encontró el artículo en las OTs actuales ni en el Catálogo Master.");
+                            alert("No se encontrÃ³ el artÃ­culo en las OTs actuales ni en el CatÃ¡logo Master.");
                         }
                     }
                 } catch(e) {
@@ -447,7 +447,7 @@
         }
 
         /* ========================================================
-           LÓGICA DE TABLA Y ESTRUCTURA DE FILAS
+           LÃ“GICA DE TABLA Y ESTRUCTURA DE FILAS
            ======================================================== */
         function cargarOT() {
             const otId = document.getElementById('select-ot').value;
@@ -503,7 +503,7 @@
             for(let i=0; i<5; i++) agregarFilaVacia(); 
 
             if(incluirEncabezado) {
-                document.getElementById('doc-proy').textContent = 'PROYECTO DESCRIPCIÓN';
+                document.getElementById('doc-proy').textContent = 'PROYECTO DESCRIPCIÃ“N';
                 document.getElementById('doc-cod').textContent = '---';
                 document.getElementById('doc-desc').textContent = '---';
                 document.getElementById('doc-cant').textContent = '0';
@@ -544,23 +544,28 @@
                     let dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y, dist=Math.sqrt(dx*dx+dy*dy);
                     if(dist<140){
                         ctx.beginPath(); ctx.strokeStyle=`rgba(212, 175, 55, ${(1-(dist/140))*0.15})`; ctx.moveTo(particles[i].x, particles[i].y); ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+
+
+
+
+
+
                     }
                 }
             }
         }
         window.addEventListener('resize', initCanvas);
 
+        if (window.location.search.includes('embed=1') || window !== window.top) {
+            document.querySelectorAll('.side-nav, .nav-toggle-tab, .header, #gold-network').forEach(el => el.style.display = 'none');
+            document.body.style.background = 'transparent';
+            const content = document.querySelector('.content') || document.querySelector('.main-wrapper');
+            if(content) { 
+                content.style.padding = '0'; 
+                content.style.marginLeft = '0';
+                content.style.paddingTop = '20px'; 
+            }
+        }
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
